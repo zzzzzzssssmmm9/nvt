@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apache_subversion_spoofing_vuln.nasl 5933 2017-04-11 10:42:30Z cfi $
+# $Id: gb_apache_subversion_spoofing_vuln.nasl 11424 2018-09-17 08:03:52Z mmartin $
 #
 # Apache Subversion Spoofing Vulnerability May15
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:apache:subversion";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805608");
-  script_version("$Revision: 5933 $");
+  script_version("$Revision: 11424 $");
   script_cve_id("CVE-2015-0251");
   script_bugtraq_id(74259);
   script_tag(name:"cvss_base", value:"4.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:S/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-04-11 12:42:30 +0200 (Tue, 11 Apr 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 10:03:52 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-05-06 12:54:14 +0530 (Wed, 06 May 2015)");
   script_tag(name:"qod_type", value:"remote_banner_unreliable");
   script_name("Apache Subversion Spoofing Vulnerability May15");
@@ -42,8 +42,7 @@ if(description)
   script_tag(name:"summary", value:"This host is installed with Apache Subversion
   and is prone to denial of service  vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Flaw is due to vulnerability in the HTTP
   protocol used for communicating with a Subversion mod_dav_svn server that is
@@ -51,9 +50,7 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow an
   authenticated remote attacker to forge a svn:author value via a crafted v1
-  HTTP protocol request .
-
-  Impact Level: Application");
+  HTTP protocol request .");
 
   script_tag(name:"affected", value:"Subversion 1.5.0 through 1.7.19 and 1.8.0
   through 1.8.11.");
@@ -63,8 +60,8 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://lists.opensuse.org/opensuse-updates/2015-04/msg00008.html");
-  script_xref(name : "URL" , value : "http://subversion.apache.org/security/CVE-2015-0251-advisory.txt");
+  script_xref(name:"URL", value:"http://lists.opensuse.org/opensuse-updates/2015-04/msg00008.html");
+  script_xref(name:"URL", value:"http://subversion.apache.org/security/CVE-2015-0251-advisory.txt");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
@@ -79,21 +76,14 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-http_port = 0;
-subver = "";
-
-## Get HTTP Port
 if(!http_port = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-# Get Version
 if(!subver = get_app_version(cpe:CPE, port:http_port)){
   exit(0);
 }
 
-#Checking for Vulnerable version
 if(version_in_range(version:subver, test_version:"1.5.0", test_version2:"1.7.19"))
 {
   fix = "1.7.20";

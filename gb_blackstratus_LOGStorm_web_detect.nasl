@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_blackstratus_LOGStorm_web_detect.nasl 4680 2016-12-05 17:59:20Z mime $
+# $Id: gb_blackstratus_LOGStorm_web_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # BlackStratus LOGStorm Detection
 #
@@ -27,25 +27,25 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.140091");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 4680 $");
- script_tag(name:"last_modification", value:"$Date: 2016-12-05 18:59:20 +0100 (Mon, 05 Dec 2016) $");
- script_tag(name:"creation_date", value:"2016-12-05 15:30:53 +0100 (Mon, 05 Dec 2016)");
- script_name("BlackStratus LOGStorm Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.140091");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-12-05 15:30:53 +0100 (Mon, 05 Dec 2016)");
+  script_name("BlackStratus LOGStorm Detection");
 
- script_tag(name: "summary" , value: "The script sends a connection request to the server and attempts to extract the version number from the reply.");
+  script_tag(name:"summary", value:"The script sends a connection request to the server and attempts to extract the version number from the reply.");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  exit(0);
 }
 
 

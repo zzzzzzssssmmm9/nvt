@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cloudbees_jenkins_mult_vuln01.nasl 9301 2018-04-04 12:02:46Z cfischer $
+# $Id: gb_cloudbees_jenkins_mult_vuln01.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # CloudBees Jenkins Multiple Vulnerabilities -01 December15
 #
@@ -29,83 +29,82 @@ CPE = "cpe:/a:cloudbees:jenkins";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.807012");
-  script_version("$Revision: 9301 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2014-2068", "CVE-2014-2066", "CVE-2014-2065", "CVE-2014-2064",
                 "CVE-2014-2063", "CVE-2014-2062", "CVE-2014-2061", "CVE-2014-2060",
                 "CVE-2014-2058");
   script_bugtraq_id(65694, 65720);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-04 14:02:46 +0200 (Wed, 04 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-12-21 15:34:06 +0530 (Mon, 21 Dec 2015)");
   script_name("CloudBees Jenkins Multiple Vulnerabilities -01 December15");
 
   script_tag(name:"summary", value:"This host is installed with CloudBees
   Jenkins and is prone to multiple vulnerabilities.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help of
-  detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Multiple flaws are due to,
+
   - Improper access restiction by 'BuildTrigger'.
+
   - Improper session handling by 'Winstone servlet container'.
+
   - Error in input control in PasswordParameterDefinition.
+
   - Error in handling of API tokens.
-  - Error in 'loadUserByUsername' function in the 
+
+  - Error in 'loadUserByUsername' function in the
   hudson/security/HudsonPrivateSecurityRealm.java script.
+
   - Insufficient validation of user supplied input via iconSize cookie.
+
   - Session fixation vulnerability via vectors involving the 'override' of
     Jenkins cookies.
+
   - 'doIndex' function in hudson/util/RemotingDiagnostics.java script does not
     restrict accessing sensitive information via vectors related to heapDump.
+
   - An unspecified vulnerability.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to obtain sensitive information, hijack web sessions, conduct
   clickjacking attacks, inject arbitrary web script or HTML, bypass the
   protection mechanism, gain elevated privileges, bypass intended access
-  restrictions and execute arbitrary code.
-
-  Impact Level: System/Application");
+  restrictions and execute arbitrary code.");
 
   script_tag(name:"affected", value:"CloudBees Jenkins LTS before 1.532.2 on
   Windows");
 
   script_tag(name:"solution", value:"Upgrade to CloudBees Jenkins LTS 1.532.2
-  or later. For more updates refer to https://www.cloudbees.com");
+  or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
-  script_xref(name : "URL" , value : "http://www.openwall.com/lists/oss-security/2014/02/21/2");
-  script_xref(name : "URL" , value : "https://wiki.jenkins-ci.org/display/SECURITY/Jenkins+Security+Advisory+2014-02-14");
+  script_xref(name:"URL", value:"http://www.openwall.com/lists/oss-security/2014/02/21/2");
+  script_xref(name:"URL", value:"https://wiki.jenkins-ci.org/display/SECURITY/Jenkins+Security+Advisory+2014-02-14");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Web application abuses");
   script_dependencies("sw_jenkins_detect.nasl", "os_detection.nasl");
-  script_mandatory_keys("jenkins/installed","Host/runs_windows");
+  script_mandatory_keys("jenkins/installed", "Host/runs_windows");
   script_require_ports("Services/www", 8080);
+  script_xref(name:"URL", value:"https://www.cloudbees.com");
   exit(0);
 }
 
-
-## Code starts from here
 
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-jenkinPort = "";
-jenkinVer= "";
-
-## Get HTTP Port
 if(!jenkinPort = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-# Get Version
 if(!jenkinVer = get_app_version(cpe:CPE, port:jenkinPort)){
   exit(0);
 }

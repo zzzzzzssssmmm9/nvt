@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_netiq_sentinel_detect.nasl 9065 2018-03-09 09:57:38Z ckuersteiner $
+# $Id: gb_netiq_sentinel_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # NetIQ Sentinel Detection
 #
@@ -27,28 +27,28 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105618");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 9065 $");
- script_tag(name:"last_modification", value:"$Date: 2018-03-09 10:57:38 +0100 (Fri, 09 Mar 2018) $");
- script_tag(name:"creation_date", value:"2016-04-21 16:30:22 +0200 (Thu, 21 Apr 2016)");
- script_name("NetIQ Sentinel Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105618");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-04-21 16:30:22 +0200 (Thu, 21 Apr 2016)");
+  script_name("NetIQ Sentinel Detection");
 
- script_tag(name: "summary" , value: "Detection of NetIQ Sentinel
+  script_tag(name:"summary", value:"Detection of NetIQ Sentinel
 
 The script sends a connection request to the server and attempts to extract the version number from the reply.");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 8443);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 8443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- exit(0);
+  exit(0);
 }
 
 
@@ -86,7 +86,7 @@ if( "version" >< buf )
 if( '"rev":"' >< buf )
 {
   _r = eregmatch( pattern:'"rev":"([0-9]+[^"]+)"', string:buf );
-  if( ! isnull( _r[1] ) ) 
+  if( ! isnull( _r[1] ) )
   {
     set_kb_item( name:"netiq_sentinel/rev", value:_r[1] );
     revision = _r[1];

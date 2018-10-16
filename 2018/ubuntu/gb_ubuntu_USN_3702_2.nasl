@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_3702_2.nasl 10556 2018-07-20 11:13:07Z cfischer $
+# $Id: gb_ubuntu_USN_3702_2.nasl 11180 2018-08-31 14:10:20Z mmartin $
 #
 # Ubuntu Update for php7.2 USN-3702-2
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.843583");
-  script_version("$Revision: 10556 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-20 13:13:07 +0200 (Fri, 20 Jul 2018) $");
+  script_version("$Revision: 11180 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-31 16:10:20 +0200 (Fri, 31 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-07-06 05:50:33 +0200 (Fri, 06 Jul 2018)");
   script_cve_id("CVE-2018-12882");
-  script_tag(name:"cvss_base", value:"5.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
   script_tag(name:"qod_type", value:"package");
   script_name("Ubuntu Update for php7.2 USN-3702-2");
   script_tag(name:"summary", value:"Check the version of php7.2");
@@ -52,7 +52,7 @@ a denial of service, or possibly execute arbitrary code.");
   script_tag(name:"solution", value:"Please install the updated packages.");
 
   script_xref(name:"USN", value:"3702-2");
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-3702-2/");
+  script_xref(name:"URL", value:"http://www.ubuntu.com/usn/usn-3702-2/");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -65,7 +65,7 @@ a denial of service, or possibly execute arbitrary code.");
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 res = "";
 if(release == NULL){

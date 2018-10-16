@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms15-006.nasl 6211 2017-05-25 09:04:14Z teissa $
+# $Id: gb_ms15-006.nasl 11876 2018-10-12 12:20:01Z cfischer $
 #
 # Microsoft Windows Error Reporting Security Feature Bypass Vulnerability (3004365)
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805239");
-  script_version("$Revision: 6211 $");
+  script_version("$Revision: 11876 $");
   script_cve_id("CVE-2015-0001");
   script_bugtraq_id(71927);
   script_tag(name:"cvss_base", value:"1.9");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:M/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-25 11:04:14 +0200 (Thu, 25 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 14:20:01 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-01-14 08:08:22 +0530 (Wed, 14 Jan 2015)");
   script_name("Microsoft Windows Error Reporting Security Feature Bypass Vulnerability (3004365)");
 
@@ -41,35 +41,30 @@ if(description)
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft Bulletin MS15-006.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and
-  check appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw is due to an error within Windows
   Error Reporting.");
 
   script_tag(name:"impact", value:"Successful exploitation could allow local
-  attackers to bypass certain security restrictions.
+  attackers to bypass certain security restrictions.");
 
-  Impact Level: System");
-
-  script_tag(name:"affected", value:"
-  Microsoft Windows 8 x32/x64
+  script_tag(name:"affected", value:"Microsoft Windows 8 x32/x64
   Microsoft Windows 8.1 x32/x64 Edition
   Microsoft Windows Server 2012/R2");
 
   script_tag(name:"solution", value:"Run Windows Update and update the
-  listed hotfixes or download and update mentioned hotfixes in the advisory
-  from the below link,
-  https://technet.microsoft.com/library/security/MS15-006");
+  listed hotfixes or download and install the hotfixes from the referenced advisory.");
   script_tag(name:"qod_type", value:"registry");
 
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/62134");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/kb/3004365");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/library/security/MS15-006");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/62134");
+  script_xref(name:"URL", value:"https://support.microsoft.com/kb/3004365");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/library/security/MS15-006");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
-  script_dependencies("secpod_reg_enum.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
+  script_require_ports(139, 445);
   script_mandatory_keys("SMB/WindowsVersion");
   exit(0);
 }
@@ -79,34 +74,26 @@ include("secpod_reg.inc");
 include("version_func.inc");
 include("secpod_smb_func.inc");
 
-## Variables Initialization
-sysPath = "";
-dllVer="";
-
-## Check for OS and Service Pack
 if(hotfix_check_sp(win8:1, win8x64:1, win2012:1, win2012R2:1,
                    win8_1:1, win8_1x64:1) <= 0){
   exit(0);
 }
 
-## Get System Path
 sysPath = smb_get_systemroot();
 if(!sysPath ){
   exit(0);
 }
 
-dllVer = fetch_file_version(sysPath, file_name:"system32\wer.dll");
+dllVer = fetch_file_version(sysPath:sysPath, file_name:"system32\wer.dll");
 if(!dllVer){
   exit(0);
 }
 
-## Windows 8 and Windows Server 2012
 if(hotfix_check_sp(win8:1, win8x64:1, win2012:1) > 0)
 {
-  ## Check for Wer.dll version
   if(version_is_less(version:dllVer, test_version:"6.2.9200.17199") ||
      version_in_range(version:dllVer, test_version:"6.2.9200.20000", test_version2:"6.2.9200.21315")){
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
   }
   exit(0);
 }
@@ -114,9 +101,8 @@ if(hotfix_check_sp(win8:1, win8x64:1, win2012:1) > 0)
 ## Win 8.1 and win2012R2
 if(hotfix_check_sp(win8_1:1, win8_1x64:1, win2012R2:1) > 0)
 {
-  ## Check for Wer.dll version
   if(version_is_less(version:dllVer, test_version:"6.3.9600.17550")){
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
   }
   exit(0);
 }

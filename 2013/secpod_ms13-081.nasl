@@ -27,118 +27,114 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.903500");
-  script_version("$Revision: 9353 $");
+  script_version("$Revision: 11875 $");
   script_cve_id("CVE-2013-3128", "CVE-2013-3200", "CVE-2013-3879", "CVE-2013-3880",
                 "CVE-2013-3881", "CVE-2013-3888", "CVE-2013-3894");
   script_bugtraq_id(62819, 62823, 62828, 62833, 62830, 62831, 62821);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:14:20 +0200 (Fri, 06 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 14:06:36 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2013-10-09 09:16:37 +0530 (Wed, 09 Oct 2013)");
   script_name("MS Windows Kernel-Mode Drivers Remote Code Execution Vulnerabilities (2870008)");
 
   script_tag(name:"summary", value:"This host is missing an critical security
   update according to Microsoft Bulletin MS13-081");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Multiple flaw exists due to,
+
   - An error when parsing OpenType fonts (OTF) can be exploited to corrupt
     memory.
+
   - An error when handling the USB descriptor of inserted USB devices can be
     exploited to corrupt memory.
+
   - A use-after-free error within the kernel-mode driver (win32k.sys) can be
     exploited to gain escalated privileges.
+
   - An error when handling objects in memory related to App Containers can
     be exploited to disclose information from a different App Container.
+
   - An error related to NULL page handling within the kernel-mode driver
     (win32k.sys) can be exploited to gain escalated privileges.
+
   - A double fetch error within the DirectX graphics kernel subsystem
     (dxgkrnl.sys) can be exploited to gain escalated privileges.
+
   - An error when parsing the CMAP table while rendering TrueType
     fonts (TTF) can be exploited to corrupt memory.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to execute arbitrary code with kernel-mode privileges and take
-  complete control of the affected system.
+  complete control of the affected system.");
 
-  Impact Level: System");
+  script_tag(name:"affected", value:"Microsoft Windows 8
 
-  script_tag(name:"affected", value:"
-  Microsoft Windows 8
   Microsoft Windows Server 2012
+
   Microsoft Windows XP x32 Edition Service Pack 3 and prior
+
   Microsoft Windows XP x64 Edition Service Pack 2 and prior
+
   Microsoft Windows 7 x32/x64 Edition Service Pack 1 and prior
+
   Microsoft Windows 2003 x32/x64 Edition Service Pack 2 and prior
+
   Microsoft Windows Vista x32/x64 Edition Service Pack 2 and prior
+
   Microsoft Windows Server 2008 R2 x64 Edition Service Pack 1 and prior
+
   Microsoft Windows Server 2008 x32/x64 Edition Service Pack 2 and prior");
 
   script_tag(name:"solution", value:"Run Windows Update and update the
-  listed hotfixes or download and update mentioned hotfixes in the advisory
-  from the below link,
-  https://technet.microsoft.com/en-us/security/bulletin/ms13-081");
+  listed hotfixes or download and install the hotfixes from the referenced advisory.");
 
-   script_tag(name:"qod_type", value:"registry");
-   script_tag(name:"solution_type", value:"VendorFix");
-   script_xref(name : "URL" , value : "http://secunia.com/advisories/55052/");
-   script_xref(name : "URL" , value : "http://support.microsoft.com/kb/2862330");
-   script_xref(name : "URL" , value : "https://technet.microsoft.com/en-us/security/bulletin/ms13-081");
-   script_category(ACT_GATHER_INFO);
-   script_copyright("Copyright (C) 2013 SecPod");
-   script_family("Windows : Microsoft Bulletins");
-   script_dependencies("smb_reg_service_pack.nasl");
-   script_mandatory_keys("SMB/WindowsVersion");
-   exit(0);
+  script_tag(name:"qod_type", value:"registry");
+  script_tag(name:"solution_type", value:"VendorFix");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/55052/");
+  script_xref(name:"URL", value:"http://support.microsoft.com/kb/2862330");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/en-us/security/bulletin/ms13-081");
+  script_category(ACT_GATHER_INFO);
+  script_copyright("Copyright (C) 2013 SecPod");
+  script_family("Windows : Microsoft Bulletins");
+  script_dependencies("smb_reg_service_pack.nasl");
+  script_require_ports(139, 445);
+  script_mandatory_keys("SMB/WindowsVersion");
+
+  exit(0);
 }
-
 
 include("smb_nt.inc");
 include("secpod_reg.inc");
 include("version_func.inc");
 include("secpod_smb_func.inc");
 
-## Variables Initialization
-sysPath = "";
-usbdSysver="";
-atmfdVer="";
-hidparseVer="";
-win32SysVer="";
-dwVer = "";
-cddVer = "";
-wdVer = "";
-
-## Check for OS and Service Pack
 if(hotfix_check_sp(xp:4, xpx64:3, win2003:3, win2003x64:3, winVista:3, win7:2,
   win7x64:2, win2008:3, win2008r2:2, win8:1, win2012:1) <= 0){
   exit(0);
 }
 
-## Get System Path
 sysPath = smb_get_system32root();
 if(!sysPath ){
   exit(0);
 }
 
-atmfdVer = fetch_file_version(sysPath, file_name:"atmfd.dll");
-usbdSysVer = fetch_file_version(sysPath, file_name:"drivers\usbd.sys");
-hidparseVer = fetch_file_version(sysPath, file_name:"drivers\hidparse.sys");
-win32SysVer = fetch_file_version(sysPath, file_name:"win32k.sys");
-fontsubVer = fetch_file_version(sysPath, file_name:"Fontsub.dll");
-dwVer = fetch_file_version(sysPath, file_name:"Dwrite.dll");
-cddVer  =  fetch_file_version(sysPath, file_name:"cdd.dll");
-wdVer = fetch_file_version(sysPath, file_name:"Wdfres.dll");
+atmfdVer = fetch_file_version(sysPath:sysPath, file_name:"atmfd.dll");
+usbdSysVer = fetch_file_version(sysPath:sysPath, file_name:"drivers\usbd.sys");
+hidparseVer = fetch_file_version(sysPath:sysPath, file_name:"drivers\hidparse.sys");
+win32SysVer = fetch_file_version(sysPath:sysPath, file_name:"win32k.sys");
+fontsubVer = fetch_file_version(sysPath:sysPath, file_name:"Fontsub.dll");
+dwVer = fetch_file_version(sysPath:sysPath, file_name:"Dwrite.dll");
+cddVer  = fetch_file_version(sysPath:sysPath, file_name:"cdd.dll");
+wdVer = fetch_file_version(sysPath:sysPath, file_name:"Wdfres.dll");
 
 if(usbdSysVer || atmfdVer ||  hidparseVer ||
    win32SysVer ||  dwVer || cddVer || wdVer)
 {
 
-  ## Windows XP
   if(hotfix_check_sp(xp:4) > 0)
   {
-    ## Grep for the file version
     if(version_is_less(version:atmfdVer, test_version:"5.1.2.236") && (atmfdVer)){
       Vulnerable_range_atmfd = "Less than 5.1.2.236";
     }
@@ -156,10 +152,8 @@ if(usbdSysVer || atmfdVer ||  hidparseVer ||
     }
   }
 
-  ## Windows XP Professional x64 edition and Windows Server 2003
   if(hotfix_check_sp(xpx64:3,win2003x64:3,win2003:3) > 0)
   {
-    ## Grep for the file version
     if(version_is_less(version:atmfdVer, test_version:"5.1.2.236") && (atmfdVer)){
       Vulnerable_range_atmfd = "Less than 5.1.2.236";
     }
@@ -177,11 +171,9 @@ if(usbdSysVer || atmfdVer ||  hidparseVer ||
     }
   }
 
-  ## Windows Vista and Windows Server 2008
   ## Currently not supporting for Vista and Windows Server 2008 64 bit
   if(hotfix_check_sp(winVista:3, win2008:3) > 0)
   {
-    ## Check for Fontsub.dll version
     if(fontsubVer)
     {
       if(version_is_less(version:fontsubVer, test_version:"6.0.6002.18272")){
@@ -259,7 +251,6 @@ if(usbdSysVer || atmfdVer ||  hidparseVer ||
     }
   }
 
-  ## Windows 7 and Windows Server 2008 R2
   if(hotfix_check_sp(win7:2, win7x64:2, win2008r2:2) > 0)
   {
     if(fontsubVer)
@@ -333,11 +324,10 @@ if(usbdSysVer || atmfdVer ||  hidparseVer ||
 
 #      else if(version_in_range(version:wdVer, test_version:"6.2.9200.16000", test_version2:"6.2.9200.16384")){
 #        Vulnerable_range_wd = "6.2.9200.16000 - 6.2.9200.16384";
-#      } 
+#      }
     }
   }
 
-  ## Windows 8 and Windows Server 2012
   if(hotfix_check_sp(win8:1, win2012:1) > 0)
   {
     if(fontsubVer)
@@ -413,7 +403,7 @@ if(Vulnerable_range_usbdSys)
 }
 
 if(Vulnerable_range_hidparse)
-{ 
+{
   report = 'File checked:     ' + sysPath + "drivers\hidparse.sys" + '\n' +
            'File version:     ' + hidparseVer  + '\n' +
            'Vulnerable range: ' + Vulnerable_range_hidparse + '\n' ;

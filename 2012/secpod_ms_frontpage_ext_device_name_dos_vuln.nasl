@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_ms_frontpage_ext_device_name_dos_vuln.nasl 4702 2016-12-07 13:02:11Z cfi $
+# $Id: secpod_ms_frontpage_ext_device_name_dos_vuln.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # Microsoft FrontPage Server Extensions MS-DOS Device Name DoS Vulnerability
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:microsoft:iis";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902839");
-  script_version("$Revision: 4702 $");
+  script_version("$Revision: 11857 $");
   script_bugtraq_id(1608);
   script_cve_id("CVE-2000-0709");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2016-12-07 14:02:11 +0100 (Wed, 07 Dec 2016) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 10:25:16 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-05-24 17:17:17 +0530 (Thu, 24 May 2012)");
   script_name("Microsoft FrontPage Server Extensions MS-DOS Device Name DoS Vulnerability");
   script_category(ACT_DENIAL);
@@ -48,32 +48,20 @@ if(description)
   script_xref(name:"URL", value:"http://www.securiteam.com/windowsntfocus/5NP0N0U2AA.html");
   script_xref(name:"URL", value:"http://archives.neohapsis.com/archives/bugtraq/2000-08/0288.html");
 
-  tag_impact = "Successful exploitation will allow remote attackers to cause denial of service
-  conditions.
-
-  Impact Level: Application";
-
-  tag_affected = "Microsoft FrontPage 2000 Server Extensions 1.1";
-
-  tag_insight = "The flaw is due to an error in the 'shtml.exe' component, which
+  script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to cause denial of service
+  conditions.");
+  script_tag(name:"affected", value:"Microsoft FrontPage 2000 Server Extensions 1.1");
+  script_tag(name:"insight", value:"The flaw is due to an error in the 'shtml.exe' component, which
   allows remote attackers to cause a denial of service in some components
-  by requesting a URL whose name includes a standard DOS device name.";
-
-  tag_solution = "Upgrade to Microsoft FrontPage 2000 Server Extensions 1.2 or later,
-  For updates refer to http://office.microsoft.com";
-
-  tag_summary = "This host is running Microsoft FrontPage Server Extensions and is
-  prone to denial of service vulnerability.";
-
-  script_tag(name:"impact", value:tag_impact);
-  script_tag(name:"affected", value:tag_affected);
-  script_tag(name:"insight", value:tag_insight);
-  script_tag(name:"solution", value:tag_solution);
-  script_tag(name:"summary", value:tag_summary);
+  by requesting a URL whose name includes a standard DOS device name.");
+  script_tag(name:"solution", value:"Upgrade to Microsoft FrontPage 2000 Server Extensions 1.2 or later.");
+  script_tag(name:"summary", value:"This host is running Microsoft FrontPage Server Extensions and is
+  prone to denial of service vulnerability.");
 
   script_tag(name:"qod_type", value:"remote_vul");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://office.microsoft.com");
   exit(0);
 }
 
@@ -86,7 +74,6 @@ url = "/_vti_bin/shtml.exe";
 if( ! port = get_app_port( cpe:CPE ) ) exit( 0 );
 if( ! dir = get_app_location( cpe:CPE, port:port ) ) exit( 0 ); # To have a reference to the detection NVT
 
-## Confirm FrontPage Server Extensions are running
 if( http_vuln_check( port:port, url:url, check_header:TRUE,
     pattern:"FrontPage Server Extensions", extra_check:"Server: Microsoft-IIS" ) ) {
 
@@ -95,7 +82,6 @@ if( http_vuln_check( port:port, url:url, check_header:TRUE,
   req = http_get( item:vulnurl, port:port );
   http_send_recv( port:port, data:req );
 
-  ## Try to access shtml.exe
   req = http_get( item:url, port:port );
   res = http_send_recv( port:port, data:req );
 

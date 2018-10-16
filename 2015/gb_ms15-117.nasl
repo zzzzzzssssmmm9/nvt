@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms15-117.nasl 6229 2017-05-29 09:04:10Z teissa $
+# $Id: gb_ms15-117.nasl 11876 2018-10-12 12:20:01Z cfischer $
 #
 # Microsoft Windows NDIS Elevation of Privilege Vulnerability (3101722)
 #
@@ -27,50 +27,45 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806615");
-  script_version("$Revision: 6229 $");
+  script_version("$Revision: 11876 $");
   script_cve_id("CVE-2015-6098");
   script_tag(name:"cvss_base", value:"7.2");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-29 11:04:10 +0200 (Mon, 29 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 14:20:01 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-11-11 12:47:24 +0530 (Wed, 11 Nov 2015)");
   script_name("Microsoft Windows NDIS Elevation of Privilege Vulnerability (3101722)");
 
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft Bulletin MS15-117.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and
-  check appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The error exists as NDIS fails to check the
   length of a buffer prior to copying memory into it.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow an attacker
-  to gain elevated privileges on a targeted system.
+  to gain elevated privileges on a targeted system.");
 
-  Impact Level: System");
-
-  script_tag(name:"affected", value:"
-  Microsoft Windows Vista x32/x64 Edition Service Pack 2
+  script_tag(name:"affected", value:"Microsoft Windows Vista x32/x64 Edition Service Pack 2
   Microsoft Windows Server 2008 x32/x64 Edition Service Pack 2
   Microsoft Windows 7 x32/x64 Edition Service Pack 1
   Microsoft Windows Server 2008 R2 x64 Edition Service Pack 1.");
 
   script_tag(name:"solution", value:"Run Windows Update and update the
-  listed hotfixes or download and update mentioned hotfixes in the advisory
-  from the below link,
-  https://technet.microsoft.com/library/security/MS15-117");
+  listed hotfixes or download and install the hotfixes from the referenced advisory.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
   script_tag(name:"qod_type", value:"executable_version");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3101722");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/library/security/MS15-117");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3101722");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/library/security/MS15-117");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
-  script_dependencies("secpod_reg_enum.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
+  script_require_ports(139, 445);
   script_mandatory_keys("SMB/WindowsVersion");
   exit(0);
 }
@@ -80,32 +75,23 @@ include("secpod_reg.inc");
 include("version_func.inc");
 include("secpod_smb_func.inc");
 
-## Variables Initialization
-sysPath = "";
-dllVer = "";
-
-## Check for OS and Service Pack
 if(hotfix_check_sp(winVista:3, win7:2, win7x64:2, win2008:3, win2008r2:2) <= 0){
   exit(0);
 }
 
-## Get System Path
 sysPath = smb_get_systemroot();
 if(!sysPath ){
   exit(0);
 }
 
-##Fetch the version of Ndis.sys
-dllVer = fetch_file_version(sysPath, file_name:"System32\drivers\Ndis.sys");
+dllVer = fetch_file_version(sysPath:sysPath, file_name:"System32\drivers\Ndis.sys");
 if(!dllVer){
   exit(0);
 }
 
-## Windows Vista and Windows Server 2008
 ## Currently not supporting for Vista and Windows Server 2008 64 bit
 if(hotfix_check_sp(winVista:3, win2008:3) > 0)
 {
-  ## Check for Ndis.sys version
   if(version_is_less(version:dllVer, test_version:"6.0.6002.19512"))
   {
      Vulnerable_range = "Less than 6.0.6002.19512";
@@ -118,10 +104,8 @@ if(hotfix_check_sp(winVista:3, win2008:3) > 0)
   }
 }
 
-## Windows 7 and Windows 2008 R2
 else if(hotfix_check_sp(win7:2, win7x64:2, win2008r2:2) > 0)
 {
-  ## Check for Ndis.sys version
   if(version_is_less(version:dllVer, test_version:"6.1.7601.19030")){
    Vulnerable_range = "Less than 6.1.7601.19030";
    VULN = TRUE ;

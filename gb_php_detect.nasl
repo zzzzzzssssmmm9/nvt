@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_php_detect.nasl 9792 2018-05-10 12:04:16Z cfischer $
+# $Id: gb_php_detect.nasl 11558 2018-09-23 08:25:04Z cfischer $
 #
 # PHP Version Detection (Remote)
 #
@@ -8,7 +8,7 @@
 # Veerendra GG <veerendragg@secpod.com>
 #
 # Copyright:
-# Copyright (c) 2008 Greenbone Networks GmbH, http://www.greenbone.net
+# Copyright (C) 2008 Greenbone Networks GmbH, http://www.greenbone.net
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -27,21 +27,21 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.800109");
-  script_version("$Revision: 9792 $");
+  script_version("$Revision: 11558 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-10 14:04:16 +0200 (Thu, 10 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-23 10:25:04 +0200 (Sun, 23 Sep 2018) $");
   script_tag(name:"creation_date", value:"2008-10-07 16:11:33 +0200 (Tue, 07 Oct 2008)");
   script_name("PHP Version Detection (Remote)");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2008 Greenbone Networks GmbH");
   script_family("Product detection");
   script_dependencies("find_service.nasl", "phpinfo.nasl", "webmirror.nasl",
-  "gb_php_detect_lin.nasl", "secpod_php_detect_win.nasl");
+                      "sw_apcu_info.nasl", "gb_php_detect_lin.nasl", "secpod_php_detect_win.nasl");
   script_require_ports("Services/www", 80);
   script_exclude_keys("Settings/disable_cgi_scanning");
 
-  script_tag(name:"summary", value:"Detection of installed version of PHP.
+  script_tag(name:"summary", value:"Detects the installed version of PHP.
   This script sends HTTP GET request and try to get the version from the
   response, and sets the result in KB.");
 
@@ -51,46 +51,65 @@ if(description)
 }
 
 include("http_func.inc");
-include("http_keepalive.inc");
 include("cpe.inc");
 include("host_details.inc");
+include("misc_func.inc");
 
 checkFiles = make_list();
 
 port = get_http_port( default:80 );
-
-phpinfoBanner = get_kb_item( "php/phpinfo/phpversion/" + port );
+host = http_host_name( dont_add_port:TRUE );
 
 foreach dir( make_list_unique( "/", cgi_dirs( port:port ) ) ) {
-
   if( dir == "/" ) dir = "";
   checkFiles = make_list( checkFiles, dir + "/", dir + "/index.php" );
 }
 
-phpFilesList = get_kb_list( "www/" + port + "/content/extensions/php" );
-if( phpFilesList ) checkFiles = make_list_unique( checkFiles, phpFilesList );
+phpFilesList = get_http_kb_file_extensions( port:port, host:host, ext:"php" );
+if( phpFilesList && is_array( phpFilesList ) ) {
+  count = 0;
+  foreach phpFile( phpFilesList ) {
+    count++;
+    checkFiles = make_list_unique( checkFiles, phpFile );
+    if( count >= 10 ) break; # TBD: Should be enough files to check, maybe we could even lower this to 5...
+  }
+}
 
 foreach checkFile( checkFiles ) {
 
   banner = get_http_banner( port:port, file:checkFile );
 
   if( "PHP" >< banner ) {
-    phpInfo = egrep( pattern:"Server.*PHP.*", string:banner );
+    phpInfo = egrep( pattern:"Server.*PHP.*", string:banner, icase:FALSE );
     if( ! phpInfo ) {
-      phpInfo = egrep( pattern:"X.Powered.By.*PHP.*", string:banner );
+      phpInfo = egrep( pattern:"X.Powered.By.*PHP.*", string:banner, icase:FALSE );
     }
 
     if( "PHPSESSID" >< banner ) phpSessId = TRUE;
 
-    # e.g PHP/5.6.0alpha1 or PHP/5.6.0
+    # PHP/5.6.0alpha1
+    # PHP/5.6.0
+    # X-Powered-By: PHP/7.0.30-0+deb9u1
     phpVer = ereg_replace( pattern:".*PHP/([.0-9A-Za-z]*).*", string:phpInfo, replace:"\1" );
     if( ! isnull( phpVer ) && phpVer != "" ) break;
   }
 }
 
 if( isnull( phpVer ) || phpVer == "" ) {
-  phpVer  = phpinfoBanner;
-  phpInfo = phpinfoBanner;
+  # nb: Currently set by sw_apcu_info.nasl and phpinfo.nasl but could be extended by other PHP scripts providing such info
+  phpscriptsUrls = get_kb_list( "php/banner/from_scripts/" + host + "/" + port + "/urls" );
+  if( phpscriptsUrls && is_array( phpscriptsUrls ) ) {
+    foreach phpscriptsUrl( phpscriptsUrls ) {
+      _phpVer  = get_kb_item( "php/banner/from_scripts/" + host + "/" + port + "/short_versions/" + phpscriptsUrl );
+      _phpInfo = get_kb_item( "php/banner/from_scripts/" + host + "/" + port + "/full_versions/" + phpscriptsUrl );
+      if( _phpVer && _phpVer =~ "[0-9.]+" ) {
+        phpVer   = _phpVer;
+        phpInfo  = _phpInfo;
+        conclUrl = report_vuln_url( port:port, url:phpscriptsUrl, url_only:TRUE ) + " (phpinfo()/ACP(u) output)";
+        break; # TBD: Don't stop after the first hit? But that could report the very same PHP version if multiple scripts where found.
+      }
+    }
+  }
 }
 
 if( phpVer || phpSessId ) {
@@ -114,6 +133,7 @@ if( phpVer || phpSessId ) {
                                             version:phpVer,
                                             install:location,
                                             cpe:cpe,
+                                            concludedUrl:conclUrl,
                                             concluded:phpInfo ),
                                             port:port );
 }

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mcafee_application_control_detect.nasl 8197 2017-12-20 12:50:38Z cfischer $
+# $Id: gb_mcafee_application_control_detect.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # McAfee Application Control Version Detection
 #
@@ -27,14 +27,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806979");
-  script_version("$Revision: 8197 $");
+  script_version("$Revision: 11279 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-20 13:50:38 +0100 (Wed, 20 Dec 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2016-01-20 15:17:03 +0530 (Wed, 20 Jan 2016)");
   script_name("McAfee Application Control Version Detection");
 
-  script_tag(name : "summary" , value : "Detection of installed version of
+  script_tag(name:"summary", value:"Detects the installed version of
   McAfee Application Control.
 
   The script detects the version of McAfee Application Control and sets the
@@ -44,29 +44,20 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
 }
-
 
 include("smb_nt.inc");
 include("secpod_smb_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## variable Initialization
-os_arch = "";
-key = "";
-mcafeePath = "";
-mcafeeVer = "";
-mcafeeName = "";
-
-## Get OS Architecture
 os_arch = get_kb_item("SMB/Windows/Arch");
 if(!os_arch){
-  exit(-1);
+  exit(0);
 }
 
 ###Key is same for 32 and 64 bit architecture
@@ -94,7 +85,6 @@ foreach item (registry_enum_keys(key:key))
 
     set_kb_item(name:"McAfee/Application/Control/Win/Installed", value:TRUE);
 
-    ## Register for 64 bit app on 64 bit OS
     if("64" >< os_arch) {
       set_kb_item(name:"McAfee/Application/Control64/Win/Ver", value:mcafeeVer);
       register_and_report_cpe( app:"McAfee Application Control", ver:mcafeeVer, base:"cpe:/a:mcafee:application_control:x64:", expr:"^([0-9.]+)", insloc:mcafeePath );

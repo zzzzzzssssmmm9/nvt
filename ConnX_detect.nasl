@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: ConnX_detect.nasl 8782 2018-02-13 10:06:23Z ckuersteiner $
+# $Id: ConnX_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # ConnX Detection
 #
@@ -28,30 +28,30 @@ tag_summary = "This host is running ConnX.";
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100114");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 8782 $");
- script_tag(name:"last_modification", value:"$Date: 2018-02-13 11:06:23 +0100 (Tue, 13 Feb 2018) $");
- script_tag(name:"creation_date", value:"2009-04-08 20:52:50 +0200 (Wed, 08 Apr 2009)");
- script_tag(name:"cvss_base", value:"0.0");
+  script_oid("1.3.6.1.4.1.25623.1.0.100114");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2009-04-08 20:52:50 +0200 (Wed, 08 Apr 2009)");
+  script_tag(name:"cvss_base", value:"0.0");
 
- script_name("ConnX Detection");
+  script_name("ConnX Detection");
 
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_tag(name: "summary", value: "Detection of ConnX.
+  script_tag(name:"summary", value:"Detection of ConnX.
 
 The script sends a connection request to the server and attempts to detect LogicalDOC.");
 
- script_xref(name: "URL", value: "http://connx.com.au/");
+  script_xref(name:"URL", value:"http://connx.com.au/");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");
@@ -77,7 +77,7 @@ foreach dir( make_list_unique( "/", "/connx", cgi_dirs( port:port ) ) ) {
        vers = version[1];
 
     set_kb_item(name: "connx/installed", value: TRUE);
-    
+
     cpe = build_cpe(value: vers, exp: "^([0-9.]+)", base: "cpe:/a:connx:connx:");
     if (!cpe)
       cpe = 'cpe:/a:connx:connx';

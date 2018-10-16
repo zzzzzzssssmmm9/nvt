@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mozilla_firefox_mult_vuln_dec15_macosx.nasl 6513 2017-07-04 09:59:28Z teissa $
+# $Id: gb_mozilla_firefox_mult_vuln_dec15_macosx.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Mozilla Firefox Multiple Vulnerabilities - Dec15 (Mac OS X)
 #
@@ -29,7 +29,7 @@ CPE = "cpe:/a:mozilla:firefox";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.807005");
-  script_version("$Revision: 6513 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-7201", "CVE-2015-7202", "CVE-2015-7203", "CVE-2015-7204",
                 "CVE-2015-7205", "CVE-2015-7207", "CVE-2015-7208", "CVE-2015-7210",
                 "CVE-2015-7211", "CVE-2015-7212", "CVE-2015-7213", "CVE-2015-7214",
@@ -38,55 +38,69 @@ if(description)
   script_bugtraq_id(79283, 79279, 79280);
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-04 11:59:28 +0200 (Tue, 04 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-12-18 11:18:19 +0530 (Fri, 18 Dec 2015)");
   script_name("Mozilla Firefox Multiple Vulnerabilities - Dec15 (Mac OS X)");
 
-  script_tag(name: "summary" , value:"This host is installed with Mozilla
+  script_tag(name:"summary", value:"This host is installed with Mozilla
   Firefox and is prone to multiple vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"Multiple flaws exists due to,
+  script_tag(name:"insight", value:"Multiple flaws exists due to,
+
   - Multiple unspecified vulnerabilities in the browser engine.
+
   - Buffer overflow in the 'DirectWriteFontInfo::LoadFontFamilyData' function in
     'gfx/thebes/gfxDWriteFontList.cpp' script.
+
   - An implementation error with unboxed objects and property storing in the
     JavaScript engine.
+
   - Integer underflow in the 'RTPReceiverVideo::ParseRtpPacket' function.
+
   - Improper restriction of the availability of IFRAME Resource Timing API times.
+
   - Control characters are allowed to set in cookies.
+
   - Use-after-free error in WebRTC that occurs due to timing issues in WebRTC
     when closing channels.
+
   - Mishandling of the '#' (number sign) character while 'data: URI' parsing.
+
   - Integer overflow in the 'mozilla::layers::BufferTextureClient::AllocateForSurface'
     function.
+
   - Integer overflow in the 'MPEG4Extractor::readMetaData' function in
     'MPEG4Extractor.cpp' script in libstagefright.
+
   - Cross-site reading vulnerability through data and view-source URIs.
+
   - Cross-origin information leak through the error events in web workers.
+
   - Multiple errors in 'HTTP/2' implementation.
+
   - Buffer overflow in the 'XDRBuffer::grow' function in 'js/src/vm/Xdr.cpp'
     script.
+
   - Buffer overflow in the 'nsDeque::GrowCapacity' function in
     'xpcom/glue/nsDeque.cpp' script.
+
   - Integer underflow in the 'Metadata::setData' function in 'MetaData.cpp' in
     libstagefright
+
   - Error in WebExtension APIs.");
 
-  script_tag(name: "impact" , value:"Successful exploitation will allow remote
+  script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to cause a denial of service, bypass security restrictions,
-  obtain sensitive information,  execute arbitrary script code, spoof web sites
-  and some unspecified impacts.
+  obtain sensitive information, execute arbitrary script code, spoof web sites
+  and some unspecified impacts.");
 
-  Impact Level: System/Application");
-
-  script_tag(name: "affected" , value:"Mozilla Firefox version before 43.0 on
+  script_tag(name:"affected", value:"Mozilla Firefox version before 43.0 on
   Mac OS X");
 
-  script_tag(name: "solution" , value:"Upgrade to Mozilla Firefox version 43.0
-  or later, For updates refer to http://www.mozilla.com/en-US/firefox/all.html");
+  script_tag(name:"solution", value:"Upgrade to Mozilla Firefox version 43.0
+  or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
@@ -100,6 +114,7 @@ if(description)
   script_family("General");
   script_dependencies("gb_mozilla_prdts_detect_macosx.nasl");
   script_mandatory_keys("Mozilla/Firefox/MacOSX/Version");
+  script_xref(name:"URL", value:"http://www.mozilla.com/en-US/firefox/all.html");
   exit(0);
 }
 
@@ -107,15 +122,10 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-ffVer = "";
-
-## Get version
 if(!ffVer = get_app_version(cpe:CPE)){
   exit(0);
 }
 
-# Check for vulnerable version
 if(version_is_less(version:ffVer, test_version:"43.0"))
 {
   report = 'Installed version: ' + ffVer + '\n' +

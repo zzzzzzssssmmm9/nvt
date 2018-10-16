@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_host_scanned_ssh.nasl 7254 2017-09-25 15:54:28Z cfischer $
+# $Id: gb_host_scanned_ssh.nasl 11658 2018-09-27 14:21:41Z cfischer $
 #
 # Leave information on scanned hosts
 #
@@ -25,66 +25,63 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "This routine stores information about the scan on the scanned host,
-provided it is a unixoid system offering ssh access with a standard shell.
-
-The information cover hostname, scan start time and scan end time.
-No details about the actual scan results are stored on the scanned host.
-
-By default, this routine is disabled even it is selected to run. To activate
-it, it needs to be explictely enabled with its corresponding preference switch.
-
-The preference 'Message' may contain 3 placeholder where respective content
-will be inserted into the message when the message is finally created on the
-target system: '::HOSTNAME::', '::SCAN_START::' and '::SCAN_STOP::'.
-
-Two methods are offered (one or even both concurrently can be used):
-
-* Syslog: The utility 'logger' on the target system is used to issue the
-message. The message will appear in the standard log environment as configured
-on the corresponding target system. Error is reported in case the logger
-utility is not available.
-
-* File: A filename under /tmp can be chosen where the message is left. It is
-configurable to either overwrite the file each time or to append new
-information. A token is added to this file to ensure only files created by
-this routine are used. Error is reported when the access rights are not
-sufficient or symbolic links detected.";
-
-SCRIPT_OID = "1.3.6.1.4.1.25623.1.0.103625";
-
-if (description)
+if(description)
 {
- script_oid(SCRIPT_OID);
- script_version("$Revision: 7254 $");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_tag(name:"last_modification", value:"$Date: 2017-09-25 17:54:28 +0200 (Mon, 25 Sep 2017) $");
- script_tag(name:"creation_date", value:"2012-12-14 10:37:58 +0100 (Fri, 14 Dec 2012)");
- script_name("Leave information on scanned hosts");
- script_category(ACT_END);
- script_tag(name:"qod_type", value:"remote_vul");
- script_family("General");
- script_copyright("This script is Copyright (C) 2012 Greenbone Networks GmbH");
- script_mandatory_keys("login/SSH/success");
- script_dependencies("host_scan_end.nasl","gather-package-list.nasl");
+  script_oid("1.3.6.1.4.1.25623.1.0.103625");
+  script_version("$Revision: 11658 $");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-27 16:21:41 +0200 (Thu, 27 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2012-12-14 10:37:58 +0100 (Fri, 14 Dec 2012)");
+  script_name("Leave information on scanned hosts");
+  script_category(ACT_END);
+  script_tag(name:"qod_type", value:"remote_vul");
+  script_family("General");
+  script_copyright("This script is Copyright (C) 2012 Greenbone Networks GmbH");
+  script_mandatory_keys("login/SSH/success");
+  script_dependencies("host_scan_end.nasl", "gather-package-list.nasl");
 
- script_add_preference(name:"Enable", type:"checkbox", value: "no");
+  script_add_preference(name:"Enable", type:"checkbox", value:"no");
 
- script_add_preference(name:"Use File", type:"checkbox", value: "no");
- script_add_preference(name:"File name /tmp/", type:"entry", value:"scan_info.txt");
- script_add_preference(name:"Append to File", type:"checkbox", value: "no");
- 
- script_add_preference(name:"Use Syslog", type:"checkbox", value: "no");
- script_add_preference(name:"Syslog priority", type:"radio",
-   value: "info;debug;notice;warning;err;crit;alert;emerg");
- script_add_preference(name:"Syslog tag", type:"entry", value:"VulScan");
+  script_add_preference(name:"Use File", type:"checkbox", value:"no");
+  script_add_preference(name:"File name /tmp/", type:"entry", value:"scan_info.txt");
+  script_add_preference(name:"Append to File", type:"checkbox", value:"no");
 
- script_add_preference(name:"Message", type:"entry",
-   value:"Security Scan of ::HOSTNAME:: finished. Start: ::SCAN_START:: Stop: ::SCAN_STOP::");
+  script_add_preference(name:"Use Syslog", type:"checkbox", value:"no");
+  script_add_preference(name:"Syslog priority", type:"radio", value:"info;debug;notice;warning;err;crit;alert;emerg");
+  script_add_preference(name:"Syslog tag", type:"entry", value:"VulScan");
 
- script_tag(name : "summary" , value : tag_summary);
- exit(0);
+  script_add_preference(name:"Message", type:"entry", value:"Security Scan of ::HOSTNAME:: finished. Start: ::SCAN_START:: Stop: ::SCAN_STOP::");
+
+  script_tag(name:"summary", value:"This routine stores information about the scan on the scanned host,
+  provided it is a unixoid system offering ssh access with a standard shell.
+
+  The information cover hostname, scan start time and scan end time.
+  No details about the actual scan results are stored on the scanned host.
+
+  By default, this routine is disabled even it is selected to run. To activate
+  it, it needs to be explictely enabled with its corresponding preference switch.
+
+  The preference 'Message' may contain 3 placeholder where respective content
+  will be inserted into the message when the message is finally created on the
+  target system:
+
+  '::HOSTNAME::', '::SCAN_START::' and '::SCAN_STOP::'.
+
+  Two methods are offered (one or even both concurrently can be used):
+
+  * Syslog: The utility 'logger' on the target system is used to issue the
+  message. The message will appear in the standard log environment as configured
+  on the corresponding target system. Error is reported in case the logger
+  utility is not available.
+
+  * File: A filename under /tmp can be chosen where the message is left. It is
+  configurable to either overwrite the file each time or to append new
+  information. A token is added to this file to ensure only files created by
+  this routine are used. Error is reported when the access rights are not
+  sufficient or symbolic links detected.");
+
+  exit(0);
 }
 
 include("ssh_func.inc");
@@ -108,7 +105,7 @@ function get_disallowed_str() { # display disallowed signs in log_message()
   ua_str = '';
   foreach ua (disallowed) {
     ua_str += ua + ' ';
-  }  
+  }
 
   return ua_str;
 }
@@ -127,7 +124,6 @@ function check_file(file) { # check given file for disallowed sign
   return TRUE;
 }
 
-# check given message for disallowed sign
 function check_message(message) {
 
   disallowed = get_disallowed_signs();
@@ -194,7 +190,7 @@ function replace_placeholders(message) {
     }
     else { # if there is no stop time in kb, create it.
       scan_stop = make_date_str(date:unixtime());
-    }  
+    }
 
     message = str_replace(string:message, find:"::SCAN_STOP::",replace:scan_stop);
   }
@@ -301,13 +297,13 @@ if("yes" >< filelog) {
     log_message(port:0, data: "It seems that /tmp does not exist. Can't create file /tmp/" + path);
     ssh_close_connection();
     exit(1);
-  }  
+  }
 
   path = '/tmp/' + path;
 
   file_exist = ssh_cmd(socket:soc, cmd:"ls -l '" + path + "'");
 
-  if(file_exist =~ "^l[^s]") { # don't work on existing symlinks. 
+  if(file_exist =~ "^l[^s]") { # don't work on existing symlinks.
      log_message(port:0, data:"File '" + path  +  "' is a symbolic link and this is not allowed. Can not continue.");
      ssh_close_connection();
      exit(1);
@@ -323,7 +319,7 @@ if("yes" >< filelog) {
         # no security_token or not created by this nvt
         log_message(port:0, data:"Security Token '" +
           file_security_token  + "' not found in existing file '" +
-          path + "'. Can not continue."); 
+          path + "'. Can not continue.");
         ssh_close_connection();
         exit(1);
       }

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_bad_ssh_keys.nasl 6229 2017-05-29 09:04:10Z teissa $
+# $Id: gb_bad_ssh_keys.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Static SSH Key Used
 #
@@ -27,30 +27,30 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105398");
- script_version ("$Revision: 6229 $");
- script_tag(name:"cvss_base", value:"10.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
- script_name("Static SSH Key Used");
- script_tag(name:"last_modification", value:"$Date: 2017-05-29 11:04:10 +0200 (Mon, 29 May 2017) $");
- script_tag(name:"creation_date", value:"2015-10-14 11:48:40 +0200 (Wed, 14 Oct 2015)");
- script_category(ACT_ATTACK);
- script_family("Gain a shell remotely");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("ssh_detect.nasl");
- script_require_ports("Services/ssh", 22);
+  script_oid("1.3.6.1.4.1.25623.1.0.105398");
+  script_version("$Revision: 11872 $");
+  script_tag(name:"cvss_base", value:"10.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_name("Static SSH Key Used");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-10-14 11:48:40 +0200 (Wed, 14 Oct 2015)");
+  script_category(ACT_ATTACK);
+  script_family("Gain a shell remotely");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("ssh_detect.nasl");
+  script_require_ports("Services/ssh", 22);
 
- script_tag(name : "impact" , value:"A remote attacker can exploit this issue to gain unauthorized access to affected devices. Successfully exploiting this issue allows
+  script_tag(name:"impact", value:"A remote attacker can exploit this issue to gain unauthorized access to affected devices. Successfully exploiting this issue allows
 attackers to completely compromise the devices.");
 
- script_tag(name : "vuldetect" , value:"Try to login as root using a known static private key");
- script_tag(name : "solution" , value:"Remove the known key.");
- script_tag(name : "summary" , value: "The remote host has a known private key installed.");
+  script_tag(name:"vuldetect", value:"Try to login as root using a known static private key");
+  script_tag(name:"solution", value:"Remove the known key.");
+  script_tag(name:"summary", value:"The remote host has a known private key installed.");
 
- script_tag(name:"qod_type", value:"remote_active");
- script_tag(name:"solution_type", value:"Workaround");
+  script_tag(name:"qod_type", value:"remote_active");
+  script_tag(name:"solution_type", value:"Workaround");
 
- exit(0);
+  exit(0);
 }
 
 include("bad_ssh_keys.inc");

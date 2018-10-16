@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: flatpress_detect.nasl 9721 2018-05-04 06:43:25Z ckuersteiner $
+# $Id: flatpress_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Flatpress Detection
 #
@@ -26,28 +26,28 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100294");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9721 $");
- script_tag(name:"last_modification", value:"$Date: 2018-05-04 08:43:25 +0200 (Fri, 04 May 2018) $");
- script_tag(name:"creation_date", value:"2009-10-06 18:45:43 +0200 (Tue, 06 Oct 2009)");
- script_tag(name:"cvss_base", value:"0.0");
+  script_oid("1.3.6.1.4.1.25623.1.0.100294");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2009-10-06 18:45:43 +0200 (Tue, 06 Oct 2009)");
+  script_tag(name:"cvss_base", value:"0.0");
 
- script_name("Flatpress Detection");
+  script_name("Flatpress Detection");
 
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_tag(name: "summary", value: "This host is running Flatpress, an open-source blogging engine.");
+  script_tag(name:"summary", value:"This host is running Flatpress, an open-source blogging engine.");
 
- script_xref(name: "URL", value: "http://www.flatpress.org");
+  script_xref(name:"URL", value:"http://www.flatpress.org");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");
@@ -75,7 +75,7 @@ foreach dir ( make_list_unique( "/flatpress", "/blog", cgi_dirs( port: port))) {
        vers = version[1];
 
    set_kb_item(name: "flatpress/installed", value: TRUE);
-   
+
    cpe = build_cpe(value: vers, exp: "^([0-9.]+([a-z0-9]+)?)", base: "cpe:/a:flatpress:flatpress:");
    if (!cpe)
      cpe = 'cpe:/a:flatpress:flatpress';

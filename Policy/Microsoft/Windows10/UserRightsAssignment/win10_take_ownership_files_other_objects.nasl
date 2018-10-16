@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: win10_take_ownership_files_other_objects.nasl 9679 2018-04-30 14:05:59Z emoss $
+# $Id: win10_take_ownership_files_other_objects.nasl 11532 2018-09-21 19:07:30Z cfischer $
 #
 # Check value for Take ownership of files or other objects (WMI)
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.109150");
-  script_version("$Revision: 9679 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-30 16:05:59 +0200 (Mon, 30 Apr 2018) $");
+  script_version("$Revision: 11532 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 21:07:30 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-04-30 15:37:24 +0200 (Mon, 30 Apr 2018)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:H/Au:S/C:N/I:N/A:N");
@@ -38,19 +38,20 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH");
   script_family("Policy");
   script_dependencies("gb_wmi_access.nasl", "smb_reg_service_pack.nasl");
+  script_add_preference(name:"Value", type:"entry", value:"Administrators");
   script_mandatory_keys("Compliance/Launch");
   script_require_keys("WMI/access_successful");
-  script_tag(name: "summary", value: "This policy setting determines which users 
-can take ownership of any securable object in the device, including 
-Active Directory objects, NTFS files and folders, printers, registry keys, 
+  script_tag(name:"summary", value:"This policy setting determines which users
+can take ownership of any securable object in the device, including
+Active Directory objects, NTFS files and folders, printers, registry keys,
 services, processes, and threads.
 
-Every object has an owner, whether the object resides in an NTFS volume or 
-Active Directory database. The owner controls how permissions are set on the 
+Every object has an owner, whether the object resides in an NTFS volume or
+Active Directory database. The owner controls how permissions are set on the
 object and to whom permissions are granted.
 
-By default, the owner is the person who or the process which created the object. 
-Owners can always change permissions to objects, even when they are denied all 
+By default, the owner is the person who or the process which created the object.
+Owners can always change permissions to objects, even when they are denied all
 access to the object.");
   exit(0);
 }
@@ -67,20 +68,33 @@ to query the registry.');
 WindowsName = get_kb_item("SMB/WindowsName");
 if('windows 10' >!< tolower(WindowsName)){
   policy_logging(text:'Host is not a Microsoft Windows 10 System.');
-  exit(0); 
+  exit(0);
 }
 
-type = 'Take ownership of files or other objects';
+title = 'Take ownership of files or other objects';
 select = 'AccountList';
 keyname = 'SeTakeOwnershipPrivilege';
+fixtext = 'Set following UI path accordingly:
+Computer Configuration/Windows Settings/Security Settings/Local Policies/User Rights Assignment/' + title;
+default = script_get_preference('Value');
 
 value = rsop_userprivilegeright(select:select,keyname:keyname);
 if( value == ''){
-  policy_logging(text:'Unable to detect setting for: "' + type + '".');
-  policy_set_kb(val:'error');
-}else{
-  policy_logging(text:'"' + type + '" is set to: ' + value);
-  policy_set_kb(val:value);
+  value = 'None';
 }
+
+if(tolower(chomp(value)) == tolower(default)){
+  compliant = 'yes';
+}else{
+  compliant = 'no';
+}
+
+policy_logging(text:'"' + title + '" is set to: ' + value);
+policy_add_oid();
+policy_set_dval(dval:default);
+policy_fixtext(fixtext:fixtext);
+policy_control_name(title:title);
+policy_set_kb(val:value);
+policy_set_compliance(compliant:compliant);
 
 exit(0);

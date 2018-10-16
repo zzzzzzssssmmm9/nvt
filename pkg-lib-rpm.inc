@@ -19,17 +19,36 @@
 # isrpmvuln returns 0 if it is not installed or is installed
 # but up to date, and returns 1 if it is installed and vulnerable
 
-
-
 # This variable is defined at inclusion time. It's declared global and is set
 # to True if isrpmvuln() is called for an OS version and a package name that
 # match the target's configuration. It allows the callers to distinguish
 # between non-installed packages and packages installed but not vulnerable.
 __pkg_match = FALSE;
 
+# Global keys to avoid that we're repeatedly asking redis for something we already know
+global_var __rpm_ssh_release, __rpm_ssh_pkgs;
+
+# @brief returns the current release string of the target saved within the KB (ssh/login/release).
+#
+# @return a string containing the current release of the target or an empty string if no release
+#         string exists in the KB.
+#
+# @todo Maybe move into a spearate (new) include if other pkg-lib-*.inc includes needs this as well.
+#
+function rpm_get_ssh_release() {
+
+  local_var rls;
+
+  if( ! isnull( __rpm_ssh_release ) ) {
+    rls = string( __rpm_ssh_release );
+  } else {
+    rls = string( get_kb_item( "ssh/login/release" ) );
+    __rpm_ssh_release = rls;
+  }
+  return rls;
+}
 
 # Example call: isrpmvuln(pkg:"gnutls-utils", rpm:"gnutls-utils~1.4.1~3", rls:"FC6")
-
 function isrpmvuln(pkg, rpm, rls) {
     local_var a, b, kbrls, pat, matches, checkshorta, checkshortb, rc, norm_pkg, report;
     # Check that we have the data for this release.
@@ -88,7 +107,7 @@ function isrpmvuln(pkg, rpm, rls) {
     a = matches[1];
     b = rpm;
 
-    ## Spliting Package name and version
+    ## Splitting Package name and version
     ## Because the below replace _ with .(Dot) condition replaces
     ## _ in package name also
     asubstr = substr(a, strlen(pkg)+1, strlen(a));
@@ -139,6 +158,12 @@ function isrpmvuln(pkg, rpm, rls) {
 
 function kernel_packge_check(a, b, pkg)
 {
+
+    # TODO: Remove once openvas-nasl-lint can handle such a missing include
+    # from within the same include.
+    if(!defined_func("revcomp")) include("revisions-lib.inc");
+
+    local_var a, b, pkg;
 
     vuln_pkg = a;
 

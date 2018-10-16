@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_nginx_http_parse_bof_vuln.nasl 6755 2017-07-18 12:55:56Z cfischer $
+# $Id: gb_nginx_http_parse_bof_vuln.nasl 11883 2018-10-12 13:31:09Z cfischer $
 #
 # Nginx Chunked Transfer Encoding Stack Based Buffer Overflow Vulnerability
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:nginx:nginx";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802052");
-  script_version("$Revision: 6755 $");
+  script_version("$Revision: 11883 $");
   script_cve_id("CVE-2013-2028");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-18 14:55:56 +0200 (Tue, 18 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:31:09 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2013-05-21 11:44:36 +0530 (Tue, 21 May 2013)");
   script_name("Nginx Chunked Transfer Encoding Stack Based Buffer Overflow Vulnerability");
 
@@ -50,50 +50,38 @@ if(description)
   script_require_ports("Services/www", 80);
   script_mandatory_keys("nginx/installed");
 
-  script_tag(name:"impact", value: "Successful exploitation will let the remote unauthenticated attackers
+  script_tag(name:"impact", value:"Successful exploitation will let the remote unauthenticated attackers
   to cause a buffer overflow, resulting in a denial of service or potentially
-  allowing the execution of arbitrary code.
-
-  Impact Level: System/Application");
+  allowing the execution of arbitrary code.");
   script_tag(name:"affected", value:"Nginx version 1.3.9 through 1.4.0");
   script_tag(name:"insight", value:"A stack-based buffer overflow will occur in a worker process while handling
   certain chunked transfer encoding requests.");
-  script_tag(name:"solution", value:"Upgrade to Nginx version 1.5.0, 1.4.1 or later,
-  http://nginx.org/");
+  script_tag(name:"solution", value:"Upgrade to Nginx version 1.5.0, 1.4.1 or later.");
+  script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"summary", value:"The host is running Nginx and is prone stack buffer overflow
   vulnerability.");
 
   exit(0);
 }
 
-
 include("http_func.inc");
 include("host_details.inc");
 
-## Variable Initialization
-port = 0;
-banner = "";
-bad_req = "";
-
-## Get HTTP Port
 if(!port = get_app_port(cpe:CPE)) exit(0);
 
-## Confirm the application before trying exploit
 banner = get_http_banner(port: port);
 if(!banner || "Server: nginx" >!< banner){
   exit(0);
 }
 
-## Get host name
+useragent = get_http_user_agent();
 host = http_host_name(port:port);
 
-## Confirm HTTP server is alive before killing ;)
 if(http_is_dead(port:port)) exit(0);
 
-## Construct crafted chunked transfer encoding request
 bad_req = string("POST / HTTP/1.1\r\n",
                  "Host: ", host, "\r\n",
-                 "User-Agent: ", OPENVAS_HTTP_USER_AGENT, "\r\n",
+                 "User-Agent: ", useragent, "\r\n",
                  "Accept-Encoding: identity\r\n",
                  "Accept: */*\r\n",
                  "Transfer-Encoding: chunked\r\n",

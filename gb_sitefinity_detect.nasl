@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sitefinity_detect.nasl 7916 2017-11-28 02:06:23Z ckuersteiner $
+# $Id: gb_sitefinity_detect.nasl 11717 2018-10-02 06:52:54Z ckuersteiner $
 #
 # Sitefinity CMS Detection
 #
@@ -28,21 +28,21 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.140540");
-  script_version("$Revision: 7916 $");
-  script_tag(name: "last_modification", value: "$Date: 2017-11-28 03:06:23 +0100 (Tue, 28 Nov 2017) $");
-  script_tag(name: "creation_date", value: "2017-11-28 08:24:34 +0700 (Tue, 28 Nov 2017)");
-  script_tag(name: "cvss_base", value: "0.0");
-  script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11717 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-02 08:52:54 +0200 (Tue, 02 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2017-11-28 08:24:34 +0700 (Tue, 28 Nov 2017)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
   script_name("Sitefinity Detection");
 
-  script_tag(name: "summary" , value: "Detection of Sitefinity CMS.
+  script_tag(name:"summary", value:"Detection of Sitefinity CMS.
 
 The script sends a connection request to the server and attempts to detect Sitefinity CMS and to extract its
 version.");
-  
+
   script_category(ACT_GATHER_INFO);
 
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
@@ -51,7 +51,7 @@ version.");
   script_require_ports("Services/www", 80, 443);
   script_exclude_keys("Settings/disable_cgi_scanning");
 
-  script_xref(name: "URL", value: "https://www.sitefinity.com/");
+  script_xref(name:"URL", value:"https://www.sitefinity.com/");
 
   exit(0);
 }
@@ -79,9 +79,9 @@ foreach dir (make_list_unique("/", cgi_dirs(port: port))) {
 
     set_kb_item(name: "sitefinity/detected", value: TRUE);
 
-    cpe = build_cpe(value: version, exp: "^([0-9.]+)", base: "cpe:/a:telerik:sitefinity_cms:");
+    cpe = build_cpe(value: version, exp: "^([0-9.]+)", base: "cpe:/a:progress:sitefinity:");
     if (!cpe)
-      cpe = 'cpe:/a:telerik:sitefinity_cms';
+      cpe = 'cpe:/a:progress:sitefinity';
 
     register_product(cpe: cpe, location: install, port: port);
 

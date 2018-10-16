@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_kb4074736.nasl 9135 2018-03-19 12:37:31Z asteins $
+# $Id: gb_ms_kb4074736.nasl 11086 2018-08-23 06:43:53Z santu $
 #
 # Microsoft Windows Internet Explorer Multiple RCE Vulnerabilities (KB4074736)
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:microsoft:ie";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.812765");
-  script_version("$Revision: 9135 $");
+  script_version("$Revision: 11086 $");
   script_cve_id("CVE-2018-0840", "CVE-2018-0866");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-03-19 13:37:31 +0100 (Mon, 19 Mar 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-23 08:43:53 +0200 (Thu, 23 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-02-14 08:59:04 +0530 (Wed, 14 Feb 2018)");
   script_name("Microsoft Windows Internet Explorer Multiple RCE Vulnerabilities (KB4074736)");
 
@@ -43,12 +43,12 @@ if(description)
   script_tag(name:"vuldetect", value:"Get the vulnerable file version and
   check appropriate patch is applied or not.");
 
-  script_tag(name:"insight", value:"Multiple flaws exist because scripting 
+  script_tag(name:"insight", value:"Multiple flaws exist because scripting
   engine improperly handles objects in memory in Microsoft browsers.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow an attacker
   who successfully exploited this vulnerability to execute arbitrary code in the
-  context of the current user. 
+  context of the current user.
 
   Impact Level: System");
 
@@ -62,11 +62,12 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"executable_version");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/help/4074736");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/help/4074736");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
   script_dependencies("gb_ms_ie_detect.nasl");
+  script_require_ports(139, 445);
   script_mandatory_keys("MS/IE/Version");
   exit(0);
 }
@@ -86,7 +87,7 @@ if(hotfix_check_sp(win2008:3, win2008x64:3, win7:2, win7x64:2, win2008r2:2, win2
   exit(0);
 }
 
-ieVer = get_app_version(cpe:CPE);
+ieVer = get_app_version(cpe:CPE, nofork: TRUE);
 if(!ieVer || !(ieVer =~ "^(9|10|11)")){
   exit(0);
 }

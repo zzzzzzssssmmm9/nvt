@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_zebedee_redirection_port_dos_vuln.nasl 4690 2016-12-06 14:44:58Z cfi $
+# $Id: secpod_zebedee_redirection_port_dos_vuln.nasl 11888 2018-10-12 15:27:49Z cfischer $
 #
 # Zebedee Allowed Redirection Port Denial of Service Vulnerability
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.903028");
-  script_version("$Revision: 4690 $");
+  script_version("$Revision: 11888 $");
   script_cve_id("CVE-2005-2904");
   script_bugtraq_id(14796);
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2016-12-06 15:44:58 +0100 (Tue, 06 Dec 2016) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 17:27:49 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-05-24 11:08:06 +0530 (Thu, 24 May 2012)");
   script_name("Zebedee Allowed Redirection Port Denial of Service Vulnerability");
   script_category(ACT_DENIAL);
@@ -45,55 +45,34 @@ if(description)
   script_xref(name:"URL", value:"http://xforce.iss.net/xforce/xfdb/22220");
   script_xref(name:"URL", value:"http://www.juniper.net/security/auto/vulnerabilities/vuln14796.html");
 
-  tag_impact = "Successful exploitation will allows remote attackers to cause a denial of
-  service via a zero in the port number of the protocol option header.
-
-  Impact Level: Application";
-
-  tag_affected = "Zebedee version 2.4.1";
-
-  tag_insight = "The flaw is due to an error, while handling a connection request that
-  contains a port number value '0'.";
-
-  tag_solution = "Upgrade to Zebedee 2.4.1A or later,
-  For updates refer to http://www.winton.org.uk/zebedee/download.html";
-
-  tag_summary = "The host is running Zebedee server and is prone to denial
-  of service vulnerability.";
-
-  script_tag(name:"impact", value:tag_impact);
-  script_tag(name:"affected", value:tag_affected);
-  script_tag(name:"insight", value:tag_insight);
-  script_tag(name:"solution", value:tag_solution);
-  script_tag(name:"summary", value:tag_summary);
+  script_tag(name:"impact", value:"Successful exploitation will allows remote attackers to cause a denial of
+  service via a zero in the port number of the protocol option header.");
+  script_tag(name:"affected", value:"Zebedee version 2.4.1");
+  script_tag(name:"insight", value:"The flaw is due to an error, while handling a connection request that
+  contains a port number value '0'.");
+  script_tag(name:"solution", value:"Upgrade to Zebedee 2.4.1A or later.");
+  script_tag(name:"summary", value:"The host is running Zebedee server and is prone to denial
+  of service vulnerability.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_vul");
 
+  script_xref(name:"URL", value:"http://www.winton.org.uk/zebedee/download.html");
   exit(0);
 }
 
-## Variable Initialization
-port= 0;
-soc = "";
-soc1 = "";
-crap = "";
-
 port = 11965;
 
-## Check the port status
 if(!get_port_state(port)){
   exit(0);
 }
 
-# Open the TCP socket.
 soc = open_sock_tcp(port);
 
 if(!soc){
   exit(0);
 }
 
-## Construct the attack request
 crap = raw_string(
     0x02, 0x01,                                      # protocol version
     0x00, 0x00,                                      # flags

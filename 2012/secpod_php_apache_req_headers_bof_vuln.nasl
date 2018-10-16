@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_php_apache_req_headers_bof_vuln.nasl 10458 2018-07-09 06:47:36Z cfischer $
+# $Id: secpod_php_apache_req_headers_bof_vuln.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # PHP 'apache_request_headers()' Function Buffer Overflow Vulnerability (Windows)
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902837");
-  script_version("$Revision: 10458 $");
+  script_version("$Revision: 11857 $");
   script_bugtraq_id(53455);
   script_cve_id("CVE-2012-2329");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 08:47:36 +0200 (Mon, 09 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 10:25:16 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-05-23 16:16:16 +0530 (Wed, 23 May 2012)");
   script_name("PHP 'apache_request_headers()' Function Buffer Overflow Vulnerability (Windows)");
   script_category(ACT_GATHER_INFO);
@@ -51,9 +51,7 @@ if(description)
   script_xref(name:"URL", value:"https://bugzilla.redhat.com/show_bug.cgi?id=820000");
 
   script_tag(name:"impact", value:"Successful exploitation could allow remote attackers to cause a denial of
-  service.
-
-  Impact Level: Application");
+  service.");
 
   script_tag(name:"affected", value:"PHP Version 5.4.x before 5.4.3 on Windows");
 
@@ -61,8 +59,7 @@ if(description)
   function, which can be exploited to cause a denial of service via a long
   string in the header of an HTTP request.");
 
-  script_tag(name:"solution", value:"Upgrade to PHP Version 5.4.3 or later,
-  For updates refer to http://php.net/downloads.php");
+  script_tag(name:"solution", value:"Upgrade to PHP Version 5.4.3 or later.");
 
   script_tag(name:"summary", value:"This host is installed with PHP and is prone to buffer overflow
   vulnerability.");
@@ -70,6 +67,7 @@ if(description)
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_banner");
 
+  script_xref(name:"URL", value:"http://php.net/downloads.php");
   exit(0);
 }
 

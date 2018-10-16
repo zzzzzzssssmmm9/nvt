@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: win_kms_client_online_avs.nasl 10345 2018-06-27 13:46:27Z emoss $
+# $Id: win_kms_client_online_avs.nasl 11344 2018-09-12 06:57:52Z emoss $
 #
 # Check value for Turn off KMS Client Online AVS Validation
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.109480");
-  script_version("$Revision: 10345 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-27 15:46:27 +0200 (Wed, 27 Jun 2018) $");
+  script_version("$Revision: 11344 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-12 08:57:52 +0200 (Wed, 12 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-06-27 14:27:37 +0200 (Wed, 27 Jun 2018)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:H/Au:S/C:N/I:N/A:N");
@@ -38,12 +38,13 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH");
   script_family("Policy");
   script_dependencies("smb_reg_service_pack.nasl", "os_detection.nasl");
+  script_add_preference(name:"Value", type:"radio", value:"1;0");
   script_mandatory_keys("Compliance/Launch");
-  script_tag(name: "summary", value: "This test checks the setting for policy 
+  script_tag(name:"summary", value:"This test checks the setting for policy
 'Turn off KMS Client Online AVS Validation' on Windows hosts (at least Windows 10).
 
-The setting configures opt-out of sending KMS client activation data to 
-Microsoft automatically. Enabling this setting prevents this computer from 
+The setting configures opt-out of sending KMS client activation data to
+Microsoft automatically. Enabling this setting prevents this computer from
 sending data to Microsoft regarding its activation state.");
   exit(0);
 }
@@ -59,7 +60,7 @@ to query the registry.');
 
 HostDetails = get_kb_list("HostDetails");
 if("cpe:/o:microsoft:windows_10" >!< HostDetails){
-  policy_logging(text:'Host is not a Microsoft Windows 10 system. 
+  policy_logging(text:'Host is not a Microsoft Windows 10 system.
 This setting applies to Windows 10 systems only.');
   exit(0);
 }
@@ -72,13 +73,24 @@ type = 'HKLM';
 key = 'Software\\Policies\\Microsoft\\Windows NT\\CurrentVersion\\Software Protection Platform';
 item = 'NoGenTicket';
 value = registry_get_dword(key:key, item:item, type:type);
-if(!value){
-  value = 'none';
+default = script_get_preference('Value');
+
+if(value == ''){
+  value = '0';
 }
 
-policy_logging_registry(type:type,key:key,item:item,value:value);
-policy_set_kb(val:value);
+if(int(value) == int(default)){
+  compliant = 'yes';
+}else{
+  compliant = 'no';
+}
+
+policy_logging(text:'"' + title + '" is set to: ' + value);
+policy_add_oid();
+policy_set_dval(dval:default);
 policy_fixtext(fixtext:fixtext);
 policy_control_name(title:title);
+policy_set_kb(val:value);
+policy_set_compliance(compliant:compliant);
 
 exit(0);

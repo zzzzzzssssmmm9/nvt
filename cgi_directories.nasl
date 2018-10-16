@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: cgi_directories.nasl 10283 2018-06-21 11:10:20Z cfischer $
+# $Id: cgi_directories.nasl 11638 2018-09-27 06:42:05Z cfischer $
 #
 # CGI Scanning Consolidation
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.111038");
-  script_version("$Revision: 10283 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-21 13:10:20 +0200 (Thu, 21 Jun 2018) $");
+  script_version("$Revision: 11638 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-27 08:42:05 +0200 (Thu, 27 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-09-14 07:00:00 +0200 (Mon, 14 Sep 2015)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -61,7 +61,7 @@ if(description)
     'Add historic /scripts and /cgi-bin to directories for CGI scanning' within the
     'Global variable settings' of the scan config in use
 
-  If you think any of these are wrong please report to openvas-plugins@wald.intevation.org");
+  If you think any of these are wrong please report to https://community.greenbone.net/c/vulnerability-tests.");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
@@ -69,7 +69,6 @@ if(description)
 }
 
 include("http_func.inc");
-include("http_keepalive.inc");
 include("host_details.inc");
 
 if( get_kb_item( "Settings/disable_cgi_scanning" ) ) {
@@ -92,37 +91,45 @@ maxItems = int( script_get_preference( "Maximum number of items shown for each l
 if( maxItems <= 0 ) maxItems = 100;
 
 port = get_http_port( default:80 );
+host = http_host_name( dont_add_port:TRUE );
 
-cgiDirs          = cgi_dirs( port:port );
+cgiDirs          = cgi_dirs( port:port, host:host );
 httpVersion      = get_kb_item( "http/" + port );
-authRequireDirs  = get_kb_list( "www/" + port + "/content/auth_required" );
-cgiList          = get_kb_list( "www/" + port + "/content/cgis/*" );
-excludedCgiList  = get_kb_list( "www/" + port + "/content/excluded_cgis/*" );
-dirIndexList     = get_kb_list( "www/" + port + "/content/dir_index" );
-phpinfoList      = get_kb_list( "www/" + port + "/content/phpinfo_script" );
-phpPathList      = get_kb_list( "www/" + port + "/content/php_physical_path" );
-guardianList     = get_kb_list( "www/" + port + "/content/guardian" );
-coffeecupList    = get_kb_list( "www/" + port + "/content/coffeecup" );
-chOptOutList     = get_kb_list( "www/" + port + "/content/coinhive_optout" );
-chOptInList      = get_kb_list( "www/" + port + "/content/coinhive_optin" );
-chNoOptOutList   = get_kb_list( "www/" + port + "/content/coinhive_nooptout" );
-chObfuscatedList = get_kb_list( "www/" + port + "/content/coinhive_obfuscated" );
-frontpageList    = get_kb_list( "www/" + port + "/content/frontpage_results" );
-skippedDirList   = get_kb_list( "www/" + port + "/content/skipped_directories" );
-excludedDirList  = get_kb_list( "www/" + port + "/content/excluded_directories" );
-recursionUrlList = get_kb_list( "www/" + port + "/content/recursion_urls" );
-maxPagesReached  = get_kb_item( "www/" + port + "/content/max_pages_reached" );
+authRequireDirs  = get_http_kb_auth_required( port:port, host:host );
+cgiList          = get_kb_list( "www/" + host + "/" + port + "/content/cgis/cgis_reporting/*" );
+excludedCgiList  = get_kb_list( "www/" + host + "/" + port + "/content/excluded_cgis/*" );
+dirIndexList     = get_kb_list( "www/" + host + "/" + port + "/content/dir_index" );
+phpinfoList      = get_kb_list( "www/" + host + "/" + port + "/content/phpinfo_script/reporting" );
+phpPathList      = get_kb_list( "www/" + host + "/" + port + "/content/php_physical_path" );
+guardianList     = get_kb_list( "www/" + host + "/" + port + "/content/guardian" );
+coffeecupList    = get_kb_list( "www/" + host + "/" + port + "/content/coffeecup" );
+chOptOutList     = get_kb_list( "www/" + host + "/" + port + "/content/coinhive_optout" );
+chOptInList      = get_kb_list( "www/" + host + "/" + port + "/content/coinhive_optin" );
+chNoOptOutList   = get_kb_list( "www/" + host + "/" + port + "/content/coinhive_nooptout" );
+chObfuscatedList = get_kb_list( "www/" + host + "/" + port + "/content/coinhive_obfuscated" );
+frontpageList    = get_kb_list( "www/" + host + "/" + port + "/content/frontpage_results" );
+skippedDirList   = get_kb_list( "www/" + host + "/" + port + "/content/skipped_directories" );
+excludedDirList  = get_kb_list( "www/" + host + "/" + port + "/content/excluded_directories" );
+srvmanualDirList = get_kb_list( "www/" + host + "/" + port + "/content/servermanual_directories" );
+recursionUrlList = get_kb_list( "www/" + host + "/" + port + "/content/recursion_urls" );
+maxPagesReached  = get_kb_item( "www/" + host + "/" + port + "/content/max_pages_reached" );
 
-#report = 'The hostname "' + http_host_name( port:port ) + '" is used.\n\n'; #TODO is this forking?
-
-#TODO: Add no404.nasl
+report = 'The Hostname/IP "' + host + '" was used to access the remote host.\n\n';
 
 if( get_kb_item( "global_settings/disable_generic_webapp_scanning" ) ) {
   report += 'Generic web application scanning is disabled for this host via the "Enable generic web application scanning" option within the "Global variable settings" of the scan config in use.\n\n';
 }
 
-if( http_is_marked_broken( port:port ) ) {
+if( get_http_is_marked_broken( port:port, host:host ) ) {
   report += 'This service is marked as broken and no CGI scanning is launched against it.\n\n';
+}
+
+if( no404_string = get_http_no404_string( port:port, host:host ) ) {
+  if( no404_string != "HTTP" ) { #nb: Set by no404.nasl if "generally" marked broken.
+    report += 'The service is responding with a 200 HTTP status code to non-existent files/urls. ';
+    report += 'The following pattern is used to work around possible false detections:\n\n';
+    report += no404_string + '\n\n';
+  }
 }
 
 if( httpVersion == "10" ) {
@@ -142,6 +149,8 @@ if( can_host_asp( port:port ) ) {
 } else {
   report += 'This service seems to be NOT able to host ASP scripts.\n\n';
 }
+
+report += 'The User-Agent "' + get_http_user_agent() + '" was used to access the remote host.\n\n';
 
 if( get_kb_item( "global_settings/exclude_historic_cgi_dirs" ) ) {
   report += 'Historic /scripts and /cgi-bin are not added to the directories used for CGI scanning. ';
@@ -250,6 +259,27 @@ if( ! isnull( excludedDirList ) ) {
     currentItems++;
     if( currentItems >= maxItems ) continue;
     tmpreport += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
+  }
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
+}
+
+if( ! isnull( srvmanualDirList ) ) {
+
+  currentItems = 0;
+
+  tmpreport  = "The following directories were excluded from CGI scanning because";
+  tmpreport += ' of the "Exclude directories containing detected known server manuals from CGI scanning"';
+  tmpreport += ' setting of the NVT "Global variable settings" (OID: 1.3.6.1.4.1.25623.1.0.12288):\n\n';
+
+  # Sort to not report changes on delta reports if just the order is different
+  srvmanualDirList = sort( srvmanualDirList );
+
+  foreach dir( srvmanualDirList ) {
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += dir + '\n';
   }
   if( currentItems >= maxItems )
     tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );

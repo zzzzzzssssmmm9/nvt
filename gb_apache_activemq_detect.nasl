@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apache_activemq_detect.nasl 8138 2017-12-15 11:42:07Z cfischer $
+# $Id: gb_apache_activemq_detect.nasl 11399 2018-09-15 07:45:12Z cfischer $
 #
 # Apache ActiveMQ Detection
 #
@@ -28,10 +28,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.105330");
-  script_version("$Revision: 8138 $");
+  script_version("$Revision: 11399 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 12:42:07 +0100 (Fri, 15 Dec 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 09:45:12 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-08-24 12:33:07 +0200 (Mon, 24 Aug 2015)");
   script_name("Apache ActiveMQ Detection");
   script_category(ACT_GATHER_INFO);
@@ -93,7 +93,7 @@ foreach jmsPort( jmsPorts ) {
     os = eregmatch( pattern:"OS: ([a-zA-Z]+), (([a-zA-Z0-9.\-]+),)?", string:buf );
     if( os[1] ) {
       if( "windows" >< tolower( os[1] ) ) {
-        register_and_report_os( os:"Windows", cpe:"cpe:/o:microsoft:windows", banner_type:banner_type, banner:os[0], port:jmsPort, desc:SCRIPT_DESC, runs_key:"windows" );
+        register_and_report_os( os:"Microsoft Windows", cpe:"cpe:/o:microsoft:windows", banner_type:banner_type, banner:os[0], port:jmsPort, desc:SCRIPT_DESC, runs_key:"windows" );
       } else if( "linux" >< tolower( os[1] ) ) {
         if( os[3] ) {
           register_and_report_os( os:"Linux", version:os[3], cpe:"cpe:/o:linux:kernel", banner_type:banner_type, banner:os[0], port:jmsPort, desc:SCRIPT_DESC, runs_key:"unixoide" );
@@ -101,7 +101,7 @@ foreach jmsPort( jmsPorts ) {
           register_and_report_os( os:"Linux", cpe:"cpe:/o:linux:kernel", banner_type:banner_type, banner:os[0], port:jmsPort, desc:SCRIPT_DESC, runs_key:"unixoide" );
         }
       } else {
-        # Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
+        # nb: Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
         register_and_report_os( os:os[1], banner_type:banner_type, banner:os[0], port:jmsPort, desc:SCRIPT_DESC, runs_key:"unixoide" );
         register_unknown_os_banner( banner:os[0], banner_type_name:banner_type, banner_type_short:"activemq_os_banner", port:jmsPort );
       }
@@ -133,6 +133,7 @@ port = get_http_port( default:8161 );
 url = "/admin/index.jsp";
 buf = http_get_cache( item:url, port:port );
 if( ! buf ) exit( 0 );
+host = http_host_name( dont_add_port:TRUE );
 
 if( egrep( pattern:"(Apache )?ActiveMQ( Console)?</title>", string:buf, icase:TRUE ) ||
     'WWW-Authenticate: basic realm="ActiveMQRealm"' >< buf ) {
@@ -141,20 +142,20 @@ if( egrep( pattern:"(Apache )?ActiveMQ( Console)?</title>", string:buf, icase:TR
   appVer = "unknown";
   conclUrl = report_vuln_url( port:port, url:url, url_only:TRUE );
 
-  #Basic auth check for default_http_auth_credentials.nasl
+  # nb: Basic auth check for default_http_auth_credentials.nasl
   if( 'WWW-Authenticate: basic realm="ActiveMQRealm"' >< buf ) {
     set_kb_item( name:"www/content/auth_required", value:TRUE );
-    set_kb_item( name:"www/" + port + "/content/auth_required", value:url );
-    set_kb_item( name:"www/" + port + "/ActiveMQ/Web/auth_required", value:url );
+    set_kb_item( name:"www/" + host + "/" + port + "/content/auth_required", value:url );
+    set_kb_item( name:"www/" + host + "/" + port + "/ActiveMQ/Web/auth_required", value:url );
     set_kb_item( name:"ActiveMQ/Web/auth_required", value:TRUE );
     set_kb_item( name:"ActiveMQ/Web/auth_or_unprotected", value:TRUE );
   } else if( egrep( pattern:"(Apache )?ActiveMQ( Console)?</title>", string:buf, icase:TRUE ) ) {
-    set_kb_item( name:"www/" + port + "/ActiveMQ/Web/unprotected", value:url );
+    set_kb_item( name:"www/" + host + "/" + port + "/ActiveMQ/Web/unprotected", value:url );
     set_kb_item( name:"ActiveMQ/Web/unprotected", value:TRUE );
     set_kb_item( name:"ActiveMQ/Web/auth_or_unprotected", value:TRUE );
   }
 
-  ##Getting version from admin page, in some cases admin page is accessible where we can get the version
+  # nb: Getting version from admin page, in some cases admin page is accessible where we can get the version
   version = eregmatch( pattern:'Version.*<td><b>([0-9.]+).*<td>ID', string:buf );
   if( version[1] ) appVer = version[1];
 

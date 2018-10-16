@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_tiki_wiki_cms_arbitrary_file_download_vuln.nasl 5144 2017-01-31 09:55:46Z cfi $
+# $Id: gb_tiki_wiki_cms_arbitrary_file_download_vuln.nasl 11903 2018-10-15 10:26:16Z asteins $
 #
 # Tiki Wiki CMS Groupware Arbitrary File Download Vulnerability
 #
@@ -29,10 +29,10 @@ CPE = "cpe:/a:tiki:tikiwiki_cms/groupware";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.808576");
-  script_version("$Revision: 5144 $");
+  script_version("$Revision: 11903 $");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-01-31 10:55:46 +0100 (Tue, 31 Jan 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-15 12:26:16 +0200 (Mon, 15 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-07-12 12:32:54 +0530 (Tue, 12 Jul 2016)");
   script_name("Tiki Wiki CMS Groupware Arbitrary File Download Vulnerability");
   script_category(ACT_ATTACK);
@@ -54,18 +54,17 @@ if(description)
   of input passed to 'flv_stream.php' script.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to gain access to arbitrary files and to compromise the application.
-
-  Impact Level: Application");
+  attackers to gain access to arbitrary files and to compromise the application.");
 
   script_tag(name:"affected", value:"Tiki Wiki CMS Groupware version 15.0");
 
   script_tag(name:"solution", value:"Upgrade to Tiki Wiki CMS Groupware version 15.1 or
-  later. For updates refer to https://tiki.org");
+  later.");
 
   script_tag(name:"qod_type", value:"remote_vul");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"https://tiki.org");
   exit(0);
 }
 
@@ -77,10 +76,8 @@ if( ! port = get_app_port( cpe:CPE ) ) exit( 0 );
 if( ! dir = get_app_location( cpe:CPE, port:port ) ) exit( 0 );
 if( dir == "/" ) dir = "";
 
-## Construct the attack request
 url = dir + "/vendor/player/flv/flv_stream.php?file=../../../db/local.php&position=0";
 
-## Try attack and check the response to confirm vulnerability
 if( http_vuln_check( port:port, url:url, check_header:TRUE, pattern:"dbversion_tiki",
                      extra_check:make_list("user_tiki", "host_tiki", "dbs_tiki" ) ) ) {
   report = report_vuln_url( port:port, url:url );

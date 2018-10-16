@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_codoforum_mult_vuln.nasl 6497 2017-06-30 09:58:54Z teissa $
+# $Id: gb_codoforum_mult_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Codoforum Multiple Vulnerabilities
 #
@@ -29,10 +29,10 @@ CPE = "cpe:/a:codoforum:codoforum";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806015");
-  script_version("$Revision: 6497 $");
+  script_version("$Revision: 11872 $");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-30 11:58:54 +0200 (Fri, 30 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-08-19 14:54:43 +0530 (Wed, 19 Aug 2015)");
   script_tag(name:"qod_type", value:"remote_vul");
   script_name("Codoforum Multiple Vulnerabilities");
@@ -50,19 +50,17 @@ if(description)
   attackers to execute arbitrary script code in a user's browser session within
   the trust relationship between their browser and the server and to inject or
   manipulate SQL queries in the back-end database, allowing for the manipulation
-  or disclosure of arbitrary data.
-
-  Impact Level: Application");
+  or disclosure of arbitrary data.");
 
   script_tag(name:"affected", value:"Codoforum version 3.3.1.");
 
-  script_tag(name: "solution" , value:"Upgrade to Codoforum version 3.4 or
-  later. For updates refer to https://codoforum.com/");
+  script_tag(name:"solution", value:"Upgrade to Codoforum version 3.4 or
+  later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
-  script_xref(name : "URL" , value : "https://packetstormsecurity.com/files/133044");
-  script_xref(name : "URL" , value : "http://seclists.org/fulldisclosure/2015/Aug/32");
-  script_xref(name : "URL" , value : "http://seclists.org/fulldisclosure/2015/Aug/31");
+  script_xref(name:"URL", value:"https://packetstormsecurity.com/files/133044");
+  script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2015/Aug/32");
+  script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2015/Aug/31");
 
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
@@ -70,6 +68,7 @@ if(description)
   script_dependencies("gb_codoforum_detect.nasl");
   script_mandatory_keys("Codoforum/Installed");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"https://codoforum.com/");
   exit(0);
 }
 
@@ -78,25 +77,16 @@ include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
 
-# Variable Initialization
-dir = "";
-url = "";
-http_port = "";
-
-# Get HTTP Port
 if(!http_port = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get Application Location
 if(!dir = get_app_location(cpe:CPE, port:http_port)){
   exit(0);
 }
 
-##Construct Attack Request
 url = dir + '/sys/Ext/hybridauth/install.php/";><script>alert(document.cookie)</script>';
 
-## Try attack and check the response to confirm vulnerability
 if(http_vuln_check(port:http_port, url:url, check_header:TRUE,
    pattern:"<script>alert\(document.cookie\)</script>",
    extra_check:make_list(">HybridAuth Installer<", "codoforum")))

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wordpress_dukaPress_dir_trav_vuln.nasl 9998 2018-05-29 08:15:38Z cfischer $
+# $Id: gb_wordpress_dukaPress_dir_trav_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Wordpress DukaPress 'src' Parameter Directory Traversal Vulnerability
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805122");
-  script_version("$Revision: 9998 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2014-8799");
   script_bugtraq_id(71294);
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-29 10:15:38 +0200 (Tue, 29 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-01-09 15:07:11 +0530 (Fri, 09 Jan 2015)");
   script_name("Wordpress DukaPress 'src' Parameter Directory Traversal Vulnerability");
 
@@ -50,19 +50,16 @@ if(description)
   parameter that contains '..' to lib/dp_image.php.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to download arbitrary files.
-
-  Impact Level: Application");
+  attackers to download arbitrary files.");
 
   script_tag(name:"affected", value:"Wordpress DukaPress plugin before 2.5.4");
 
-  script_tag(name:"solution", value:"Upgrade to version 2.5.4 or higher,
-  For updates refer to https://wordpress.org/plugins/dukapress");
+  script_tag(name:"solution", value:"Upgrade to version 2.5.4 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://xforce.iss.net/xforce/xfdb/98943");
-  script_xref(name : "URL" , value : "http://www.exploit-db.com/exploits/35346");
+  script_xref(name:"URL", value:"http://xforce.iss.net/xforce/xfdb/98943");
+  script_xref(name:"URL", value:"http://www.exploit-db.com/exploits/35346");
 
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
@@ -71,6 +68,7 @@ if(description)
   script_dependencies("secpod_wordpress_detect_900182.nasl");
   script_mandatory_keys("wordpress/installed");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"https://wordpress.org/plugins/dukapress");
   exit(0);
 }
 

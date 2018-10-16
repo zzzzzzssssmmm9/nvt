@@ -29,12 +29,12 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805685");
-  script_version("$Revision: 10456 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-0273", "CVE-2014-9705");
   script_bugtraq_id(73031, 72701);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 08:10:17 +0200 (Mon, 09 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-07-23 13:10:57 +0530 (Thu, 23 Jul 2015)");
   script_name("PHP Multiple Remote Code Execution Vulnerabilities - Jul15 (Linux)");
 
@@ -51,15 +51,13 @@ if(description)
   'ext/enchant/enchant.c' script.");
 
   script_tag(name:"impact", value:"Successfully exploiting this issue allow
-  remote attackers to execute arbitrary code via some crafted dimensions.
-
-  Impact Level: Application");
+  remote attackers to execute arbitrary code via some crafted dimensions.");
 
   script_tag(name:"affected", value:"PHP versions before 5.4.38, 5.5.x before
   5.5.22, and 5.6.x before 5.6.6");
 
   script_tag(name:"solution", value:"Upgrade to PHP 5.4.38 or 5.5.22 or 5.6.6
-  or later. For updates refer to http://www.php.net");
+  or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_banner_unreliable");
@@ -73,6 +71,7 @@ if(description)
   script_family("Web application abuses");
   script_dependencies("gb_php_detect.nasl", "os_detection.nasl");
   script_mandatory_keys("php/installed", "Host/runs_unixoide");
+  script_xref(name:"URL", value:"http://www.php.net");
   exit(0);
 }
 

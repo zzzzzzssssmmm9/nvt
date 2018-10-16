@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mozilla_thunderbird_mult_vuln02_sep14_macosx.nasl 6692 2017-07-12 09:57:43Z teissa $
+# $Id: gb_mozilla_thunderbird_mult_vuln02_sep14_macosx.nasl 11402 2018-09-15 09:13:36Z cfischer $
 #
 # Mozilla Thunderbird Multiple Vulnerabilities-02 September14 (Mac OS X)
 #
@@ -29,36 +29,37 @@ CPE = "cpe:/a:mozilla:thunderbird";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804836");
-  script_version("$Revision: 6692 $");
+  script_version("$Revision: 11402 $");
   script_cve_id("CVE-2014-1565", "CVE-2014-1564", "CVE-2014-1563", "CVE-2014-1553");
   script_bugtraq_id(69521, 69525, 69523, 69524);
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 11:57:43 +0200 (Wed, 12 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:13:36 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2014-09-05 20:20:31 +0530 (Fri, 05 Sep 2014)");
 
   script_name("Mozilla Thunderbird Multiple Vulnerabilities-02 September14 (Mac OS X)");
 
-  script_tag(name: "summary" , value:"This host is installed with Mozilla
+  script_tag(name:"summary", value:"This host is installed with Mozilla
   Thunderbird and is prone to multiple vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Get the installed version with the help of
-  detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"Multiple flaws exist due to,
+  script_tag(name:"insight", value:"Multiple flaws exist due to,
+
   - An out-of-bounds read error when creating an audio timeline in Web Audio.
+
   - An error when decoding GIF images.
+
   - A use-after-free error during cycle collection when animating SVG content.
+
   - Some other unspecified errors.");
 
-  script_tag(name: "impact" , value:"Successful exploitation will allow attackers
-  to disclose potentially sensitive information and compromise a user's system.
+  script_tag(name:"impact", value:"Successful exploitation will allow attackers
+  to disclose potentially sensitive information and compromise a user's system.");
 
-  Impact Level: Application/System");
+  script_tag(name:"affected", value:"Mozilla Thunderbird 31.x before 31.1 on Mac OS X");
 
-  script_tag(name: "affected" , value:"Mozilla Thunderbird 31.x before 31.1 on Mac OS X");
-
-  script_tag(name: "solution" , value:"Upgrade to Mozilla Thunderbird version
+  script_tag(name:"solution", value:"Upgrade to Mozilla Thunderbird version
   31.1 or later, For updates refer http://www.mozilla.com/en-US/thunderbird");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
@@ -80,20 +81,15 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-tbVer = "";
-
-## Get version
 if(!tbVer = get_app_version(cpe:CPE)){
   exit(0);
 }
 
-# Check for vulnerable version
 if(tbVer =~ "^31\.")
 {
   if(version_is_equal(version:tbVer, test_version:"31.0"))
   {
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }

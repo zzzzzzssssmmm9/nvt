@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apache_tomcat_xee_info_disc_vuln.nasl 4347 2016-10-25 13:52:16Z cfi $
+# $Id: gb_apache_tomcat_xee_info_disc_vuln.nasl 11402 2018-09-15 09:13:36Z cfischer $
 #
 # Apache Tomcat XML External Entity Information Disclosure Vulnerability
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:apache:tomcat";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805019");
-  script_version("$Revision: 4347 $");
+  script_version("$Revision: 11402 $");
   script_cve_id("CVE-2014-0119");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2016-10-25 15:52:16 +0200 (Tue, 25 Oct 2016) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:13:36 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2014-11-28 19:52:03 +0530 (Fri, 28 Nov 2014)");
   script_name("Apache Tomcat XML External Entity Information Disclosure Vulnerability");
   script_category(ACT_GATHER_INFO);
@@ -49,8 +49,7 @@ if(description)
   script_tag(name:"summary", value:"This host is running Apache Tomcat and is
   prone to information disclosure vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw is due to an application does
   not properly constrain the class loader that accesses the XML parser used
@@ -58,9 +57,7 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to read arbitrary files via a crafted web application that provides
-  an XML external entity declaration in conjunction with an entity reference. 
-
-  Impact Level: Application");
+  an XML external entity declaration in conjunction with an entity reference.");
 
   script_tag(name:"affected", value:"Apache Tomcat before 6.0.40, 7.x before 7.0.54, and 8.x before 8.0.6");
 

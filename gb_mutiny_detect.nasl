@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mutiny_detect.nasl 9584 2018-04-24 10:34:07Z jschulte $
+# $Id: gb_mutiny_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Mutiny Detection
 #
@@ -25,31 +25,30 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "Detection of Mutiny.
-
-The script sends a connection request to the server and attempts to
-extract the version number from the reply.";
-
-SCRIPT_OID  = "1.3.6.1.4.1.25623.1.0.103588";   
-
 if(description)
 {
- script_oid(SCRIPT_OID); 
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_tag(name:"qod_type", value:"remote_banner");
- script_version("$Revision: 9584 $");
- script_tag(name:"last_modification", value:"$Date: 2018-04-24 12:34:07 +0200 (Tue, 24 Apr 2018) $");
- script_tag(name:"creation_date", value:"2012-10-23 10:15:44 +0200 (Tue, 23 Oct 2012)");
- script_name("Mutiny Detection");
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2012 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
- script_tag(name : "summary" , value : tag_summary);
- exit(0);
+  script_oid("1.3.6.1.4.1.25623.1.0.103588");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2012-10-23 10:15:44 +0200 (Tue, 23 Oct 2012)");
+
+  script_name("Mutiny Detection");
+
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2012 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+
+  script_tag(name:"summary", value:"Detection of Mutiny.
+
+The script sends a connection request to the server and attempts to extract the version number from the reply.");
+
+  exit(0);
 }
 
 include("http_func.inc");
@@ -63,33 +62,28 @@ foreach dir( make_list_unique( "/", cgi_dirs( port:port ) ) ) {
 
  install = dir;
  if( dir == "/" ) dir = "";
+
  url = dir + '/interface/logon.do';
- req = http_get(item:url, port:port);
- buf = http_keepalive_send_recv(port:port, data:req, bodyonly:FALSE);
- if( buf == NULL )continue;
+ buf = http_get_cache(item:url, port:port);
 
- if(egrep(pattern: "<title>.*Mutiny.*Login.*</title>", string: buf, icase: TRUE))
- {
-    vers = string("unknown");
-    ### try to get version 
+ if(egrep(pattern: "<title>.*Mutiny.*Login.*</title>", string: buf, icase: TRUE)) {
+    vers = "unknown";
+
     version = eregmatch(string: buf, pattern: 'var currentMutinyVersion = "Version ([0-9.-]+)',icase:TRUE);
+    if (!isnull(version[1]))
+       vers = version[1];
 
-    if ( !isnull(version[1]) ) {
-       vers = chomp(version[1]);
-    }
-
-    set_kb_item(name: string("www/", port, "/Mutiny"), value: string(vers," under ",install));
     set_kb_item(name: "Mutiny/installed", value: TRUE);
 
     cpe = build_cpe(value:vers, exp:"^([0-9.-]+)", base:"cpe:/a:mutiny:standard:");
-    if(isnull(cpe))
+    if(!cpe)
       cpe = 'cpe:/a:mutiny:standard';
 
     register_product(cpe:cpe, location:install, port:port);
 
-    log_message(data: build_detection_report(app:"Mutiny", version:vers, install:install, cpe:cpe, concluded: version[0]),
+    log_message(data: build_detection_report(app:"Mutiny", version:vers, install:install, cpe:cpe,
+                                             concluded: version[0]),
                 port:port);
-
     exit(0);
   }
 }

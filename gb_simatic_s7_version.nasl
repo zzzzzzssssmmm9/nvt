@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_simatic_s7_version.nasl 8864 2018-02-19 11:02:17Z cfischer $
+# $Id: gb_simatic_s7_version.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Siemens SIMATIC S7 Device Detection Consolidation
 #
@@ -27,30 +27,30 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.106096");
- script_version ("$Revision: 8864 $");
- script_tag(name: "last_modification", value: "$Date: 2018-02-19 12:02:17 +0100 (Mon, 19 Feb 2018) $");
- script_tag(name: "creation_date", value: "2016-06-15 15:30:33 +0700 (Wed, 15 Jun 2016)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.106096");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-06-15 15:30:33 +0700 (Wed, 15 Jun 2016)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("Siemens SIMATIC S7 Device Detection Consolidation");
+  script_name("Siemens SIMATIC S7 Device Detection Consolidation");
 
- script_tag(name: "summary" , value: "Report the Siemens SIMATIC S7 device model and firmware version.");
+  script_tag(name:"summary", value:"Report the Siemens SIMATIC S7 device model and firmware version.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_family("Product detection");
- script_dependencies("gb_simatic_s7_cotp_detect.nasl", "gb_simatic_s7_snmp_detect.nasl",
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("gb_simatic_s7_cotp_detect.nasl", "gb_simatic_s7_snmp_detect.nasl",
                      "gb_simatic_s7_http_detect.nasl");
- script_mandatory_keys("simatic_s7/detected");
+  script_mandatory_keys("simatic_s7/detected");
 
- script_xref(name: "URL", value: "https://www.siemens.com/global/en/home/products/automation/systems/industrial/plc.html");
+  script_xref(name:"URL", value:"https://www.siemens.com/global/en/home/products/automation/systems/industrial/plc.html");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_abb-microscada_detect_win.nasl 9157 2018-03-21 13:11:44Z cfischer $
+# $Id: gb_abb-microscada_detect_win.nasl 11420 2018-09-17 06:33:13Z cfischer $
 #
 # ABB MicroSCADA Detection (Windows)
 #
@@ -28,14 +28,14 @@
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.812815");
-  script_version("$Revision: 9157 $");
+  script_version("$Revision: 11420 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-03-21 14:11:44 +0100 (Wed, 21 Mar 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 08:33:13 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-03-05 17:50:51 +0530 (Mon, 05 Mar 2018)");
   script_name("ABB MicroSCADA Detection (Windows)");
 
-  script_tag(name:"summary" , value:"Detection of installed version of ABB
+  script_tag(name:"summary", value:"Detects the installed version of ABB
   MicroSCADA on Windows.
 
   The script logs in via smb, searches for MicroSCADA in the registry and
@@ -45,9 +45,10 @@ if (description)
   script_category(ACT_GATHER_INFO);
   script_copyright("This script is Copyright (C) 2018 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
+
   exit(0);
 }
 
@@ -55,17 +56,13 @@ include("smb_nt.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-osArch = "";
-mcver = "";
-mcpath = "";
-
 osArch = get_kb_item("SMB/Windows/Arch");
 if(!osArch){
   exit(0);
 }
 
 if("x86" >< osArch){
-  key_list = make_list("SOFTWARE\ABB\Products\SYS_600");                                                                                         
+  key_list = make_list("SOFTWARE\ABB\Products\SYS_600");
 }
 
 else if("x64" >< osArch){

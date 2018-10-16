@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_arcserve_udp_detect.nasl 5877 2017-04-06 09:01:48Z teissa $
+# $Id: gb_arcserve_udp_detect.nasl 11006 2018-08-16 12:21:56Z cfischer $
 #
 # Arcserve UDP Detection
 #
@@ -25,28 +25,29 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if (description)
+if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105294");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 5877 $");
- script_tag(name:"last_modification", value:"$Date: 2017-04-06 11:01:48 +0200 (Thu, 06 Apr 2017) $");
- script_tag(name:"creation_date", value:"2015-06-10 17:49:06 +0200 (Wed, 10 Jun 2015)");
- script_name("Arcserve UDP Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105294");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11006 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-16 14:21:56 +0200 (Thu, 16 Aug 2018) $");
+  script_tag(name:"creation_date", value:"2015-06-10 17:49:06 +0200 (Wed, 10 Jun 2015)");
+  script_name("Arcserve UDP Detection");
 
- script_tag(name: "summary" , value: "The script sends a connection request to the server and attempts
-to extract the version number from the reply.");
+  script_tag(name:"summary", value:"The script sends a connection request to the server and attempts
+  to extract the version number from the reply.");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 8014);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 8014);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+
+  exit(0);
 }
 
 include("http_func.inc");
@@ -58,17 +59,18 @@ cpe = 'cpe:/a:arcserve:arcserve_unified_data_protection';
 port = get_http_port( default:8014 );
 
 host = http_host_name( port:port );
+useragent = get_http_user_agent();
 
 function check_win()
 {
-  data = '<?xml version="1.0" encoding="UTF-8"?>' + 
+  data = '<?xml version="1.0" encoding="UTF-8"?>' +
          '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">' +
          '<S:Body><ns2:getVersionInfo xmlns:ns2="http://webservice.arcflash.ca.com" ' +
-         'xmlns:ns3="http://data.webservice.arcflash.ca.com/xsd" ' + 
+         'xmlns:ns3="http://data.webservice.arcflash.ca.com/xsd" ' +
          'xmlns:ns4="http://backup.data.webservice.arcflash.ca.com/xsd" ' +
          'xmlns:ns5="http://restore.data.webservice.arcflash.ca.com/xsd" ' +
          'xmlns:ns6="http://vsphere.data.webservice.arcflash.ca.com/xsd" ' +
-         'xmlns:ns7="http://browse.data.webservice.arcflash.ca.com/xsd" ' + 
+         'xmlns:ns7="http://browse.data.webservice.arcflash.ca.com/xsd" ' +
          'xmlns:ns8="http://remotedeploy.data.webservice.arcflash.ca.com/xsd" ' +
          'xmlns:ns9="http://catalog.data.webservice.arcflash.ca.com/xsd" ' +
          'xmlns:ns10="http://activitylog.data.webservice.arcflash.ca.com/xsd"/>' +
@@ -76,11 +78,11 @@ function check_win()
 
   len = strlen( data );
 
-  req = 'POST /WebServiceImpl/services/FlashServiceImpl HTTP/1.1\r\n' + 
-        'Accept: text/xml, multipart/related\r\n' + 
+  req = 'POST /WebServiceImpl/services/FlashServiceImpl HTTP/1.1\r\n' +
+        'Accept: text/xml, multipart/related\r\n' +
         'Content-Type: text/xml; charset=utf-8;\r\n' +
         'SOAPAction: "http://webservice.arcflash.ca.com/IFlashService_R16_5/getVersionInfoRequest"\r\n' +
-        'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+        'User-Agent: ' + useragent + '\r\n' +
         'Cache-Control: no-cache\r\n' +
         'Pragma: no-cache\r\n' +
         'Host: ' + host + '\r\n' +
@@ -188,18 +190,18 @@ function check_lin()
   data = '<?xml version="1.0" encoding="UTF-8"?>' +
          '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">' +
          '<S:Body><ns2:getVersionInfo xmlns:ns2="http://webservice.linuximaging.arcserve.ca.com" ' +
-         'xmlns:ns3="http://backup.data.webservice.arcflash.ca.com/xsd" ' + 
+         'xmlns:ns3="http://backup.data.webservice.arcflash.ca.com/xsd" ' +
          'xmlns:ns4="http://catalog.data.webservice.arcflash.ca.com/xsd" ' +
-         'xmlns:ns5="http://browse.data.webservice.arcflash.ca.com/xsd"/>' + 
+         'xmlns:ns5="http://browse.data.webservice.arcflash.ca.com/xsd"/>' +
          '</S:Body></S:Envelope>';
 
   len = strlen( data );
 
   req = 'POST /WebServiceImpl/services/LinuximagingServiceImpl HTTP/1.1\r\n' +
-        'Accept: text/xml, multipart/related\r\n' + 
+        'Accept: text/xml, multipart/related\r\n' +
         'Content-Type: text/xml; charset=utf-8\r\n' +
         'SOAPAction: "http://webservice.linuximaging.arcserve.ca.com/ILinuximagingService/getVersionInfoRequest"\r\n' +
-        'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+        'User-Agent: ' + useragent + '\r\n' +
         'Cache-Control: no-cache\r\n' +
         'Pragma: no-cache\r\n' +
         'Host: ' + host + '\r\n' +

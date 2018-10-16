@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_accellion_fta_multi_vuln.nasl 5246 2017-02-09 09:23:09Z ckuerste $
+# $Id: gb_accellion_fta_multi_vuln.nasl 11874 2018-10-12 11:28:04Z mmartin $
 #
 # Accellion FTA Multiple Vulnerabilities
 #
@@ -30,17 +30,17 @@ CPE = 'cpe:/h:accellion:secure_file_transfer_appliance';
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.106581");
-  script_version("$Revision: 5246 $");
-  script_tag(name: "last_modification", value: "$Date: 2017-02-09 10:23:09 +0100 (Thu, 09 Feb 2017) $");
-  script_tag(name: "creation_date", value: "2017-02-09 11:28:49 +0700 (Thu, 09 Feb 2017)");
-  script_tag(name: "cvss_base", value: "4.3");
-  script_tag(name: "cvss_base_vector", value: "AV:N/AC:M/Au:N/C:P/I:N/A:N");
+  script_version("$Revision: 11874 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:28:04 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2017-02-09 11:28:49 +0700 (Thu, 09 Feb 2017)");
+  script_tag(name:"cvss_base", value:"5.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
 
   script_cve_id("CVE-2016-9499", "CVE-2016-9500");
 
-  script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
-  script_tag(name: "solution_type", value: "VendorFix");
+  script_tag(name:"solution_type", value:"VendorFix");
 
   script_name("Accellion FTA Multiple Vulnerabilities");
 
@@ -51,23 +51,23 @@ if (description)
   script_dependencies("gb_accellion_fta_detect.nasl");
   script_mandatory_keys("accellion_fta/installed");
 
-  script_tag(name: "summary", value: "Accellion FTA is prone to multiple vulnerabilities");
+  script_tag(name:"summary", value:"Accellion FTA is prone to multiple vulnerabilities");
 
-  script_tag(name: "vuldetect", value: "Checks the version.");
+  script_tag(name:"vuldetect", value:"Checks the version.");
 
-  script_tag(name: "insight", value: "Accellion FTA is prone to multiple vulnerabilities:
+  script_tag(name:"insight", value:"Accellion FTA is prone to multiple vulnerabilities:
 
-- Accellion FTP server only returns the username in the server response if the a username is invalid. An attacker
+  - Accellion FTP server only returns the username in the server response if the a username is invalid. An attacker
 may use this information to determine valid user accounts and enumerate them. (CVE-2016-9499)
 
-- Accellion FTP server uses the Accusoft Prizm Content flash component, which contains multiple parameters
+  - Accellion FTP server uses the Accusoft Prizm Content flash component, which contains multiple parameters
 (customTabCategoryName, customButton1Image) that are vulnerable to cross-site scripting. (CVE-2016-9500)");
 
-  script_tag(name: "affected", value: "Accellion FTA Version prior to 9_12_220.");
+  script_tag(name:"affected", value:"Accellion FTA Version prior to 9_12_220.");
 
-  script_tag(name: "solution", value: "Upgrade to version 9_12_220 or later");
+  script_tag(name:"solution", value:"Upgrade to version 9_12_220 or later");
 
-  script_xref(name: "URL", value: "https://www.kb.cert.org/vuls/id/745607");
+  script_xref(name:"URL", value:"https://www.kb.cert.org/vuls/id/745607");
 
   exit(0);
 }

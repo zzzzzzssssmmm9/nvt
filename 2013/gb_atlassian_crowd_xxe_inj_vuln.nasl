@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_atlassian_crowd_xxe_inj_vuln.nasl 9353 2018-04-06 07:14:20Z cfischer $
+# $Id: gb_atlassian_crowd_xxe_inj_vuln.nasl 11865 2018-10-12 10:03:43Z cfischer $
 #
 # Atlassian Crowd Xml eXternal Entity (XXE) Injection Vulnerability
 #
@@ -24,48 +24,31 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_impact = "";
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.803830");
-  script_version("$Revision: 9353 $");
+  script_version("$Revision: 11865 $");
   script_cve_id("CVE-2013-3925");
   script_bugtraq_id(60899);
   script_tag(name:"cvss_base", value:"5.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:14:20 +0200 (Fri, 06 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:03:43 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2013-07-09 15:27:15 +0530 (Tue, 09 Jul 2013)");
   script_name("Atlassian Crowd Xml eXternal Entity (XXE) Injection Vulnerability");
+  script_tag(name:"summary", value:"This host is running Atlassian Crowd and is prone to xml external
+entity injection vulnerability.");
+  script_tag(name:"vuldetect", value:"Send a crafted data via HTTP POST request and check whether it is able to
+read the system file or not.");
+  script_tag(name:"solution", value:"Upgrade to version 2.5.4, 2.6.3, 2.7 or higher.");
+  script_tag(name:"solution_type", value:"VendorFix");
+  script_tag(name:"insight", value:"Flaw is due to an incorrectly configured XML parser accepting XML external
+entities from an untrusted source.");
+  script_tag(name:"affected", value:"Atlassian Crowd 2.5.x before 2.5.4, 2.6.x before 2.6.3, 2.3.8, and 2.4.9");
+  script_tag(name:"impact", value:"Successful exploitation allow remote attackers to gain access to arbitrary
+files by sending specially crafted XML data.");
 
-  tag_summary = "This host is running Atlassian Crowd and is prone to xml external
-entity injection vulnerability.";
-
-  tag_vuldetect = "Send a crafted data via HTTP POST request and check whether it is able to
-read the system file or not.";
-
-  tag_insight = "Flaw is due to an incorrectly configured XML parser accepting XML external
-entities from an untrusted source.";
-
-  tag_impact = "Successful exploitation allow remote attackers to gain access to arbitrary
-files by sending specially crafted XML data.
-
-  Impact Level: Application";
-
-  tag_affected = "Atlassian Crowd 2.5.x before 2.5.4, 2.6.x before 2.6.3, 2.3.8, and 2.4.9";
-
-  tag_solution = "Upgrade to version 2.5.4, 2.6.3, 2.7 or higher,
-For updates refer to http://www.atlassian.com/software/crowd/download";
-
-  script_tag(name : "summary" , value : tag_summary);
-  script_tag(name : "vuldetect" , value : tag_vuldetect);
-  script_tag(name : "solution" , value : tag_solution);
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "impact" , value : tag_impact);
-
-  script_xref(name : "URL" , value : "https://jira.atlassian.com/browse/CWD-3366");
-  script_xref(name : "URL" , value : "http://www.commandfive.com/papers/C5_TA_2013_3925_AtlassianCrowd.pdf");
+  script_xref(name:"URL", value:"https://jira.atlassian.com/browse/CWD-3366");
+  script_xref(name:"URL", value:"http://www.commandfive.com/papers/C5_TA_2013_3925_AtlassianCrowd.pdf");
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
   script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
@@ -74,6 +57,7 @@ For updates refer to http://www.atlassian.com/software/crowd/download";
   script_dependencies("find_service.nasl", "http_version.nasl", "os_detection.nasl");
   script_exclude_keys("Settings/disable_cgi_scanning");
 
+  script_xref(name:"URL", value:"http://www.atlassian.com/software/crowd/download");
   exit(0);
 }
 
@@ -82,19 +66,13 @@ include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
 
-## Variable Initialization
-port = "";
-req = "";
-res = "";
-url = "";
-
 port = get_http_port(default:8095);
 
 files = traversal_files();
 
+useragent = get_http_user_agent();
 host = http_host_name( port:port );
 
-## Send and Receive the response
 req = http_get(item:"/crowd/console/login.action",  port:port);
 res = http_keepalive_send_recv(port:port, data:req, bodyonly:TRUE);
 
@@ -133,7 +111,7 @@ if("Atlassian<" >< res && "Crowd Console<" >< res)
 
       req = string("POST ",url," HTTP/1.1\r\n",
                "Host: ", host,"\r\n",
-               "User-Agent: ", OPENVAS_HTTP_USER_AGENT,"\r\n",
+               "User-Agent: ", useragent, "\r\n",
                "SOAPAction: ",'""',"\r\n",
                "Content-Type: text/xml; charset=UTF-8\r\n",
                "Content-Length: ", len,"\r\n",

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_onenote_ms15-116.nasl 6412 2017-06-23 09:05:07Z cfischer $
+# $Id: gb_ms_onenote_ms15-116.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Microsoft OneNote Privilege Elevation Vulnerability (3104540)
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:microsoft:onenote";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806163");
-  script_version("$Revision: 6412 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-2503");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-23 11:05:07 +0200 (Fri, 23 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-11-11 14:34:29 +0530 (Wed, 11 Nov 2015)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Microsoft OneNote Privilege Elevation Vulnerability (3104540)");
@@ -41,8 +41,7 @@ if(description)
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft Bulletin MS15-116.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"An elevation of privilege vulnerability
   exists in Microsoft Office software when an attacker instantiates an affected
@@ -50,39 +49,35 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to gain elevated privileges and break out of the Internet Explorer
-  sandbox.
+  sandbox.");
 
-  Impact Level: System/Application");
-
-  script_tag(name:"affected", value:"
-  Microsoft OneNote 2010 Service Pack 2 
+  script_tag(name:"affected", value:"Microsoft OneNote 2010 Service Pack 2
   Microsoft OneNote 2013 Service Pack 1
   Microsoft OneNote 2007 Service Pack 3
   Microsoft OneNote 2016 Service Pack 1");
 
   script_tag(name:"solution", value:"Run Windows Update and update the listed
-  hotfixes or download and update mentioned hotfixes in the advisory from the
-  below link, https://technet.microsoft.com/en-us/security/bulletin/ms15-116");
+  hotfixes or download and install the hotfixes from the referenced advisory.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/2889915");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3054978");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3101371");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/en-us/library/security/MS15-116");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/2889915");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3054978");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3101371");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/en-us/library/security/MS15-116");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
   script_dependencies("gb_ms_onenote_detect.nasl");
   script_mandatory_keys("MS/Office/OneNote/Ver");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/en-us/security/bulletin/ms15-116");
   exit(0);
 }
 
 include("version_func.inc");
 include("host_details.inc");
 
-## Get 'OneNote.exe' Version and location
 if( ! infos = get_app_version_and_location( cpe:CPE, exit_no_version:TRUE ) ) exit( 0 );
 
 exeVer = infos['version'];
@@ -91,18 +86,18 @@ notePath = infos['location'];
 if( ! notePath ) notePath =  "Unable to fetch full installation path";
 
 if(exeVer && exeVer =~ "^(12|14|15|16).*") {
-  if(exeVer =~ "^(12)"){
+  if(exeVer =~ "^12"){
     Vulnerable_range  =  "12.0 - 12.0.6735.4999";
   }
-  else if(exeVer =~ "^(14)"){
+  else if(exeVer =~ "^14"){
     Vulnerable_range  =  "14 - 14.0.7162.4999";
   }
-  else if(exeVer =~ "^(15)"){
+  else if(exeVer =~ "^15"){
     Vulnerable_range  =  "15 - 15.0.4763.0999";
   }
-  else if(exeVer =~ "^(16)"){
+  else if(exeVer =~ "^16"){
     Vulnerable_range  =  "16 - 16.0.4300.1000";
-  } 
+  }
 
   if(version_in_range(version:exeVer, test_version:"12.0", test_version2:"12.0.6735.4999") ||
      version_in_range(version:exeVer, test_version:"14.0", test_version2:"14.0.7162.4999") ||

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: ssl_funcs.inc 8322 2018-01-08 13:17:36Z cfischer $
+# $Id: ssl_funcs.inc 11009 2018-08-16 13:55:00Z cfischer $
 #
 # Implementation of common ssl functions
 #
@@ -25,9 +25,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 8322 $
+# $Revision: 11009 $
 #
 ###############################################################################
+
+# Enables debugging output for a few functions below
+global_var _ssl_funcs_debug;
+_ssl_funcs = FALSE;
 
 SSL_v2 = raw_string( 0x02, 0x00 );
 SSL_v3 = raw_string( 0x03, 0x00 );
@@ -568,6 +572,11 @@ global_var alpn_prot; # Passed globally by gb_tls_npn_alpn_detect.nasl
 
 function get_cert_from_port( port, extensions )
 {
+
+  # TODO: Remove once openvas-nasl-lint can handle such a missing include
+  # from within the same include.
+  if(!defined_func("base64")) include("misc_func.inc");
+
   local_var port, soc, hello, data, ret, cl;
 
   if( ! port ) {
@@ -713,7 +722,7 @@ function check_cert_validity( fprlist, port, vhost, check_for, now, timeframe ) 
   fpr = tmp[0];
 
   if( fpr[0] == "[" ) {
-    debug_print( "A SSL/TLS certificate on port ", port, " (" + vhost + ") is erroneous.", level:0 );
+    if( _ssl_funcs ) display( "A SSL/TLS certificate on port ", port, " (" + vhost + ") is erroneous." );
     return;
   }
 
@@ -1251,6 +1260,11 @@ function _ssl3_tls_hello( ciphers, version, extensions, session_id, add_tls_fall
 
 function add_ssl_extension( extensions, alpn_protocol )
 {
+
+  # TODO: Remove once openvas-nasl-lint can handle such a missing include
+  # from within the same include.
+  if(!defined_func("mkword")) include("byte_func.inc");
+
   local_var extension, e, ret, alpn, alpn_ret, alpn_protocol;
 
   if( ! extensions ) {
@@ -1380,6 +1394,11 @@ function data_len( data ) {
 # nb: Include mysql.inc for recv_mysql_server_handshake() if you're using this function
 function open_ssl_socket( port )
 {
+
+  # TODO: Remove once openvas-nasl-lint can handle such a missing include
+  # from within the same include.
+  if(!defined_func("recv_mysql_server_handshake")) include("mysql.inc");
+
   local_var soc, port, starttls_typ, starttls, st, search, stls;
 
   if( ! port ) {
@@ -2051,7 +2070,7 @@ function parse_npn_alpn_prot( data, pos, j, alpn ) {
   local_var data, pos, start, end, _pos, j, l, alpn, offset;
   local_var parsed_protocols, protocols_raw, protocols_raw_len, protocol;
 
-  # The ALPN repsonse contains an additional with the ALPN Extension length
+  # The ALPN response contains an additional with the ALPN Extension length
   # so add an offset for this here.
   if( alpn )
     offset = 1;

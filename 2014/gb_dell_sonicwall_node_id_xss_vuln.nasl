@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_dell_sonicwall_node_id_xss_vuln.nasl 9982 2018-05-28 12:00:03Z cfischer $
+# $Id: gb_dell_sonicwall_node_id_xss_vuln.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # DELL SonicWALL 'node_id' Cross Site Scripting Vulnerability
 #
@@ -27,32 +27,29 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804239");
-  script_version("$Revision: 9982 $");
+  script_version("$Revision: 11867 $");
   script_cve_id("CVE-2014-0332");
   script_bugtraq_id(65498);
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-28 14:00:03 +0200 (Mon, 28 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-02-17 19:09:31 +0530 (Mon, 17 Feb 2014)");
   script_name("DELL SonicWALL 'node_id' Cross Site Scripting Vulnerability");
 
-  script_tag(name : "summary" , value : "This host is running DELL SonicWALL and is prone to cross site scripting
+  script_tag(name:"summary", value:"This host is running DELL SonicWALL and is prone to cross site scripting
 vulnerability.");
-  script_tag(name : "vuldetect" , value : "Send a crafted exploit string via HTTP GET request and check whether it is
+  script_tag(name:"vuldetect", value:"Send a crafted exploit string via HTTP GET request and check whether it is
 able to read the string or not.");
-  script_tag(name : "insight" , value : "The flaw is due to an input passed via the 'node_id' parameter to
+  script_tag(name:"insight", value:"The flaw is due to an input passed via the 'node_id' parameter to
 'sgms/mainPage', which is not properly sanitised before using it.");
-  script_tag(name : "impact" , value : "Successful exploitation will allow remote attackers to steal the victim's
-cookie-based authentication credentials.
+  script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to steal the victim's
+cookie-based authentication credentials.");
+  script_tag(name:"affected", value:"DELL SonicWALL 7.0 and 7.1");
+  script_tag(name:"solution", value:"Upgrade to DELL SonicWALL version 7.2 or later.");
 
-Impact Level: Application");
-  script_tag(name : "affected" , value : "DELL SonicWALL 7.0 and 7.1");
-  script_tag(name : "solution" , value : "Upgrade to DELL SonicWALL version 7.2 or later.
-For updates refer to http://www.sonicwall.com/");
-
-  script_xref(name : "URL" , value : "http://xforce.iss.net/xforce/xfdb/91062");
-  script_xref(name : "URL" , value : "http://packetstormsecurity.com/files/125180");
-  script_xref(name : "URL" , value : "http://seclists.org/fulldisclosure/2014/Feb/108");
+  script_xref(name:"URL", value:"http://xforce.iss.net/xforce/xfdb/91062");
+  script_xref(name:"URL", value:"http://packetstormsecurity.com/files/125180");
+  script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2014/Feb/108");
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
@@ -63,6 +60,7 @@ For updates refer to http://www.sonicwall.com/");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://www.sonicwall.com/");
   exit(0);
 }
 

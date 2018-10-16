@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_FishEye_detect.nasl 9580 2018-04-24 08:44:20Z jschulte $
+# $Id: gb_FishEye_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # FishEye Detection
 #
@@ -26,32 +26,32 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100864");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9580 $");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"last_modification", value:"$Date: 2018-04-24 10:44:20 +0200 (Tue, 24 Apr 2018) $");
- script_tag(name:"creation_date", value:"2010-10-21 13:52:26 +0200 (Thu, 21 Oct 2010)");
- script_name("FishEye Detection");
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2010 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
- script_tag(name : "summary" , value : "Detection of FishEye.
-                    
+  script_oid("1.3.6.1.4.1.25623.1.0.100864");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2010-10-21 13:52:26 +0200 (Thu, 21 Oct 2010)");
+  script_name("FishEye Detection");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2010 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  script_tag(name:"summary", value:"Detection of FishEye.
+
 The script sends a connection request to the server and attempts to
 extract the version number from the reply.");
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");
 include("host_details.inc");
 include("http_func.inc");
 include("http_keepalive.inc");
-include("global_settings.inc");
+
 
 port = get_http_port(default:80);
 
@@ -67,7 +67,6 @@ foreach dir( make_list_unique( "/", "/fisheye", cgi_dirs( port:port ) ) ) {
   if("<h3>Administration log in to FishEye" >< buf) {
 
      vers = string("unknown");
-     ### try to get version 
      version = eregmatch(string: buf, pattern: "(\(Version:([0-9.]+))");
 
      if ( !isnull(version[2]) ) {
@@ -91,6 +90,6 @@ foreach dir( make_list_unique( "/", "/fisheye", cgi_dirs( port:port ) ) ) {
 
   }
 
-}  
+}
 
 exit(0);

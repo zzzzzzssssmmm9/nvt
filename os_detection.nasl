@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: os_detection.nasl 10573 2018-07-23 10:44:26Z cfischer $
+# $Id: os_detection.nasl 11833 2018-10-11 08:18:59Z cfischer $
 #
 # OS Detection Consolidation and Reporting
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.105937");
-  script_version("$Revision: 10573 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-23 12:44:26 +0200 (Mon, 23 Jul 2018) $");
+  script_version("$Revision: 11833 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-11 10:18:59 +0200 (Thu, 11 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-02-19 11:19:54 +0100 (Fri, 19 Feb 2016)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -38,6 +38,7 @@ if(description)
   script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Product detection");
   # Keep order the same as in host_details.inc. Also add NVTs registering an OS there if adding here.
+  # nmap_net.nasl was not added as this is in ACT_SCANNER and doesn't use register_and_report_os yet
   # Keep in sync with os_fingerprint.nasl as well.
   script_dependencies("gb_greenbone_os_detect.nasl", "gb_ami_megarac_sp_web_detect.nasl",
                       "gb_ros_detect.nasl", "gb_apple_mobile_detect.nasl",
@@ -51,6 +52,7 @@ if(description)
                       "gb_palo_alto_panOS_version.nasl", "gb_screenos_version.nasl",
                       "gb_extremeos_snmp_detect.nasl",
                       "gb_cisco_asa_version_snmp.nasl", "gb_cisco_asa_version.nasl",
+                      "gb_cisco_asa_detect.nasl",
                       "gb_arista_eos_snmp_detect.nasl", "gb_netgear_prosafe_consolidation.nasl",
                       "gb_hirschmann_consolidation.nasl", "gb_mikrotik_router_routeros_consolidation.nasl",
                       "gb_xenserver_version.nasl", "gb_cisco_ios_xe_version.nasl",
@@ -62,10 +64,11 @@ if(description)
                       "gb_simatic_cp_consolidation.nasl", "gb_simatic_scalance_snmp_detect.nasl",
                       "gb_siemens_ruggedcom_consolidation.nasl", "ilo_detect.nasl",
                       "gb_watchguard_fireware_detect.nasl", "gb_vibnode_consolidation.nasl",
-                      "gb_hyperip_consolidation.nasl", "gb_windows_cpe_detect.nasl",
+                      "gb_hyperip_consolidation.nasl", "gb_avm_fritz_box_detect.nasl",
+                      "gb_windows_cpe_detect.nasl",
                       "gather-package-list.nasl", "gb_cisco_pis_version.nasl",
                       "gb_checkpoint_fw_version.nasl", "gb_smb_windows_detect.nasl",
-                      "gb_nec_communication_platforms_detect.nasl", "gb_ssh_os_detection.nasl", # nmap_net.nasl not added as this is in ACT_SCANNER (and doesn't use register_and_report_os yet)
+                      "gb_nec_communication_platforms_detect.nasl", "gb_ssh_os_detection.nasl",
                       "gb_citrix_netscaler_version.nasl",
                       "gb_junos_snmp_version.nasl", "gb_snmp_os_detection.nasl",
                       "gb_dns_os_detection.nasl", "gb_ftp_os_detection.nasl",
@@ -80,15 +83,18 @@ if(description)
                       "dcetest.nasl", "gb_hnap_os_detection.nasl",
                       "ident_process_owner.nasl", "gb_pihole_detect.nasl",
                       "gb_dropbear_ssh_detect.nasl", "gb_rtsp_os_detection.nasl",
-                      "gb_android_adb_detect.nasl",
+                      "gb_nntp_os_detection.nasl", "gb_android_adb_detect.nasl",
+                      "netbios_name_get.nasl",
                       "gb_nmap_os_detection.nasl", "os_fingerprint.nasl");
+
+  script_xref(name:"URL", value:"https://community.greenbone.net/c/vulnerability-tests");
 
   script_tag(name:"summary", value:"This script consolidates the OS information detected by several NVTs and tries to find the best matching OS.
 
   Furthermore it reports all previously collected information leading to this best matching OS. It also reports possible additional information
   which might help to improve the OS detection.
 
-  If any of this information is wrong or could be improved please consider to report these to openvas-plugins@wald.intevation.org.");
+  If any of this information is wrong or could be improved please consider to report these to the references community portal.");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
@@ -175,7 +181,7 @@ foreach oid( OS_CPE_SRC ) {
 if( ! found_best ) {
   report += "No Best matching OS identified. Please see the NVT 'Unknown OS and Service Banner Reporting' (OID: 1.3.6.1.4.1.25623.1.0.108441) ";
   report += "for possible ways to identify this OS.";
-  # Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
+  # nb: Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
   set_kb_item( name:"Host/runs_unixoide", value:TRUE );
 } else {
   # TBD: Move into host_details.nasl?

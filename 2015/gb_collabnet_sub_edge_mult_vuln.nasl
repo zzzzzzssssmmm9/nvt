@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_collabnet_sub_edge_mult_vuln.nasl 5819 2017-03-31 10:57:23Z cfi $
+# $Id: gb_collabnet_sub_edge_mult_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # CollabNet Subversion Edge Management Frontend Multiple Vulnerabilities
 #
@@ -28,37 +28,39 @@
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805710");
-  script_version("$Revision: 5819 $");
+  script_version("$Revision: 11872 $");
   script_tag(name:"cvss_base", value:"6.6");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:L/Au:N/C:N/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-03-31 12:57:23 +0200 (Fri, 31 Mar 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-07-02 13:11:22 +0530 (Thu, 02 Jul 2015)");
   script_name("CollabNet Subversion Edge Management Frontend Multiple Vulnerabilities");
 
-  script_tag(name: "summary" , value:"This host is installed with CollabNet
+  script_tag(name:"summary", value:"This host is installed with CollabNet
   Subversion Edge Management Frontend and is prone to multiple vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Get the installed version and check
+  script_tag(name:"vuldetect", value:"Get the installed version and check
   the version is vulnerable or not.");
 
-  script_tag(name: "insight" , value:"Multiple flaws are due to,
+  script_tag(name:"insight", value:"Multiple flaws are due to,
+
   - An improper input sanitization by 'listViewItem' parameter in 'index'
     script.
+
   - The password are stored in unsalted MD5, which can easily cracked by
     attacker.
+
   - Does not protect against brute forcing accounts.
+
   - Does not implement a strong password policy.
+
   - Does not require the old password for changing the password to a new one.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow an attacker
-  read arbitrary local files, bypass authentication mechanisms.
+  read arbitrary local files, bypass authentication mechanisms.");
 
-  Impact Level: Application");
+  script_tag(name:"affected", value:"CollabNet Subversion Edge Management Frontend 4.0.11");
 
-  script_tag(name: "affected" , value:"CollabNet Subversion Edge Management Frontend 4.0.11");
-
-  script_tag(name: "solution" , value:"Upgrade to 5.0 or later,
-  For updates refer to https://www.open.collab.net");
+  script_tag(name:"solution", value:"Upgrade to 5.0 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
@@ -76,17 +78,13 @@ if (description)
   script_dependencies("find_service.nasl", "http_version.nasl");
   script_require_ports("Services/www", 3343);
   script_exclude_keys("Settings/disable_cgi_scanning");
+  script_xref(name:"URL", value:"https://www.open.collab.net");
   exit(0);
 }
 
 include("http_func.inc");
 include("http_keepalive.inc");
 include("version_func.inc");
-
-coll_Port = "";
-url = "";
-req = "";
-buf = "";
 
 coll_Port = get_http_port(default:3343);
 
@@ -95,14 +93,11 @@ foreach dir (make_list_unique("/", "/csvn", cgi_dirs(port:coll_Port)))
 
   if( dir == "/" ) dir = "";
 
-  req = http_get(item:dir + "/login/auth", port:coll_Port);
-  buf = http_keepalive_send_recv(port:coll_Port, data:req, bodyonly:FALSE);
-  if(buf == NULL )continue;
+  buf = http_get_cache(item:dir + "/login/auth", port:coll_Port);
+  if(!buf) continue;
 
-  #Confirm Application
   if(">CollabNet Subversion Edge Login<" >< buf)
   {
-    ### try to get version
     version = eregmatch(string: buf, pattern: ">Release: ([0-9.]+)",icase:TRUE);
 
     if (!isnull(version[1]) ) {
@@ -112,7 +107,6 @@ foreach dir (make_list_unique("/", "/csvn", cgi_dirs(port:coll_Port)))
     if(vers)
     {
 
-      #Check for Vulnerable Version
       if((version_is_equal(version:vers, test_version:"4.0.11")))
       {
         report = 'Installed Version: ' + vers + '\n' +

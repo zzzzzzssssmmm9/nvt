@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_open_xchange_appsuite_dos_vuln.nasl 9384 2018-04-06 12:20:19Z cfischer $
+# $Id: gb_open_xchange_appsuite_dos_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Open-Xchange (OX) AppSuite XEE Denial of Service Vulnerability
 #
@@ -29,43 +29,38 @@ CPE = "cpe:/a:open-xchange:open-xchange_appsuite";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806075");
-  script_version("$Revision: 9384 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2014-5238");
   script_bugtraq_id(69816);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 14:20:19 +0200 (Fri, 06 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-10-06 18:57:33 +0530 (Tue, 06 Oct 2015)");
   script_tag(name:"qod_type", value:"remote_banner");
   script_name("Open-Xchange (OX) AppSuite XEE Denial of Service Vulnerability");
 
-  script_tag(name: "summary" , value:"The host is installed with Open-Xchange
+  script_tag(name:"summary", value:"The host is installed with Open-Xchange
   (OX) AppSuite and is prone to denial of service vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"The flaw is due to an incorrectly
+  script_tag(name:"insight", value:"The flaw is due to an incorrectly
   configured XML parser accepting XML external entities from an untrusted
   source.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to launch XEEE attacks and can that be used to run denial-of-service
-  attacks to the deployment.
-
-  Impact Level: Application");
+  attacks to the deployment.");
 
   script_tag(name:"affected", value:"Open-Xchange (OX) AppSuite versions before
   7.4.2-rev11 and 7.6.x before 7.6.0-rev9");
 
   script_tag(name:"solution", value:"Upgrade to Open-Xchange (OX) AppSuite
-  version 7.4.2-rev11 or 7.6.0-rev9 or later.
-
-  For updates refer to https://www.open-xchange.com");
+  version 7.4.2-rev11 or 7.6.0-rev9 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://packetstormsecurity.com/files/128257");
+  script_xref(name:"URL", value:"https://packetstormsecurity.com/files/128257");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
@@ -73,6 +68,7 @@ if(description)
   script_dependencies("gb_ox_app_suite_detect.nasl");
   script_mandatory_keys("open_xchange_appsuite/installed");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"https://www.open-xchange.com");
   exit(0);
 }
 
@@ -96,7 +92,6 @@ if(oxRev)
   ## Updating version with revision number
   oxVer = oxVer + "." + oxRev;
 
-  ##Check for vulnerable version
   if(version_is_less(version:oxVer, test_version:"7.4.2.11"))
   {
     fix = "7.4.2-rev11";

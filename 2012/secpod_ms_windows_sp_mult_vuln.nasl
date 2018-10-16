@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_ms_windows_sp_mult_vuln.nasl 6694 2017-07-12 10:30:06Z cfischer $
+# $Id: secpod_ms_windows_sp_mult_vuln.nasl 11855 2018-10-12 07:34:51Z cfischer $
 #
 # Microsoft Windows Service Pack Missing Multiple Vulnerabilities
 #
@@ -27,11 +27,11 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902909");
-  script_version("$Revision: 6694 $");
+  script_version("$Revision: 11855 $");
   script_cve_id("CVE-1999-0662");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 12:30:06 +0200 (Wed, 12 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 09:34:51 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-03-27 12:06:13 +0530 (Tue, 27 Mar 2012)");
   script_name("Microsoft Windows Service Pack Missing Multiple Vulnerabilities");
   script_category(ACT_GATHER_INFO);
@@ -46,16 +46,13 @@ if(description)
   script_tag(name:"summary", value:"This host is installed Microsoft Windows
   and is prone to multiple vulnerabilities.");
 
-  script_tag(name:"vuldetect", value:"Get the installed service pack version
-  and check whether it is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaws are due to a system critical
   service pack not installed or is outdated or obsolete.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to compromise a vulnerable system.
-
-  Impact Level: System");
+  attackers to compromise a vulnerable system.");
 
   script_tag(name:"affected", value:"Microsoft Windows 7 x32/x64 Editions SP0,
 

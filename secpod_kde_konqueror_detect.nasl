@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_kde_konqueror_detect.nasl 9584 2018-04-24 10:34:07Z jschulte $
+# $Id: secpod_kde_konqueror_detect.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # KDE Konqueror Version Detection
 #
@@ -26,19 +26,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "Detection of installed version of KDE Konqueror.
-
-The script logs in via ssh, searches for executable 'konqueror' and
-queries the found executables via command line option '-v'.";
-
-SCRIPT_OID  = "1.3.6.1.4.1.25623.1.0.900902";
-
 if(description)
 {
-  script_oid(SCRIPT_OID);
+  script_oid("1.3.6.1.4.1.25623.1.0.900902");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9584 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-24 12:34:07 +0200 (Tue, 24 Apr 2018) $");
+  script_version("$Revision: 11279 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2009-07-31 07:37:13 +0200 (Fri, 31 Jul 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"qod_type", value:"executable_version");
@@ -50,7 +43,10 @@ if(description)
   script_mandatory_keys("login/SSH/success");
   script_exclude_keys("ssh/no_linux_shell");
 
-  script_tag(name : "summary" , value : tag_summary);
+  script_tag(name:"summary", value:"Detects the installed version of KDE Konqueror.
+
+The script logs in via ssh, searches for executable 'konqueror' and
+queries the found executables via command line option '-v'.");
   exit(0);
 }
 
@@ -61,7 +57,7 @@ include("host_details.inc");
 
 sock = ssh_login_or_reuse_connection();
 if(!sock){
-  exit(-1);
+  exit(0);
 }
 
 konqerName = find_file(file_name:"konqueror", file_path:"/", useregex:TRUE,

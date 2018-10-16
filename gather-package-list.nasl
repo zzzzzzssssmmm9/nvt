@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gather-package-list.nasl 10509 2018-07-16 10:19:56Z cfischer $
+# $Id: gather-package-list.nasl 11744 2018-10-04 08:40:58Z cfischer $
 #
 # Determine OS and list of installed packages via SSH login
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.50282");
-  script_version("$Revision: 10509 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-16 12:19:56 +0200 (Mon, 16 Jul 2018) $");
+  script_version("$Revision: 11744 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-04 10:40:58 +0200 (Thu, 04 Oct 2018) $");
   script_tag(name:"creation_date", value:"2008-01-17 22:05:49 +0100 (Thu, 17 Jan 2008)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -395,7 +395,12 @@ OS_CPE = make_array(
 
     # Arch Linux
     # nb: Arch Linux is a rolling release so there is no "real" version
-    "ArchLinux", "cpe:/o:archlinux:archlinux"
+    "ArchLinux", "cpe:/o:archlinux:archlinux",
+
+    # EulerOS
+    "EULEROS2.0SP3", "cpe:/o:huawei:euleros:2.0:SP3",
+    "EULEROS2.0SP2", "cpe:/o:huawei:euleros:2.0:SP2",
+    "EULEROS2.0SP1", "cpe:/o:huawei:euleros:2.0:SP1"
 );
 
 # GNU/Linux platforms:
@@ -419,8 +424,10 @@ function register_rpms( buf ) {
   set_kb_item( name:"ssh/login/rpms", value:";" + buf );
 }
 
-function register_npms( buf ) {
-  set_kb_item( name:"ssh/login/npms", value:buf );
+function register_uname( uname ) {
+  local_var uname;
+  replace_kb_item( name:"ssh/login/uname", value:uname );
+  replace_kb_item( name:"Host/uname", value:uname );
 }
 
 port = get_preference( "auth_port_ssh" );
@@ -433,9 +440,6 @@ if( ! sock ) exit( 0 );
 # First command: Grab uname -a of the remote system
 uname = ssh_cmd( socket:sock, cmd:"uname -a", return_errors:TRUE, pty:TRUE, timeout:60, retry:30 );
 if( isnull( uname ) ) exit( 0 );
-
-buf = ssh_cmd( socket:sock, cmd:"COLUMNS=400 npm list" );
-if( ! isnull( buf ) && "command not found" >!< buf ) register_npms( buf:buf );
 
 if( "HyperIP Command Line Interface" >< uname ) {
 
@@ -506,8 +510,7 @@ if( "linux" >< tolower( uname ) ) {
     u = eregmatch( pattern:'(Linux [^ ]+ [^ ]+ #[0-9]+ [^\n]+)', string:un );
 
     if( ! isnull( u[1] ) ) {
-      replace_kb_item( name:"ssh/login/uname", value:u[1] );
-      replace_kb_item( name:"Host/uname", value:u[1] );
+      register_uname( uname:u[1] );
     }
   }
 }
@@ -1061,7 +1064,6 @@ if( "Unknown action 0" >< uname ) {
     register_detected_os(os:"FortiOS", oskey:"FortiOS");
     set_kb_item( name:"ssh/no_linux_shell", value:TRUE );
 
-    # set FortiOS version for all models
 
     f_version = eregmatch( pattern:"Version\s*:\s*(Forti[^ ]* )?v([0-9.]+)", string:system );
     if( ! isnull( f_version[2] ) )
@@ -3103,6 +3105,37 @@ if( "Gentoo" >< rls ) {
   exit( 0 );
 }
 
+# EulerOS
+rls = ssh_cmd( socket: sock, cmd:"cat /etc/euleros-release" );
+
+if( "No such file or directory" >!< rls && strlen( rls ) )
+  _unknown_os_info += '/etc/euleros-release: ' + rls + '\n\n';
+
+if( "EulerOS release 2.0 (SP3)" >< rls ) {
+  set_kb_item( name:"ssh/login/euleros", value:TRUE );
+  buf = ssh_cmd( socket:sock, cmd:"/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'" );
+  register_rpms( buf:buf );
+  log_message( port:port, data:"We are able to login and detect that you are running EulerOS release 2.0 (SP3)" );
+  register_detected_os( os:"EulerOS 2.0 (SP3)", oskey:"EULEROS2.0SP3" );
+  exit( 0 );
+}
+if( "EulerOS release 2.0 (SP2)" >< rls ) {
+  set_kb_item( name:"ssh/login/euleros", value:TRUE );
+  buf = ssh_cmd( socket:sock, cmd:"/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'" );
+  register_rpms( buf:buf );
+  log_message( port:port, data:"We are able to login and detect that you are running EulerOS release 2.0 (SP3)" );
+  register_detected_os( os:"EulerOS 2.0 (SP2)", oskey:"EULEROS2.0SP2" );
+  exit( 0 );
+}
+if( "EulerOS release 2.0 (SP1)" >< rls ) {
+  set_kb_item( name:"ssh/login/euleros", value:TRUE );
+  buf = ssh_cmd( socket:sock, cmd:"/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'" );
+  register_rpms( buf:buf );
+  log_message( port:port, data:"We are able to login and detect that you are running EulerOS release 2.0 (SP3)" );
+  register_detected_os( os:"EulerOS 2.0 (SP1)", oskey:"EULEROS2.0SP1" );
+  exit( 0 );
+}
+
 # Non GNU/Linux platforms:
 
 
@@ -3249,6 +3282,10 @@ if( "HP-UX" >< uname ) {
 uname = ssh_cmd( socket:sock, cmd:"uname -a" );
 if( "FreeBSD" >< uname ) {
 
+  set_kb_item( name:"ssh/login/freebsd", value:TRUE );
+
+  register_uname( uname:uname );
+
   osversion = ssh_cmd( socket:sock, cmd:"uname -r" );
 
   version = eregmatch( pattern:"^[^ ]+ [^ ]+ ([^ ]+)+", string:uname );
@@ -3299,6 +3336,10 @@ if( "FreeBSD" >< uname ) {
 # Whilst we're at it, lets check if it's Solaris
 if( "SunOS " >< uname ) {
 
+  set_kb_item( name:"ssh/login/solaris", value:TRUE );
+
+  register_uname( uname:uname );
+
   osversion = ssh_cmd( socket:sock, cmd:"uname -r" );
   set_kb_item( name:"ssh/login/solosversion", value:osversion );
 
@@ -3332,6 +3373,10 @@ if( "SunOS " >< uname ) {
 # OpenBSD $hostname 6.3 GENERIC#100 amd64
 if( "OpenBSD " >< uname ) {
 
+  set_kb_item( name:"ssh/login/openbsd", value:TRUE );
+
+  register_uname( uname:uname );
+
   osversion = ssh_cmd( socket:sock, cmd:"uname -r" );
   set_kb_item( name:"ssh/login/openbsdversion", value:osversion );
 
@@ -3347,6 +3392,8 @@ if( "OpenBSD " >< uname ) {
 
 #maybe it's a real OS... like Mac OS X :)
 if( "Darwin" >< uname ) {
+
+  register_uname( uname:uname );
 
   sw_vers_buf = ssh_cmd( socket:sock, cmd:"sw_vers" );
   log_message( data:'We are able to login and detect that you are running:\n' + sw_vers_buf );
@@ -3374,6 +3421,35 @@ if( "Darwin" >< uname ) {
   exit( 0 );
 }
 
+# Minix 127.0.0.1 3.3.0 Minix 3.3.0 (GENERIC) i386
+# nb: Keep down below to only catch the "uname -a" from FreeBSD above which doesn't
+# contain the full PTY output / banner of Minix.
+if( uname =~ "^Minix " ) {
+
+  register_uname( uname:uname );
+
+  set_kb_item( name:"ssh/login/minix", value:TRUE );
+
+  # e.g.:
+  # openssh-6.6.1        Open Source Secure shell client and server (remote login program)
+  # openssl-1.0.1g       Secure Socket Layer and cryptographic library
+  buf = chomp( ssh_cmd( socket:sock, cmd:"pkgin list" ) );
+  set_kb_item( name:"ssh/login/pkgin_pkgs", value:buf );
+
+  minix_cpe = "cpe:/o:minix3:minix";
+  minix_version = eregmatch( pattern:"^Minix .* Minix ([0-9.]+) ", string:uname );
+  report = "We are able to login and detect that you are running MINIX3";
+
+  if( ! isnull( minix_version[1] ) ) {
+    report += " " + minix_version[1];
+    register_and_report_os( os:"MINIX3", version:minix_version[1], cpe:minix_cpe, banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+  } else {
+    register_and_report_os( os:"MINIX3", cpe:minix_cpe, banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+  }
+  log_message( data:report + ". Note: Local Security Checks (LSC) are not available for this OS." );
+  exit( 0 );
+}
+
 # TODO:
 #{ "NetBSD",     "????????????????",         },
 #{ "WhiteBox",   "????????????????",         },
@@ -3385,6 +3461,7 @@ if( "Darwin" >< uname ) {
 #{ "Yellow Dog", "/etc/yellowdog-release",   },
 
 if( uname ) {
+  _unknown_os_info = 'uname: ' + uname + '\n\n' + _unknown_os_info;
   report  = 'System identifier unknown:\n\n';
   report += uname;
   report += '\n\nTherefore no local security checks applied (missing list of installed packages) ';
@@ -3397,7 +3474,6 @@ if( uname ) {
 log_message( port:port, data:report );
 
 if( _unknown_os_info ) {
-  if( uname ) _unknown_os_info = 'uname: ' + uname + '\n\n' + _unknown_os_info;
   register_unknown_os_banner( banner:_unknown_os_info, banner_type_name:SCRIPT_DESC, banner_type_short:"gather_package_list", port:port );
 }
 

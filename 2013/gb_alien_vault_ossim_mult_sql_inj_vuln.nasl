@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_alien_vault_ossim_mult_sql_inj_vuln.nasl 6104 2017-05-11 09:03:48Z teissa $
+# $Id: gb_alien_vault_ossim_mult_sql_inj_vuln.nasl 11865 2018-10-12 10:03:43Z cfischer $
 #
 # AlienVault OSSIM 'date_from' Parameter Multiple SQL Injection Vulnerabilities
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:alienvault:open_source_security_information_management";
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804028");
-  script_version("$Revision: 6104 $");
+  script_version("$Revision: 11865 $");
   script_cve_id("CVE-2013-5967");
   script_bugtraq_id(62790);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-11 11:03:48 +0200 (Thu, 11 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:03:43 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2013-10-17 15:25:41 +0530 (Thu, 17 Oct 2013)");
   script_name("AlienVault OSSIM 'date_from' Parameter Multiple SQL Injection Vulnerabilities");
 
@@ -42,16 +42,13 @@ if (description)
   vulnerabilities.");
   script_tag(name:"vuldetect", value:"Send a HTTP GET request and check whether it is able to execute sql query
   or not.");
-  script_tag(name:"solution", value:"Upgrade to version 4.4.0 or later,
-  For updates refer to http://www.alienvault.com/open-threat-exchange/projects");
+  script_tag(name:"solution", value:"Upgrade to version 4.4.0 or later.");
   script_tag(name:"insight", value:"Multiple flaws are due to improper sanitation of user-supplied input to the
   'date_form' parameter when displaying radar reports.");
   script_tag(name:"affected", value:"AlienVault Open Source Security Information Management (OSSIM) version 4.3
   and prior.");
   script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to inject or manipulate
-  SQL queries in the back-end database, allowing for the manipulation or disclosure of arbitrary data.
-
-  Impact Level: Application");
+  SQL queries in the back-end database, allowing for the manipulation or disclosure of arbitrary data.");
 
   script_xref(name:"URL", value:"http://xforce.iss.net/xforce/xfdb/87652");
 
@@ -65,6 +62,7 @@ if (description)
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_vul");
 
+  script_xref(name:"URL", value:"http://www.alienvault.com/open-threat-exchange/projects");
   exit(0);
 }
 
@@ -73,20 +71,16 @@ include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
 
-## Get HTTP Port
 if( ! port = get_app_port( cpe:CPE ) ) exit( 0 );
 if( ! dir = get_app_location( cpe:CPE, port:port) ) exit(0);
 
 if( dir == "/" ) dir = "";
 
-## Construct Malformed URL
 url = dir + "/RadarReport/radar-iso27001-potential.php?date_from='SQL-Injection-Test";
 
-## Construct Attack Request
 req = http_get( item: url, port: port );
 res = http_keepalive_send_recv( port:port, data:req );
 
-## Check the response to confirm vulnerability
 if( res && res =~ "You have an error in your SQL syntax.*SQL-Injection-Test"
         && "datawarehouse.ssi_user" >< res ) {
   report = report_vuln_url( port:port, url:url );

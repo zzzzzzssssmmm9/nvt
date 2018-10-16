@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mozilla_firefox_mfsa_2016-89_2016-90_win.nasl 9910 2018-05-18 13:37:53Z cfischer $
+# $Id: gb_mozilla_firefox_mfsa_2016-89_2016-90_win.nasl 11702 2018-10-01 07:31:38Z asteins $
 #
 # Mozilla Firefox Security Updates (mfsa_2016-89_2016-90)-Windows
 #
@@ -29,7 +29,7 @@ CPE = "cpe:/a:mozilla:firefox";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.809805");
-  script_version("$Revision: 9910 $");
+  script_version("$Revision: 11702 $");
   script_cve_id("CVE-2016-5296", "CVE-2016-5292", "CVE-2016-5293", "CVE-2016-5294",
 		"CVE-2016-5297", "CVE-2016-9064", "CVE-2016-9066", "CVE-2016-9067",
                 "CVE-2016-5290", "CVE-2016-9068", "CVE-2016-5289", "CVE-2016-9075",
@@ -37,50 +37,66 @@ if(description)
                 "CVE-2016-9073", "CVE-2016-9074", "CVE-2016-9076", "CVE-2016-9063",
                 "CVE-2016-9071");
   script_bugtraq_id(94336, 94337, 94342, 94339);
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-18 15:37:53 +0200 (Fri, 18 May 2018) $");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-01 09:31:38 +0200 (Mon, 01 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-11-16 12:21:41 +0530 (Wed, 16 Nov 2016)");
   script_name("Mozilla Firefox Security Updates (mfsa_2016-89_2016-90)-Windows");
 
-  script_tag(name: "summary" , value:"This host is installed with
+  script_tag(name:"summary", value:"This host is installed with
   Mozilla Firefox and is prone to multiple vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"The multiple flaws exists due to,
+  script_tag(name:"insight", value:"The multiple flaws exists due to,
+
   - Heap-buffer-overflow WRITE in rasterize_edges_1.
+
   - URL parsing causes crash.
+
   - Write to arbitrary file with Mozilla Updater and Maintenance Service using
     updater.log hardlink.
+
   - Arbitrary target directory for result files of update process.
+
   - Incorrect argument length checking in JavaScript.
+
   - Add-ons update must verify IDs match between current and new versions.
+
   - Integer overflow leading to a buffer overflow in nsScriptLoadHandler.
+
   - heap-use-after-free in nsINode::ReplaceOrInsertBefore.
+
   - heap-use-after-free in nsRefreshDriver.
+
   - WebExtensions can access the mozAddonManager API and use it to gain elevated
     privileges.
+
   - Canvas filters allow feDisplacementMaps to be applied to cross-origin images,
     allowing timing attacks on them.
+
   - Same-origin policy violation using local HTML file and saved shortcut file.
+
   - Mozilla Maintenance Service: Ability to read arbitrary files as SYSTEM.
+
   - Sidebar bookmark can have reference to chrome window.
+
   - Insufficient timing side-channel resistance in divSpoiler.
+
   - select dropdown menu can be used for URL bar spoofing on e10s.
+
   - Possible integer overflow to fix inside XML_Parse in Expat.
+
   - Probe browser history via HSTS/301 redirect + CSP.");
 
-  script_tag(name: "impact" , value:"Successful exploitation of this
+  script_tag(name:"impact", value:"Successful exploitation of this
   vulnerability will allow remote attackers to execute arbitrary code, to delete
   arbitrary files by leveraging certain local file execution, to obtain sensitive
-  information, and to cause a denial of service.
+  information, and to cause a denial of service.");
 
-  Impact Level: Application.");
+  script_tag(name:"affected", value:"Mozilla Firefox version before 50 on Windows.");
 
-  script_tag(name: "affected" , value:"Mozilla Firefox version before 50 on Windows.");
-
-  script_tag(name: "solution" , value:"Upgrade to Mozilla Firefox version 50
+  script_tag(name:"solution", value:"Upgrade to Mozilla Firefox version 50
   or later, For updates refer to http://www.mozilla.com/en-US/firefox/all.html");
 
   script_tag(name:"solution_type", value:"VendorFix");

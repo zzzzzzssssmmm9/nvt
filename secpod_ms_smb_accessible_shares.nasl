@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_ms_smb_accessible_shares.nasl 9347 2018-04-06 06:58:53Z cfischer $
+# $Id: secpod_ms_smb_accessible_shares.nasl 11420 2018-09-17 06:33:13Z cfischer $
 #
 # Microsoft Windows SMB Accessible Shares
 #
@@ -24,15 +24,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "The script detects the Windows SMB Accessible Shares and sets the
-  result into KB.";
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902425");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9347 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 08:58:53 +0200 (Fri, 06 Apr 2018) $");
+  script_version("$Revision: 11420 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 08:33:13 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2012-02-29 12:08:36 +0530 (Wed, 29 Feb 2012)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("Microsoft Windows SMB Accessible Shares");
@@ -43,25 +40,14 @@ if(description)
   script_dependencies("smb_login.nasl");
   script_require_keys("SMB/transport", "SMB/name", "SMB/login", "SMB/password");
   script_require_ports(139, 445);
-  script_tag(name : "summary" , value : tag_summary);
+
+  script_tag(name:"summary", value:"The script detects the Windows SMB Accessible Shares and sets the
+  result into KB.");
+
   exit(0);
 }
 
-
 include("smb_nt.inc");
-
-
-
-name = "";
-domain = "";
-port = "";
-login = "";
-pass = "";
-soc = "";
-r = "";
-prot = "";
-uid = "";
-tid = "";
 
 name = kb_smb_name();
 domain = kb_smb_domain();
@@ -69,23 +55,19 @@ port = kb_smb_transport();
 login  = kb_smb_login();
 pass   = kb_smb_password();
 
-## Get the SMB Port
 if(!port){
   port = 139;
 }
 
-## Check the port status
 if(!get_port_state(port)){
  exit(0);
 }
 
-## Open the tcp socket
 soc = open_sock_tcp(port);
 if(!soc){
   exit(0);
 }
 
-## Session request
 r = smb_session_request(soc:soc, remote:name);
 if(!r)
 {
@@ -93,7 +75,6 @@ if(!r)
   exit(0);
 }
 
-## Get the protocol
 prot = smb_neg_prot(soc:soc);
 if(!prot)
 {
@@ -101,7 +82,6 @@ if(!prot)
   exit(0);
 }
 
-## Start the session
 r = smb_session_setup(soc:soc, login:login, password:pass ,domain:"", prot:prot);
 if(!r)
 {
@@ -113,7 +93,6 @@ if(!r)
   }
 }
 
-## Get the uid
 uid = session_extract_uid(reply:r);
 if(!uid)
 {

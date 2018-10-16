@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: sw_teamspeak3_3.0.13.nasl 5598 2017-03-17 10:00:43Z teissa $
+# $Id: sw_teamspeak3_3.0.13.nasl 11903 2018-10-15 10:26:16Z asteins $
 #
 # TeamSpeak 3 Server <= 3.0.13 Multiple Vulnerabilities
 #
@@ -29,8 +29,8 @@ CPE = "cpe:/a:teamspeak:teamspeak3";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.111113");
-  script_version("$Revision: 5598 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-03-17 11:00:43 +0100 (Fri, 17 Mar 2017) $");
+  script_version("$Revision: 11903 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-15 12:26:16 +0200 (Mon, 15 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-08-15 15:00:00 +0200 (Mon, 15 Aug 2016)");
   script_tag(name:"cvss_base", value:"7.6");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:H/Au:N/C:C/I:C/A:C");
@@ -48,14 +48,16 @@ if(description)
 
   script_tag(name:"summary", value:"This host is running a TeamSpeak 3 server and is prone to
   multiple vulnerabilities which leads to:
+
   - Remote code execution
+
   - Information disclosure
+
   - Denial-of-Service
   on the affected system.");
   script_tag(name:"impact", value:"Exploiting this vulnerability may allow an attacker execute
   arbitrary code on the TeamSpeak 3 server or cause a Denial-of-Service of the affected service.");
-  script_tag(name:"vuldetect", value:"Get the installed version with the help of the detect
-  NVT and check if the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
   script_tag(name:"affected", value:"TeamSpeak 3 server version up to 3.0.13");
   script_tag(name:"solution", value:"Update your TeamSpeak 3 server to version 3.0.13.1 or higher.");
 

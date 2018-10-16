@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_openfire_xss_vuln.nasl 10214 2018-06-15 10:06:28Z asteins $
+# $Id: gb_openfire_xss_vuln.nasl 11470 2018-09-19 09:45:56Z cfischer $
 #
 # Openfire Reflected XSS Vulnerability
 #
@@ -25,11 +25,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if( description )
+if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.112307");
-  script_version("$Revision: 10214 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-15 12:06:28 +0200 (Fri, 15 Jun 2018) $");
+  script_version("$Revision: 11470 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-19 11:45:56 +0200 (Wed, 19 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-06-15 10:04:21 +0200 (Fri, 15 Jun 2018)");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
@@ -50,30 +50,37 @@ if( description )
   script_mandatory_keys("OpenFire/Installed");
 
   script_tag(name:"summary", value:"This host is running Openfire and is prone to a reflected cross-site scripting vulnerability.");
+
   script_tag(name:"vuldetect", value:"Performs an HTTP request and checks the response for malicious HTML content.");
+
   script_tag(name:"insight", value:"Ignite Realtime Openfire is vulnerable to cross-site scripting, caused by improper validation of user-supplied input.");
+
   script_tag(name:"impact", value:"A  remote attacker could exploit this vulnerability via a crafted URL to execute script
   in a victim's Web browser within the security context of the hosting Web site, once the URL is clicked.
   An attacker could use this vulnerability to steal the victim's cookie-based authentication credentials.");
+
   script_tag(name:"affected", value:"Ignite Realtime Openfire");
+
   script_tag(name:"solution", value:"No known solution is available as of 15th June, 2018.
   Information regarding this issue will be updated once solution details are available.");
 
   script_xref(name:"URL", value:"https://vulmon.com/vulnerabilitydetails?qid=CVE-2018-11688");
 
-  exit( 0 );
+  exit(0);
 }
 
 CPE = "cpe:/a:igniterealtime:openfire";
 
-include( "host_details.inc" );
-include( "http_func.inc" );
-include( "http_keepalive.inc" );
+include("host_details.inc");
+include("http_func.inc");
+include("http_keepalive.inc");
+include("misc_func.inc");
 
 if( ! port = get_app_port( cpe: CPE ) ) exit( 0 );
 if( ! dir = get_app_location( cpe: CPE, port: port ) ) exit( 0 );
 
-data = "greenbone_" + unixtime();
+vtstring = get_vt_string(lowercase:TRUE);
+data = vtstring + "_" + unixtime();
 urls = make_list( 'login.jsp?url=a%22onclick=%22alert(' + data + ')', 'login.jsp?url=a"onclick="alert(' + data + ')' );
 
 foreach url ( urls ) {

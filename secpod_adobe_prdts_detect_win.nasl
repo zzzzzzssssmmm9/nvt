@@ -1,22 +1,11 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_adobe_prdts_detect_win.nasl 10216 2018-06-15 11:24:33Z jschulte $
+# $Id: secpod_adobe_prdts_detect_win.nasl 11015 2018-08-17 06:31:19Z cfischer $
 #
 # Adobe Products Version Detection (Windows)
 #
 # Authors:
 # Sharath S <sharaths@secpod.com>
-#
-# Updated by: Madhuri D <dmadhuri@secpod.com> on 2011-05-25
-# - Updated script to detect Adobe Audition
-#
-# Updated By: Antu Sanadi <santu@secpod.com> on 2012-01-13
-# - Updated to detect for 64 bit platform also.
-# - Updated according to CR 57.
-# - Updated to avoid setting same version multiple times.
-#
-# Updated By: Thanga Prakash S <tprakash@secpod.com> on 2013-09-04
-# According to new style script_tags.
 #
 # Copyright:
 # Copyright (c) 2009 SecPod, http://www.secpod.com
@@ -38,15 +27,15 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.900319");
-  script_version("$Revision: 10216 $");
+  script_version("$Revision: 11015 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-15 13:24:33 +0200 (Fri, 15 Jun 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 08:31:19 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2009-03-03 06:56:37 +0100 (Tue, 03 Mar 2009)");
   script_tag(name:"qod_type", value:"registry");
   script_name("Adobe Products Version Detection (Windows)");
 
-  script_tag(name : "summary" , value : "Detection of installed version of Adobe Products.
+  script_tag(name:"summary", value:"Detects the installed version of Adobe Products.
 
 The script logs in via smb, searches for Adobe Products in the registry
 and gets the version from 'DisplayVersion' string in registry.");
@@ -54,7 +43,7 @@ and gets the version from 'DisplayVersion' string in registry.");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2009 SecPod");
   script_family("Product detection");
-  script_dependencies( "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_require_ports(139, 445);
   script_mandatory_keys("SMB/WindowsVersion");
 
@@ -193,7 +182,6 @@ foreach key (adkeylist)
           set_kb_item(name:"Adobe/Audition/Win/Ver", value:audVer);
           register_and_report_cpe( app:audName, ver:audVer, base:"cpe:/a:adobe:audition:", expr:"^([0-9.]+)", insloc:insPath );
 
-          ## set version for 64 bit Adobe Audition on 64 bit OS
           if( "x64" >< osArch && "Wow6432Node" >!< key){
             set_kb_item(name:"Adobe/Audition64/Win/Ver", value:audVer);
             register_and_report_cpe( app:audName, ver:audVer, base:"cpe:/a:adobe:audition:x64:", expr:"^([0-9.]+)", insloc:insPath );

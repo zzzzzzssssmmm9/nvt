@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_forti_authenticator_version.nasl 9369 2018-04-06 08:36:49Z cfischer $
+# $Id: gb_forti_authenticator_version.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Forti Authenticator Detection
 #
@@ -27,23 +27,23 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105221");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 9369 $");
- script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:36:49 +0200 (Fri, 06 Apr 2018) $");
- script_tag(name:"creation_date", value:"2015-02-18 10:02:43 +0100 (Wed, 18 Feb 2015)");
- script_name("Forti Authenticator Detection");
- script_tag(name:"summary", value:"This script performs SSH based detection of FortiAuthenticator");
+  script_oid("1.3.6.1.4.1.25623.1.0.105221");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-02-18 10:02:43 +0100 (Wed, 18 Feb 2015)");
+  script_name("Forti Authenticator Detection");
+  script_tag(name:"summary", value:"This script performs SSH based detection of FortiAuthenticator");
 
- script_tag(name:"qod_type", value:"package");
+  script_tag(name:"qod_type", value:"package");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("gather-package-list.nasl");
- script_mandatory_keys("FortiOS/Authenticator/system");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("gather-package-list.nasl");
+  script_mandatory_keys("FortiOS/Authenticator/system");
+  exit(0);
 }
 
 include("host_details.inc");

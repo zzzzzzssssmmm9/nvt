@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: win10_prevent_onedrive_file_storage.nasl 10340 2018-06-27 08:31:37Z emoss $
+# $Id: win10_prevent_onedrive_file_storage.nasl 11532 2018-09-21 19:07:30Z cfischer $
 #
 # Check value for Prevent the usage of OneDrive for file storage
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.109095");
-  script_version("$Revision: 10340 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-27 10:31:37 +0200 (Wed, 27 Jun 2018) $");
+  script_version("$Revision: 11532 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 21:07:30 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-04-23 12:03:04 +0200 (Mon, 23 Apr 2018)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:H/Au:S/C:N/I:N/A:N");
@@ -38,15 +38,21 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH");
   script_family("Policy");
   script_dependencies("smb_reg_service_pack.nasl", "os_detection.nasl");
+  script_add_preference(name:"Value", type:"radio", value:"1;0");
   script_mandatory_keys("Compliance/Launch");
-  script_tag(name: "summary", value: "This policy setting lets you prevent apps and 
+  script_tag(name:"summary", value:"This policy setting lets you prevent apps and
 features from working with files on OneDrive.
 Enabling this feature prevents:
-- User access to OneDrive from OneDrive app and file picker
-- Windows Store apps access to OneDrive
-- OneDrive appearance in navigation pane in File Explorer
-- OneDrive files kept in sync with the cloud
-- User from automatically upload photos and videos from camera roll directory.");
+
+  - User access to OneDrive from OneDrive app and file picker
+
+  - Windows Store apps access to OneDrive
+
+  - OneDrive appearance in navigation pane in File Explorer
+
+  - OneDrive files kept in sync with the cloud
+
+  - User from automatically upload photos and videos from camera roll directory.");
   exit(0);
 }
 
@@ -61,7 +67,7 @@ to query the registry.');
 
 HostDetails = get_kb_list("HostDetails");
 if("cpe:/o:microsoft:windows_10" >!< HostDetails){
-  policy_logging(text:'Host is not a Microsoft Windows 10 system. 
+  policy_logging(text:'Host is not a Microsoft Windows 10 system.
 This setting applies to Windows 10 systems only.');
   exit(0);
 }

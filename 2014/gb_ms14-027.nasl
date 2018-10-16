@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms14-027.nasl 6724 2017-07-14 09:57:17Z teissa $
+# $Id: gb_ms14-027.nasl 11846 2018-10-11 15:26:58Z cfischer $
 #
 # Microsoft Windows Shell Handler Privilege Escalation Vulnerability (2962488)
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804295");
-  script_version("$Revision: 6724 $");
+  script_version("$Revision: 11846 $");
   script_cve_id("CVE-2014-1807");
   script_bugtraq_id(67276);
   script_tag(name:"cvss_base", value:"7.2");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-14 11:57:17 +0200 (Fri, 14 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-11 17:26:58 +0200 (Thu, 11 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-05-14 08:27:46 +0530 (Wed, 14 May 2014)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Microsoft Windows Shell Handler Privilege Escalation Vulnerability (2962488)");
@@ -40,57 +40,55 @@ if(description)
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft Bulletin MS14-027.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Flaw is due to an error in the 'ShellExecute'
   function within the Windows Shell API when handling file associations.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow attackers
   to gain elevated privileges and execute code in the context of the LocalSystem
-  account.
+  account.");
 
-  Impact Level: System/Application");
+  script_tag(name:"affected", value:"Microsoft Windows 8 x32/x64
 
-  script_tag(name:"affected", value:"
-  Microsoft Windows 8 x32/x64
   Microsoft Windows 8.1 x32/x64
+
   Microsoft Windows Server 2012
+
   Microsoft Windows 7 x32/x64 Service Pack 1 and prior
+
   Microsoft Windows 2003 x32/x64 Service Pack 2 and prior
+
   Microsoft Windows Vista x32/x64 Service Pack 2 and prior
+
   Microsoft Windows Server 2008 R2 x64 Service Pack 1 and prior
+
   Microsoft Windows Server 2008 x32/x64 Service Pack 2 and prior");
 
   script_tag(name:"solution", value:"Run Windows Update and update the listed
   hotfixes or download and update mentioned hotfixes in the advisory from the
-  link, https://technet.microsoft.com/en-us/security/bulletin/ms14-027");
+  references.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/kb/2926765");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/kb/2962123");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/library/security/ms14-027");
+  script_xref(name:"URL", value:"https://support.microsoft.com/kb/2926765");
+  script_xref(name:"URL", value:"https://support.microsoft.com/kb/2962123");
+  script_xref(name:"URL", value:"https://docs.microsoft.com/en-us/security-updates/SecurityBulletins/2014/ms14-027");
   script_category(ACT_GATHER_INFO);
   script_family("Windows : Microsoft Bulletins");
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
-  script_dependencies("secpod_reg_enum.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion");
   script_require_ports(139, 445);
+
   exit(0);
 }
-
 
 include("smb_nt.inc");
 include("secpod_reg.inc");
 include("version_func.inc");
 include("secpod_smb_func.inc");
 
-## Variables Initialization
-sysPath = "";
-sysVer = "";
-
-## Check for OS and Service Pack
 if(hotfix_check_sp(win2003:3, win2003x64:3, winVista:3,
                    win7:2, win7x64:2, win2008:3, win2008x64:3, win2008r2:2,
                    win8:1, win8x64:1, win2012:1, win8_1:1, win8_1x64:1) <= 0)
@@ -98,54 +96,46 @@ if(hotfix_check_sp(win2003:3, win2003x64:3, winVista:3,
   exit(0);
 }
 
-## Get System Path
 sysPath = smb_get_systemroot();
 if(!sysPath){
   exit(0);
 }
 
-sysVer = fetch_file_version(sysPath,file_name:"\system32\shlwapi.dll");
+sysVer = fetch_file_version(sysPath:sysPath, file_name:"\system32\shlwapi.dll");
 if(sysVer)
 {
-  ## Windows 2003 x86 and Windows 2003 x64
   if(hotfix_check_sp(win2003:3, win2003x64:3) > 0)
   {
-    ## Check for 'shlwapi.dll' version before 6.0.3790.5340
     if(version_is_less(version:sysVer, test_version:"6.0.3790.5318"))
     {
-      security_message(0);
+      security_message( port: 0, data: "The target host was found to be vulnerable" );
       exit(0);
     }
   }
 }
 
-## Get Version from 'shell32.dll' file
-sysVer = fetch_file_version(sysPath, file_name:"\system32\shell32.dll");
+sysVer = fetch_file_version(sysPath:sysPath, file_name:"\system32\shell32.dll");
 if(!sysVer){
   exit(0);
 }
 
-## Windows Vista and Windows Server 2008
 ## Currently not supporting for Vista and Windows Server 2008 64 bit
 if(hotfix_check_sp(winVista:3, win2008:3) > 0)
 {
-  ## Check for shell32.dll version
   if(version_is_less(version:sysVer, test_version:"6.0.6002.19070") ||
      version_in_range(version:sysVer, test_version:"6.0.6002.23000", test_version2:"6.0.6002.23359"))
   {
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }
 
-## Windows 7 and Windows 2008 R2
 else if(hotfix_check_sp(win7:2, win7x64:2, win2008r2:2) > 0)
 {
-  ## Check for shell32.dll version
   if(version_is_less(version:sysVer, test_version:"6.1.7601.18429") ||
      version_in_range(version:sysVer, test_version:"6.1.7601.22000", test_version2:"6.1.7601.22638"))
   {
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }
@@ -153,11 +143,10 @@ else if(hotfix_check_sp(win7:2, win7x64:2, win2008r2:2) > 0)
 ## Win 8 and 2012
 else if(hotfix_check_sp(win8:1, win8x64:1, win2012:1) > 0)
 {
- ## Check for shell32.dll version
   if(version_is_less(version:sysVer, test_version:"6.2.9200.16882") ||
      version_in_range(version:sysVer, test_version:"6.2.9200.20000", test_version2:"6.2.9200.20999"))
   {
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }
@@ -166,10 +155,9 @@ else if(hotfix_check_sp(win8:1, win8x64:1, win2012:1) > 0)
 ## Currently not supporting for Windows Server 2012 R2
 else if(hotfix_check_sp(win8_1:1, win8_1x64:1) > 0)
 {
-  ## Check for shell32.dll version
   if(version_in_range(version:sysVer, test_version:"6.3.9600.16000", test_version2:"6.3.9600.16659")||
      version_in_range(version:sysVer, test_version:"6.3.9600.17000", test_version2:"6.3.9600.17082")){
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }

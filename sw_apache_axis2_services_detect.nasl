@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: sw_apache_axis2_services_detect.nasl 9323 2018-04-05 08:44:52Z cfischer $
+# $Id: sw_apache_axis2_services_detect.nasl 11006 2018-08-16 12:21:56Z cfischer $
 #
 # Apache Axis2 Web Services Detection
 #
@@ -29,8 +29,8 @@ CPE = 'cpe:/a:apache:axis2';
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.111008");
-  script_version("$Revision: 9323 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-05 10:44:52 +0200 (Thu, 05 Apr 2018) $");
+  script_version("$Revision: 11006 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-16 14:21:56 +0200 (Thu, 16 Aug 2018) $");
   script_tag(name:"creation_date", value:"2015-03-20 08:00:00 +0100 (Fri, 20 Mar 2015)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -39,12 +39,12 @@ if(description)
   script_family("Product detection");
   script_copyright("This script is Copyright (C) 2015 SCHUTZWERK GmbH");
   script_dependencies("gb_apache_axis2_detect.nasl");
-  script_require_ports("Services/www", 8080,8081);
+  script_require_ports("Services/www", 8080, 8081);
   script_mandatory_keys("axis2/installed");
 
   script_xref(name:"URL", value:"http://ws.apache.org/axis2/");
 
-  script_tag(name:"summary" , value:"This host is running Apache Axis2, a Web Services / SOAP / WSDL
+  script_tag(name:"summary", value:"This host is running Apache Axis2, a Web Services / SOAP / WSDL
   engine, the successor to the widely used Apache Axis SOAP stack.");
 
   script_tag(name:"qod_type", value:"remote_banner");
@@ -88,11 +88,12 @@ if( "/services/listServices.jsp" >< buf ) {
 
    cookie = eregmatch( pattern:"JSESSIONID=([0-9a-zA-Z]+);", string:buf );
 
+   useragent = get_http_user_agent();
    host = http_host_name( port:port );
 
    req = 'GET ' + url + '.jsp HTTP/1.1\r\n' +
          'Host: ' + host + '\r\n' +
-         'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+         'User-Agent: ' + useragent + '\r\n' +
          'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
          'Accept-Language: en-US,en;q=0.5\r\n' +
          'Cookie: JSESSIONID=' + cookie[1] + '\r\n' +

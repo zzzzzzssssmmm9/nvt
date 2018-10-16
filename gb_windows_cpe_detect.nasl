@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_windows_cpe_detect.nasl 10393 2018-07-04 07:23:20Z cfischer $
+# $Id: gb_windows_cpe_detect.nasl 11613 2018-09-26 07:07:19Z cfischer $
 #
 # Windows Application CPE Detection
 #
@@ -9,10 +9,6 @@
 #
 # Copyright:
 # Copyright (c) 2011 Greenbone Networks GmbH, http://www.greenbone.net
-#
-# Set in an Workgroup Environment under Vista with enabled UAC this DWORD to access WMI:
-# HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system\LocalAccountTokenFilterPolicy to 1
-#
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -31,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.96207");
-  script_version("$Revision: 10393 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-04 09:23:20 +0200 (Wed, 04 Jul 2018) $");
+  script_version("$Revision: 11613 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-26 09:07:19 +0200 (Wed, 26 Sep 2018) $");
   script_tag(name:"creation_date", value:"2011-04-26 12:54:47 +0200 (Tue, 26 Apr 2011)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -60,14 +56,7 @@ include("smb_nt.inc");
 include("secpod_smb_func.inc");
 include("host_details.inc");
 include("version_func.inc");
-
-function split_ver( value ) {
-  val = split( value, keep:FALSE );
-  if( "(x86)" >< val[1] ) {
-    val = split( val[1], sep:"(x86)", keep:FALSE );
-  }
-  return val[1];
-}
+include("misc_func.inc");
 
 SCRIPT_DESC = "Windows Application CPE Detection";
 BANNER_TYPE = "Registry access via SMB";
@@ -746,9 +735,10 @@ else if(handle && handlereg){
   if(msodll)msodll = ereg_replace(pattern:"\\", replace:"\\", string:msodll);
   if(visiopath)visiopath = ereg_replace(pattern:"\\", replace:"\\", string:visiopath);
 
-  if (OfficeVer == "10.0")Outlook = "OutLLib.dll";
-  else Outlook = "OUTLOOK.exe";
-
+  if (OfficeVer == "10.0")
+    Outlook = "OutLLib.dll";
+  else
+    Outlook = "OUTLOOK.exe";
 
   if (msodll){
     OfficeFileVer = wmi_query(wmi_handle:handle, query:'Select Version from CIM_DataFile Where Name = "' + msodll + '"' );
@@ -759,32 +749,142 @@ else if(handle && handlereg){
     }
   }
   if (officepath){
-    AccessVer = wmi_file_fileversion(handle:handle, filePath:officepath + Access);
-    ExcelVer = wmi_file_fileversion(handle:handle, filePath:officepath + Excel);
-    InfoPathVer = wmi_file_fileversion(handle:handle, filePath:officepath + InfoPath);
-    OneNoteVer = wmi_file_fileversion(handle:handle, filePath:officepath + OneNote);
-    OutlookVer = wmi_file_fileversion(handle:handle, filePath:officepath + Outlook);
-    PowerPointVer = wmi_file_fileversion(handle:handle, filePath:officepath + PowerPoint);
-    ProjectVer = wmi_file_fileversion(handle:handle, filePath:officepath + Project);
-    PublisherVer = wmi_file_fileversion(handle:handle, filePath:officepath + Publisher);
-    SharePoint_DesignerVer = wmi_file_fileversion(handle:handle, filePath:officepath + SharePoint_Designer);
-    SharePoint_WorkspaceVer = wmi_file_fileversion(handle:handle, filePath:officepath + SharePoint_Workspace);
-    WordVer = wmi_file_fileversion(handle:handle, filePath:officepath + Word);
-    VisioVer = wmi_file_fileversion(handle:handle, filePath:visiopath + Visio);
-    VisioSMBVer = fetch_file_version(sysPath:visiopath, file_name:Visio);
+    AccessVer = wmi_file_fileversion(handle:handle, filePath:officepath + Access, includeHeader:FALSE);
+    ExcelVer = wmi_file_fileversion(handle:handle, filePath:officepath + Excel, includeHeader:FALSE);
+    InfoPathVer = wmi_file_fileversion(handle:handle, filePath:officepath + InfoPath, includeHeader:FALSE);
+    OneNoteVer = wmi_file_fileversion(handle:handle, filePath:officepath + OneNote, includeHeader:FALSE);
+    OutlookVer = wmi_file_fileversion(handle:handle, filePath:officepath + Outlook, includeHeader:FALSE);
+    PowerPointVer = wmi_file_fileversion(handle:handle, filePath:officepath + PowerPoint, includeHeader:FALSE);
+    ProjectVer = wmi_file_fileversion(handle:handle, filePath:officepath + Project, includeHeader:FALSE);
+    PublisherVer = wmi_file_fileversion(handle:handle, filePath:officepath + Publisher, includeHeader:FALSE);
+    SharePoint_DesignerVer = wmi_file_fileversion(handle:handle, filePath:officepath + SharePoint_Designer, includeHeader:FALSE);
+    SharePoint_WorkspaceVer = wmi_file_fileversion(handle:handle, filePath:officepath + SharePoint_Workspace, includeHeader:FALSE);
+    WordVer = wmi_file_fileversion(handle:handle, filePath:officepath + Word, includeHeader:FALSE);
+    VisioVer = wmi_file_fileversion(handle:handle, filePath:visiopath + Visio, includeHeader:FALSE);
+    VisioSMBVer = fetch_file_version(sysPath:visiopath, file_name:Visio, includeHeader:FALSE);
 
-    AccessVer = split_ver(value:AccessVer);
-    ExcelVer = split_ver(value:ExcelVer);
-    InfoPathVer = split_ver(value:InfoPathVer);
-    OneNoteVer = split_ver(value:OneNoteVer);
-    OutlookVer = split_ver(value:OutlookVer);
-    PowerPointVer = split_ver(value:PowerPointVer);
-    ProjectVer = split_ver(value:ProjectVer);
-    PublisherVer = split_ver(value:PublisherVer);
-    SharePoint_DesignerVer = split_ver(value:SharePoint_DesignerVer);
-    SharePoint_WorkspaceVer = split_ver(value:SharePoint_WorkspaceVer);
-    WordVer = split_ver(value:WordVer);
-    VisioVer = split_ver(value:VisioVer);
+    # TODO: This needs to be verified once WMI is enabled again.
+    # For some unknown reason the following function was used
+    # to split the return of wmi_file_fileversion():
+    #function split_ver( value ) {
+    #  val = split( value, keep:FALSE );
+    #  if( "(x86)" >< val[1] ) {
+    #    val = split( val[1], sep:"(x86)", keep:FALSE );
+    #  }
+    #  return val[1];
+    #}
+    # However the (x86) looks strange and its strange as well that
+    # this should have been included in the version at all...
+    # AccessVer = split_ver(value:AccessVer);
+    # ExcelVer = split_ver(value:ExcelVer);
+    # InfoPathVer = split_ver(value:InfoPathVer);
+    # OneNoteVer = split_ver(value:OneNoteVer);
+    # OutlookVer = split_ver(value:OutlookVer);
+    # PowerPointVer = split_ver(value:PowerPointVer);
+    # ProjectVer = split_ver(value:ProjectVer);
+    # PublisherVer = split_ver(value:PublisherVer);
+    # SharePoint_DesignerVer = split_ver(value:SharePoint_DesignerVer);
+    # SharePoint_WorkspaceVer = split_ver(value:SharePoint_WorkspaceVer);
+    # WordVer = split_ver(value:WordVer);
+    # VisioVer = split_ver(value:VisioVer);
+    # END TODO
+
+    if (AccessVer && is_array(AccessVer)){
+      foreach vers(keys(AccessVer)){
+        if (AccessVer[vers] && version = egrep(string:AccessVer[vers], pattern:"([0-9.]+)" ) ) {
+          AccessVer = version;
+          break;
+        }
+      }
+    }
+    if (ExcelVer && is_array(ExcelVer)){
+      foreach vers(keys(ExcelVer)){
+        if (ExcelVer[vers] && version = egrep(string:ExcelVer[vers], pattern:"([0-9.]+)")){
+          ExcelVer = version;
+          break;
+        }
+      }
+    }
+    if (InfoPathVer && is_array(InfoPathVer)){
+      foreach vers(keys(InfoPathVer)){
+        if (InfoPathVer[vers] && version = egrep(string:InfoPathVer[vers], pattern:"([0-9.]+)")){
+          InfoPathVer = version;
+          break;
+        }
+      }
+    }
+    if (OneNoteVer && is_array(OneNoteVer)){
+      foreach vers(keys(OneNoteVer)){
+        if (OneNoteVer[vers] && version = egrep(string:OneNoteVer[vers], pattern:"([0-9.]+)")){
+          OneNoteVer = version;
+          break;
+        }
+      }
+    }
+    if (OutlookVer && is_array(OutlookVer)){
+      foreach vers(keys(OutlookVer)){
+        if (OutlookVer[vers] && version = egrep(string:OutlookVer[vers], pattern:"([0-9.]+)")){
+          OutlookVer = version;
+          break;
+        }
+      }
+    }
+    if (PowerPointVer && is_array(PowerPointVer)){
+      foreach vers(keys(PowerPointVer)){
+        if (PowerPointVer[vers] && version = egrep(string:PowerPointVer[vers], pattern:"([0-9.]+)")){
+          PowerPointVer = version;
+          break;
+        }
+      }
+    }
+    if (ProjectVer && is_array(ProjectVer)){
+      foreach vers(keys(ProjectVer)){
+        if (ProjectVer[vers] && version = egrep(string:ProjectVer[vers], pattern:"([0-9.]+)")){
+          ProjectVer = version;
+          break;
+        }
+      }
+    }
+    if (PublisherVer && is_array(PublisherVer)){
+      foreach vers(keys(PublisherVer)){
+        if (PublisherVer[vers] && version = egrep(string:PublisherVer[vers], pattern:"([0-9.]+)")){
+          PublisherVer = version;
+          break;
+        }
+      }
+    }
+    if (SharePoint_DesignerVer && is_array(SharePoint_DesignerVer)){
+      foreach vers(keys(SharePoint_DesignerVer)){
+        if (SharePoint_DesignerVer[vers] && version = egrep(string:SharePoint_DesignerVer[vers], pattern:"([0-9.]+)")){
+          SharePoint_DesignerVer = version;
+          break;
+        }
+      }
+    }
+    if (SharePoint_WorkspaceVer && is_array(SharePoint_WorkspaceVer)){
+      foreach vers(keys(SharePoint_WorkspaceVer)){
+        if (SharePoint_WorkspaceVer[vers] && version = egrep(string:SharePoint_WorkspaceVer[vers], pattern:"([0-9.]+)")){
+          SharePoint_WorkspaceVer = version;
+          break;
+        }
+      }
+    }
+    if (WordVer && is_array(WordVer)){
+      foreach vers(keys(WordVer)){
+        if (WordVer[vers] && version = egrep(string:WordVer[vers], pattern:"([0-9.]+)")){
+          WordVer = version;
+          break;
+        }
+      }
+    }
+    if (VisioVer && is_array(VisioVer)){
+      foreach vers(keys(VisioVer)){
+        if (VisioVer[vers] && version = egrep(string:VisioVer[vers], pattern:"([0-9.]+)")){
+          VisioVer = version;
+          break;
+        }
+      }
+    }
   }
   if (!VisioRegVer && VisioSMBVer)VisioRegVer = VisioSMBVer;
   if(version_is_less(version:VisioRegVer, test_version:VisioSMBVer))VisioRegVer = VisioSMBVer;
@@ -803,7 +903,7 @@ else if(handle && handlereg){
   IISMinorVersion = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\INetStp", val_name:"MinorVersion");
   IISMajorVersion = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\INetStp", val_name:"MajorVersion");
 
-  ipnathlp = wmi_file_check_file_exists(wmi_handle:handle, filePath:OSSYSDIR + "\\ipnathlp.dll");
+  ipnathlp = wmi_file_check_file_exists(handle:handle, filePath:OSSYSDIR + "\\ipnathlp.dll");
 
   ExchProductMajor = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\Exchange\Setup", val_name:"MsiProductMajor");
   ExchProductMinor = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\Exchange\Setup", val_name:"MsiProductMinor");
@@ -817,11 +917,11 @@ else if(handle && handlereg){
   Exch2013ProductMajor = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"Software\Microsoft\ExchangeServer\v15\Setup", val_name:"MsiProductMajor");
   Exch2013DispName = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Exchange v15", key_name:"DisplayName");
 
-  msxml3 = wmi_file_check_file_exists(wmi_handle:handle, filePath:OSSYSDIR + "\\msxml3.dll");
-  msxml4 = wmi_file_check_file_exists(wmi_handle:handle, filePath:OSSYSDIR + "\\msxml4.dll");
-  if (x64)msxml5 = wmi_file_check_file_exists(wmi_handle:handle, filePath:ComFilesDirx86 + "\\Microsoft Shared\\OFFICE11\\msxml5.dll");
-  else msxml5 = wmi_file_check_file_exists(wmi_handle:handle, filePath:ComFilesDir + "\\Microsoft Shared\\OFFICE11\\msxml5.dll");
-  msxml6 = wmi_file_check_file_exists(wmi_handle:handle, filePath:OSSYSDIR + "\\msxml6.dll");
+  msxml3 = wmi_file_check_file_exists(handle:handle, filePath:OSSYSDIR + "\\msxml3.dll");
+  msxml4 = wmi_file_check_file_exists(handle:handle, filePath:OSSYSDIR + "\\msxml4.dll");
+  if (x64)msxml5 = wmi_file_check_file_exists(handle:handle, filePath:ComFilesDirx86 + "\\Microsoft Shared\\OFFICE11\\msxml5.dll");
+  else msxml5 = wmi_file_check_file_exists(handle:handle, filePath:ComFilesDir + "\\Microsoft Shared\\OFFICE11\\msxml5.dll");
+  msxml6 = wmi_file_check_file_exists(handle:handle, filePath:OSSYSDIR + "\\msxml6.dll");
 
   NDPv4Client = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client", val_name:"Install");
   NDPv4ClientVer = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client", key_name:"Version");
@@ -842,7 +942,15 @@ else if(handle && handlereg){
   isapath = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\Fpc", key_name:"InstallDirectory");
   if (isapath){
     isapath = ereg_replace(pattern:"\\", replace:"\\", string:isapath);
-    IsaVer = wmi_file_fileversion(handle:handle, filePath:isapath + "wspsrv.exe");
+    IsaVer = wmi_file_fileversion(handle:handle, filePath:isapath + "wspsrv.exe", includeHeader:FALSE);
+    if (IsaVer && is_array(IsaVer)){
+      foreach vers(keys(IsaVer)){
+        if (IsaVer[vers] && version = egrep(string:IsaVer[vers], pattern:"([0-9.]+)" ) ) {
+          IsaVer = version;
+          break;
+        }
+      }
+    }
   }
 
   vsdotnet2k2sp = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\Updates\Visual Studio\7.0\S895309", key_name:"Type");
@@ -852,47 +960,47 @@ else if(handle && handlereg){
   VS2002path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\7.0", key_name:"Installdir");
   if (VS2002path){
     VS2002path = ereg_replace(pattern:"\\", replace:"\\", string:VS2002path);
-    VS2002 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2002path + "devenv.exe");
+    VS2002 = wmi_file_check_file_exists(handle:handle, filePath:VS2002path + "devenv.exe");
   }
   VS2003path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\7.1", key_name:"Installdir");
   if (VS2003path){
     VS2003path = ereg_replace(pattern:"\\", replace:"\\", string:VS2003path);
-    VS2003 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2003path + "devenv.exe");
+    VS2003 = wmi_file_check_file_exists(handle:handle, filePath:VS2003path + "devenv.exe");
   }
   VS2005path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\8.0", key_name:"Installdir");
   if (VS2005path) {
     VS2005path = ereg_replace(pattern:"\\", replace:"\\", string:VS2005path);
-    VS2005 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2005path + "devenv.exe");
+    VS2005 = wmi_file_check_file_exists(handle:handle, filePath:VS2005path + "devenv.exe");
     VS2005SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\DevDiv\VS\Servicing\8.0", val_name:"SP");
   }
   VS2008path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0", key_name:"Installdir");
   if (VS2008path){
     VS2008path = ereg_replace(pattern:"\\", replace:"\\", string:VS2008path);
-    VS2008 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2008path + "devenv.exe");
+    VS2008 = wmi_file_check_file_exists(handle:handle, filePath:VS2008path + "devenv.exe");
     VS2008SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\DevDiv\VS\Servicing\9.0", val_name:"SP");
   }
   VS2010path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0", key_name:"Installdir");
   if (VS2010path){
     VS2010path = ereg_replace(pattern:"\\", replace:"\\", string:VS2010path);
-    VS2010 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2010path + "devenv.exe");
+    VS2010 = wmi_file_check_file_exists(handle:handle, filePath:VS2010path + "devenv.exe");
     VS2010SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\DevDiv\VS\Servicing\10.0", val_name:"SP");
   }
   VS2012path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0", key_name:"Installdir");
   if (VS2012path){
     VS2012path = ereg_replace(pattern:"\\", replace:"\\", string:VS2012path);
-    VS2012 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2012path + "devenv.exe");
+    VS2012 = wmi_file_check_file_exists(handle:handle, filePath:VS2012path + "devenv.exe");
     VS2012SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\DevDiv\VS\Servicing\11.0", val_name:"SP");
   }
   VS2013path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0", key_name:"Installdir");
   if (VS2013path){
     VS2013path = ereg_replace(pattern:"\\", replace:"\\", string:VS2013path);
-    VS2013 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2013path + "devenv.exe");
+    VS2013 = wmi_file_check_file_exists(handle:handle, filePath:VS2013path + "devenv.exe");
     VS2013SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\DevDiv\VS\Servicing\12.0", val_name:"SP");
   }
   VS2015path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0", key_name:"Installdir");
   if (VS2015path){
     VS2015path = ereg_replace(pattern:"\\", replace:"\\", string:VS2015path);
-    VS2015 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2015path + "devenv.exe");
+    VS2015 = wmi_file_check_file_exists(handle:handle, filePath:VS2015path + "devenv.exe");
     VS2015SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Wow6432Node\Microsoft\DevDiv\VS\Servicing\14.0", val_name:"SP");
   }
  }
@@ -900,47 +1008,47 @@ else if(handle && handlereg){
   VS2002path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\VisualStudio\7.0", key_name:"Installdir");
   if (VS2002path){
     VS2002path = ereg_replace(pattern:"\\", replace:"\\", string:VS2002path);
-    VS2002 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2002path + "devenv.exe");
+    VS2002 = wmi_file_check_file_exists(handle:handle, filePath:VS2002path + "devenv.exe");
   }
   VS2003path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\VisualStudio\7.1", key_name:"Installdir");
   if (VS2003path){
     VS2003path = ereg_replace(pattern:"\\", replace:"\\", string:VS2003path);
-    VS2003 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2003path + "devenv.exe");
+    VS2003 = wmi_file_check_file_exists(handle:handle, filePath:VS2003path + "devenv.exe");
   }
   VS2005path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\VisualStudio\8.0", key_name:"Installdir");
   if (VS2005path) {
     VS2005path = ereg_replace(pattern:"\\", replace:"\\", string:VS2005path);
-    VS2005 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2005path + "devenv.exe");
+    VS2005 = wmi_file_check_file_exists(handle:handle, filePath:VS2005path + "devenv.exe");
     VS2005SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\DevDiv\VS\Servicing\8.0", val_name:"SP");
   }
   VS2008path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\VisualStudio\9.0", key_name:"Installdir");
   if (VS2008path){
     VS2008path = ereg_replace(pattern:"\\", replace:"\\", string:VS2008path);
-    VS2008 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2008path + "devenv.exe");
+    VS2008 = wmi_file_check_file_exists(handle:handle, filePath:VS2008path + "devenv.exe");
     VS2008SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\DevDiv\VS\Servicing\9.0", val_name:"SP");
   }
   VS2010path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\VisualStudio\10.0", key_name:"Installdir");
   if (VS2010path){
     VS2010path = ereg_replace(pattern:"\\", replace:"\\", string:VS2010path);
-    VS2010 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2010path + "devenv.exe");
+    VS2010 = wmi_file_check_file_exists(handle:handle, filePath:VS2010path + "devenv.exe");
     VS2010SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\DevDiv\VS\Servicing\10.0", val_name:"SP");
   }
   VS2012path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\VisualStudio\11.0", key_name:"Installdir");
   if (VS2012path){
     VS2012path = ereg_replace(pattern:"\\", replace:"\\", string:VS2012path);
-    VS2012 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2012path + "devenv.exe");
+    VS2012 = wmi_file_check_file_exists(handle:handle, filePath:VS2012path + "devenv.exe");
     VS2012SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\DevDiv\VS\Servicing\11.0", val_name:"SP");
   }
   VS2013path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\VisualStudio\12.0", key_name:"Installdir");
   if (VS2013path){
     VS2013path = ereg_replace(pattern:"\\", replace:"\\", string:VS2013path);
-    VS2013 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2013path + "devenv.exe");
+    VS2013 = wmi_file_check_file_exists(handle:handle, filePath:VS2013path + "devenv.exe");
     VS2013SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\DevDiv\VS\Servicing\12.0", val_name:"SP");
   }
   VS2015path = wmi_reg_get_sz(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\VisualStudio\14.0", key_name:"Installdir");
   if (VS2015path){
     VS2015path = ereg_replace(pattern:"\\", replace:"\\", string:VS2015path);
-    VS2015 = wmi_file_check_file_exists(wmi_handle:handle, filePath:VS2015path + "devenv.exe");
+    VS2015 = wmi_file_check_file_exists(handle:handle, filePath:VS2015path + "devenv.exe");
     VS2015SP = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SOFTWARE\Microsoft\DevDiv\VS\Servicing\14.0", val_name:"SP");
   }
  }
@@ -1400,7 +1508,7 @@ if (OSVER == "6.2"){
         register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:-:x86", desc:SCRIPT_DESC);
       }
       if (OSSP == "1"){
-        #register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:sp1:x86", desc:SCRIPT_DESC);
+      # TBD: Why is this commented out? register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:sp1:x86", desc:SCRIPT_DESC);
       }
     }
     if (x64 == "1"){
@@ -1408,7 +1516,7 @@ if (OSVER == "6.2"){
         register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:-:x64", desc:SCRIPT_DESC);
       }
       if (OSSP == "1"){
-        #register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:sp1:x64", desc:SCRIPT_DESC);
+      # TBD: Why is this commented out? register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:sp1:x64", desc:SCRIPT_DESC);
       }
     }
   }
@@ -1417,6 +1525,7 @@ if (OSVER == "6.2"){
       register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:"cpe:/o:microsoft:windows_server_2012:-", desc:SCRIPT_DESC);
     }
     if (OSSP == "1"){
+      # TBD: Really empty?
     }
   }
   #SMB fallback. Is not so exactly as wmi.
@@ -1426,6 +1535,7 @@ if (OSVER == "6.2"){
         register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:"cpe:/o:microsoft:windows_server_2012:-", desc:SCRIPT_DESC);
       }
       if (OSSP == "1"){
+        # TBD: Really empty?
       }
     }
     else if ("Windows 8" >< OSNAME){
@@ -1435,7 +1545,7 @@ if (OSVER == "6.2"){
           register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:-:x86", desc:SCRIPT_DESC);
         }
         if (OSSP == "1"){
-          #register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:sp1:x86", desc:SCRIPT_DESC);
+          # TBD: Why is this commented out? register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:sp1:x86", desc:SCRIPT_DESC);
         }
       }
       if (x64 == "1"){
@@ -1443,7 +1553,7 @@ if (OSVER == "6.2"){
           register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:-:x64", desc:SCRIPT_DESC);
         }
         if (OSSP == "1"){
-          #register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:sp1:x64", desc:SCRIPT_DESC);
+          # TBD: Why is this commented out? register_and_report_os( os:OSNAME, runs_key:"windows", banner_type:BANNER_TYPE, cpe:cpe + ":-:sp1:x64", desc:SCRIPT_DESC);
         }
       }
     }
@@ -2264,7 +2374,6 @@ if (ExchProductMajor || Exch2010ProductMajor || Exch2013ProductMajor){
 
 
 if (msxml3 || msxml4 || msxml5 || msxml6){
-  #register_host_detail(name:app, value:"cpe:/a:microsoft:xml_core_services", desc:SCRIPT_DESC);
   if (msxml3)register_host_detail(name:app, value:"cpe:/a:microsoft:xml_core_services:3.0", desc:SCRIPT_DESC);
   if (msxml4)register_host_detail(name:app, value:"cpe:/a:microsoft:xml_core_services:4.0", desc:SCRIPT_DESC);
   if (msxml5)register_host_detail(name:app, value:"cpe:/a:microsoft:xml_core_services:5.0", desc:SCRIPT_DESC);
@@ -2273,7 +2382,6 @@ if (msxml3 || msxml4 || msxml5 || msxml6){
 
 
 if (worksVer){
-  #register_host_detail(name:app, value:"cpe:/a:microsoft:works", desc:SCRIPT_DESC);
   register_host_detail(name:app, value:"cpe:/a:microsoft:works:" + worksVer, desc:SCRIPT_DESC);
 }
 

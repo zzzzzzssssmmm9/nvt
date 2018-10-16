@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_exponent_cms_mult_vuln.nasl 7577 2017-10-26 10:41:56Z cfischer $
+# $Id: gb_exponent_cms_mult_vuln.nasl 11865 2018-10-12 10:03:43Z cfischer $
 #
 # Exponent CMS Multiple Vulnerabilities
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:exponentcms:exponent_cms";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.803702");
-  script_version("$Revision: 7577 $");
+  script_version("$Revision: 11865 $");
   script_cve_id("CVE-2013-3294", "CVE-2013-3295");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-26 12:41:56 +0200 (Thu, 26 Oct 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:03:43 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2013-05-23 14:56:02 +0530 (Thu, 23 May 2013)");
   script_name("Exponent CMS Multiple Vulnerabilities");
   script_category(ACT_ATTACK);
@@ -53,21 +53,20 @@ if(description)
   script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to execute arbitrary SQL
   commands or include arbitrary PHP files from the local system using directory
   traversal sequences with URL-encoded NULL byte, read arbitrary files or execute
-  arbitrary PHP code on the target system.
-
-  Impact Level: Application");
+  arbitrary PHP code on the target system.");
 
   script_tag(name:"affected", value:"Exponent CMS version 2.2.0 beta 3 and prior");
 
   script_tag(name:"insight", value:"Multiple flaws due to,
+
   - Insufficient filtration of 'src' and 'username' HTTP GET parameters passed
     to '/index.php' script. A remote unauthenticated attacker can execute
     arbitrary SQL commands in application's database.
+
   - Improper filtration of user-supplied input passed via the 'page' HTTP GET
     parameter to '/install/popup.php' script.");
 
-  script_tag(name:"solution", value:"Update to Exponent CMS 2.2.0 Release Candidate 1 or later,
-  For updates refer to http://www.exponentcms.org");
+  script_tag(name:"solution", value:"Update to Exponent CMS 2.2.0 Release Candidate 1 or later.");
 
   script_tag(name:"summary", value:"This host is installed with Exponent CMS and is prone to multiple
   vulnerabilities.");

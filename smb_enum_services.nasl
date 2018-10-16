@@ -1,6 +1,6 @@
 ###################################################################
 # OpenVAS Vulnerability Test
-# $Id: smb_enum_services.nasl 10393 2018-07-04 07:23:20Z cfischer $
+# $Id: smb_enum_services.nasl 11285 2018-09-07 09:40:40Z cfischer $
 #
 # SMB Enumerate Services
 #
@@ -8,7 +8,7 @@
 #
 # Developed by LSS Security Team <http://security.lss.hr>
 #
-# Copyright(C) 2010 LSS <http://www.lss.hr>
+# Copyright (C) 2010 LSS <http://www.lss.hr>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.102016");
-  script_version("$Revision: 10393 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-04 09:23:20 +0200 (Wed, 04 Jul 2018) $");
+  script_version("$Revision: 11285 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:40:40 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2010-02-10 12:17:39 +0100 (Wed, 10 Feb 2010)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -422,7 +422,7 @@ function svcenumservicesstatus( soc, name, uid, tid, pipe, handle, svc_type, svc
     }
     if( svc_type == SERVICE_TYPE_WIN32 ) {
       set_kb_item( name:"SMB/number_of_active_win32_procesess", value:ret[0] );
-      #set_kb_item( name:"SMB/active_win32_procesess", value:ret[1] );
+      #TBD: Why is this commented out? set_kb_item( name:"SMB/active_win32_procesess", value:ret[1] )
       set_kb_item( name:"SMB/svcs", value:ret[1] ); #changed naming convention to "svcs" to accommodate dependencies
     }
     if( svc_type == SERVICE_TYPE_INTERACTIVE_PROCESS ) {

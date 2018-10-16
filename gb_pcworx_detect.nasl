@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_pcworx_detect.nasl 7738 2017-11-13 02:50:25Z ckuersteiner $
+# $Id: gb_pcworx_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # PCWorx Detection
 #
@@ -27,32 +27,32 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.140418");
- script_version ("$Revision: 7738 $");
- script_tag(name: "last_modification", value: "$Date: 2017-11-13 03:50:25 +0100 (Mon, 13 Nov 2017) $");
- script_tag(name: "creation_date", value: "2017-09-28 15:33:55 +0700 (Thu, 28 Sep 2017)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.140418");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2017-09-28 15:33:55 +0700 (Thu, 28 Sep 2017)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("PCWorx Detection");
+  script_name("PCWorx Detection");
 
- script_tag(name: "summary" , value: "A PCWorx Service is running at this host.
+  script_tag(name:"summary", value:"A PCWorx Service is running at this host.
 
 PCWorx is a protocol and program by Phoenix Contact used by a wide range of industries.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
- script_family("Service detection");
- script_dependencies("find_service.nasl");
- script_require_ports(1962);
+  script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
+  script_family("Service detection");
+  script_dependencies("find_service.nasl");
+  script_require_ports(1962);
 
- script_xref(name: "URL", value: "https://www.phoenixcontact.com");
+  script_xref(name:"URL", value:"https://www.phoenixcontact.com");
 
 
- exit(0);
+  exit(0);
 }
 
 include("dump.inc");
@@ -67,13 +67,13 @@ soc = open_sock_tcp(port);
 if (!soc)
   exit(0);
 
-# initialize
+# nb: initialize
 query = raw_string(0x01, 0x01, 0x00, 0x1a, 0x00, 0x00, 0x00, 0x00, 0x78, 0x80, 0x00, 0x03, 0x00, 0x0c,
                    'IBETH01N0_M', 0x00);
 send(socket: soc, data: query);
 recv = recv(socket: soc, length: 512);
 
-# Check if error occured
+# nb: Check if error occurred
 if (hexstr(recv[0]) != "81" || strlen(recv) < 20) {
   close(soc);
   exit(0);
@@ -88,7 +88,7 @@ query = raw_string(0x01, 0x05, 0x00, 0x16, 0x00, 0x01, 0x00, 0x00, 0x78, 0x80, 0
 send(socket: soc, data: query);
 recv = recv(socket: soc, length: 512);
 
-# Check if error occured
+# nb: Check if error occurred
 if (hexstr(recv[0]) != "81") {
   close(soc);
   exit(0);
@@ -100,7 +100,7 @@ send(socket: soc, data: query);
 recv = recv(socket: soc, length: 512);
 close(soc);
 
-# Check if error occured
+# nb: Check if error occurred
 if (hexstr(recv[0]) != "81") {
   exit(0);
 }

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_3654_1.nasl 10015 2018-05-30 06:04:26Z cfischer $
+# $Id: gb_ubuntu_USN_3654_1.nasl 11037 2018-08-17 11:51:16Z cfischer $
 #
 # Ubuntu Update for linux USN-3654-1
 #
@@ -27,15 +27,15 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.843531");
-  script_version("$Revision: 10015 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-30 08:04:26 +0200 (Wed, 30 May 2018) $");
+  script_version("$Revision: 11037 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 13:51:16 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-05-22 12:41:50 +0200 (Tue, 22 May 2018)");
   script_cve_id("CVE-2018-3639", "CVE-2017-17975", "CVE-2017-18193", "CVE-2017-18222",
                 "CVE-2018-1065", "CVE-2018-1068", "CVE-2018-1130", "CVE-2018-5803",
                 "CVE-2018-7480", "CVE-2018-7757", "CVE-2018-7995", "CVE-2018-8781",
                 "CVE-2018-8822");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"7.2");
+  script_tag(name:"cvss_base_vector", value:"AV:L/AC:L/Au:N/C:C/I:C/A:C");
   script_tag(name:"qod_type", value:"package");
   script_name("Ubuntu Update for linux USN-3654-1");
   script_tag(name:"summary", value:"Check the version of linux");
@@ -98,7 +98,7 @@ cause a denial of service (system crash) or possibly execute arbitr ...
   script_tag(name:"solution", value:"Please install the updated packages.");
 
   script_xref(name:"USN", value:"3654-1");
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-3654-1/");
+  script_xref(name:"URL", value:"http://www.ubuntu.com/usn/usn-3654-1/");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -111,7 +111,7 @@ cause a denial of service (system crash) or possibly execute arbitr ...
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 res = "";
 if(release == NULL){

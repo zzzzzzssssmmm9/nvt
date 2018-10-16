@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_publisher_ms15-116.nasl 6443 2017-06-27 10:00:22Z teissa $
+# $Id: gb_ms_publisher_ms15-116.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Microsoft Publisher Privilege Elevation Vulnerability (3104540)
 #
@@ -27,11 +27,11 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806165");
-  script_version("$Revision: 6443 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-2503");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-27 12:00:22 +0200 (Tue, 27 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-11-11 16:12:59 +0530 (Wed, 11 Nov 2015)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Microsoft Publisher Privilege Elevation Vulnerability (3104540)");
@@ -39,8 +39,7 @@ if(description)
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft Bulletin MS15-116.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"An elevation of privilege vulnerability
   exists in Microsoft Office software when an attacker instantiates an affected
@@ -48,46 +47,40 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to gain elevated privileges and break out of the Internet Explorer
-  sandbox.
+  sandbox.");
 
-  Impact Level: System/Application");
+  script_tag(name:"affected", value:"Microsoft Publisher 2007 Service Pack 3 and prior
 
-  script_tag(name:"affected", value:"
-  Microsoft Publisher 2007 Service Pack 3 and prior
   Microsoft Publisher 2010 Service Pack 1 and prior
+
   Microsoft Publisher 2013 Service Pack 1 and prior
+
   Microsoft Publisher 2016 Service Pack 1 and prior");
 
   script_tag(name:"solution", value:"Run Windows Update and update the listed
-  hotfixes or download and update mentioned hotfixes in the advisory from the
-  below link, https://technet.microsoft.com/en-us/security/bulletin/ms15-116");
+  hotfixes or download and install the hotfixes from the referenced advisory.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/2880506");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/2817478");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3085561");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/en-us/library/security/MS15-116");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/2880506");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/2817478");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3085561");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/en-us/library/security/MS15-116");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
   script_dependencies("secpod_office_products_version_900032.nasl");
-  script_require_keys("SMB/Office/Publisher/Version");
+  script_mandatory_keys("SMB/Office/Publisher/Version");
+
+  script_xref(name:"URL", value:"https://technet.microsoft.com/en-us/security/bulletin/ms15-116");
   exit(0);
 }
-
 
 include("smb_nt.inc");
 include("secpod_reg.inc");
 include("version_func.inc");
 include("secpod_smb_func.inc");
-
-## Variable initialization
-offPath = "";
-pptVer = "";
-dllVer = "";
-path = "";
 
 exeVer = get_kb_item("SMB/Office/Publisher/Version");
 if(!exeVer){
@@ -99,18 +92,18 @@ if(!exePath){
   exePath = "Unable to fetch the install path";
 }
 
-if(exeVer && exeVer =~ "^(12|14|15|16).*")
+if(exeVer && exeVer =~ "^1[2456].*")
 {
-  if(exeVer =~ "^(12)"){
+  if(exeVer =~ "^12"){
     Vulnerable_range  =  "12 - 12.0.6735.4999";
   }
-  else if(exeVer =~ "^(14)"){
+  else if(exeVer =~ "^14"){
     Vulnerable_range  =  "14 - 14.0.7162.4999";
   }
-  else if(exeVer =~ "^(15)"){
+  else if(exeVer =~ "^15"){
     Vulnerable_range  =  "15 - 15.0.4763.0999";
   }
-  else if(exeVer =~ "^(16)"){
+  else if(exeVer =~ "^16"){
     Vulnerable_range  =  "16 - 16.0.4300.0999";
   }
 

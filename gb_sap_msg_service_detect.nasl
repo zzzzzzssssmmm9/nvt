@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sap_msg_service_detect.nasl 9765 2018-05-09 05:08:37Z ckuersteiner $
+# $Id: gb_sap_msg_service_detect.nasl 11404 2018-09-15 09:17:49Z cfischer $
 #
 # SAP Message Server Service Detection
 #
@@ -28,26 +28,26 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.141067");
-  script_version("$Revision: 9765 $");
-  script_tag(name: "last_modification", value: "$Date: 2018-05-09 07:08:37 +0200 (Wed, 09 May 2018) $");
-  script_tag(name: "creation_date", value: "2018-05-09 09:04:58 +0700 (Wed, 09 May 2018)");
-  script_tag(name: "cvss_base", value: "0.0");
-  script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11404 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:17:49 +0200 (Sat, 15 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2018-05-09 09:04:58 +0700 (Wed, 09 May 2018)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
-  script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
   script_name("SAP Message Server Service Detection");
 
-  script_tag(name: "summary" , value: "A SAP Message Server Service is running at this host.
+  script_tag(name:"summary", value:"A SAP Message Server Service is running at this host.
 
 SAP Message Server is for
 
-- Central communication channel between the individual application servers (instances) of the system
+  - Central communication channel between the individual application servers (instances) of the system
 
-- Load distribution of logons using SAP GUI and RFC with logon groups
+  - Load distribution of logons using SAP GUI and RFC with logon groups
 
-- Information point for the Web Dispatcher and the application servers");
-  
+  - Information point for the Web Dispatcher and the application servers");
+
   script_category(ACT_GATHER_INFO);
 
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -55,7 +55,7 @@ SAP Message Server is for
   script_dependencies("find_service.nasl");
   script_require_ports("Services/unknown", 3600, 3900);
 
-  script_xref(name: "URL", value: "https://www.sap.com/");
+  script_xref(name:"URL", value:"https://www.sap.com/");
 
   exit(0);
 }
@@ -108,7 +108,7 @@ register_service(port: port, ipproto: "tcp", proto: "sap_msg_service");
 server = substr(recv, 72, 111);
 server_name = bin2string(ddata: server, noprint_replacement: '');
 
-# Try to dump some general information (this succeeds just if we have permission to do so)
+# nb: This tries to dump some general information (this succeeds just if we have permission to do so)
 query = raw_string(0x00, 0x00, 0x00, 0xa2,		# message length
                    '**MESSAGE**', 0x00,
                    0x04,				# version

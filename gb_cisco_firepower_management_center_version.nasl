@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cisco_firepower_management_center_version.nasl 6065 2017-05-04 09:03:08Z teissa $
+# $Id: gb_cisco_firepower_management_center_version.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Cisco Firepower Management Center Version Detection
 #
@@ -27,24 +27,24 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105522");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 6065 $");
- script_tag(name:"last_modification", value:"$Date: 2017-05-04 11:03:08 +0200 (Thu, 04 May 2017) $");
- script_tag(name:"creation_date", value:"2016-01-19 18:05:56 +0100 (Tue, 19 Jan 2016)");
- script_name("Cisco Firepower Management Center Version Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105522");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-01-19 18:05:56 +0100 (Tue, 19 Jan 2016)");
+  script_name("Cisco Firepower Management Center Version Detection");
 
- script_tag(name: "summary" , value: "This script get the version of Cisco Firepower Management Center detected via SSH or HTTP");
+  script_tag(name:"summary", value:"This script get the version of Cisco Firepower Management Center detected via SSH or HTTP");
 
- script_tag(name:"qod_type", value:"package");
+  script_tag(name:"qod_type", value:"package");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("gb_cisco_firepower_management_center_ssh_detect.nasl","gb_cisco_firepower_management_center_web_detect.nasl");
- script_mandatory_keys("cisco_fire_linux_os/installed");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("gb_cisco_firepower_management_center_ssh_detect.nasl", "gb_cisco_firepower_management_center_web_detect.nasl");
+  script_mandatory_keys("cisco_fire_linux_os/installed");
+  exit(0);
 }
 
 

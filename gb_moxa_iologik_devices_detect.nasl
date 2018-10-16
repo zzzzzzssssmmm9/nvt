@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_moxa_iologik_devices_detect.nasl 4388 2016-10-31 10:47:11Z ckuerste $
+# $Id: gb_moxa_iologik_devices_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Moxa ioLogik Devices Detection
 #
@@ -27,33 +27,33 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.106359");
- script_version ("$Revision: 4388 $");
- script_tag(name: "last_modification", value: "$Date: 2016-10-31 11:47:11 +0100 (Mon, 31 Oct 2016) $");
- script_tag(name: "creation_date", value: "2016-10-31 15:52:13 +0700 (Mon, 31 Oct 2016)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.106359");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-10-31 15:52:13 +0700 (Mon, 31 Oct 2016)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("Moxa ioLogik Devices Detection");
+  script_name("Moxa ioLogik Devices Detection");
 
- script_tag(name: "summary" , value: "Detection of Moxa ioLogik Devices.
+  script_tag(name:"summary", value:"Detection of Moxa ioLogik Devices.
 
 The script sends a connection request to the server and attempts to detect Moxa ioLogik Devices and its
 version.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_family("Product detection");
- script_dependencies("find_service.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("find_service.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_xref(name: "URL", value: "http://www.moxa.com/");
+  script_xref(name:"URL", value:"http://www.moxa.com/");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");

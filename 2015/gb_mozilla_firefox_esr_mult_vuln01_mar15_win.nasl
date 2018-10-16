@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mozilla_firefox_esr_mult_vuln01_mar15_win.nasl 9910 2018-05-18 13:37:53Z cfischer $
+# $Id: gb_mozilla_firefox_esr_mult_vuln01_mar15_win.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Mozilla Firefox ESR Multiple Vulnerabilities-01 Mar15 (Windows)
 #
@@ -29,42 +29,45 @@ CPE = "cpe:/a:mozilla:firefox_esr";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805477");
-  script_version("$Revision: 9910 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-0836", "CVE-2015-0833", "CVE-2015-0831", "CVE-2015-0827",
                 "CVE-2015-0822");
   script_bugtraq_id(72742, 72747, 72746, 72755, 72756);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-18 15:37:53 +0200 (Fri, 18 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-03-03 15:35:20 +0530 (Tue, 03 Mar 2015)");
   script_name("Mozilla Firefox ESR Multiple Vulnerabilities-01 Mar15 (Windows)");
 
-  script_tag(name: "summary" , value:"This host is installed with Mozilla Firefox ESR
+  script_tag(name:"summary", value:"This host is installed with Mozilla Firefox ESR
   and is prone to multiple vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"Multiple flaws exist due to,
+  script_tag(name:"insight", value:"Multiple flaws exist due to,
+
   - Some unspecified vulnerabilities in the browser engine.
+
   - Multiple untrusted search path vulnerabilities in updater.exe.
+
   - Use-after-free error in the 'IDBDatabase::CreateObjectStore' function in
   dom/indexedDB/IDBDatabase.cpp script.
+
   - Heap-based buffer overflow in the 'mozilla::gfx::CopyRect' and
   'nsTransformedTextRun::SetCapitalization' functions.
+
   - Flaw in the autocomplete feature for forms.");
 
-  script_tag(name: "impact" , value:"Successful exploitation will allow remote
+  script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to disclose potentially sensitive information, bypass certain security
   restrictions, cause a denial of service, execute arbitrary code and local
-  privilege escalation.
+  privilege escalation.");
 
-  Impact Level: System/Application");
-
-  script_tag(name: "affected" , value:"Mozilla Firefox ESR 31.x before 31.5 on
+  script_tag(name:"affected", value:"Mozilla Firefox ESR 31.x before 31.5 on
   Windows");
 
-  script_tag(name: "solution" , value:"Upgrade to Mozilla Firefox ESR version 31.5
-  or later, For updates refer to https://www.mozilla.org/en-US/firefox/organizations");
+  script_tag(name:"solution", value:"Upgrade to Mozilla Firefox ESR version 31.5
+  or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
@@ -78,6 +81,7 @@ if(description)
   script_family("General");
   script_dependencies("gb_firefox_detect_portable_win.nasl");
   script_mandatory_keys("Firefox-ESR/Win/Ver");
+  script_xref(name:"URL", value:"https://www.mozilla.org/en-US/firefox/organizations");
   exit(0);
 }
 
@@ -89,7 +93,7 @@ if(!ffVer = get_app_version(cpe:CPE)){
   exit(0);
 }
 
-if(ffVer =~ "^(31)\.")
+if(ffVer =~ "^31\.")
 {
   if((version_in_range(version:ffVer, test_version:"31.0", test_version2:"31.4")))
   {

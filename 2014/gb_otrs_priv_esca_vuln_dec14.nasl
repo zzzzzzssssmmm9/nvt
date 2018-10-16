@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_otrs_priv_esca_vuln_dec14.nasl 7000 2017-08-24 11:51:46Z teissa $
+# $Id: gb_otrs_priv_esca_vuln_dec14.nasl 11402 2018-09-15 09:13:36Z cfischer $
 #
 # OTRS Help Desk Privilege Escalation Vulnerability - Dec14
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:otrs:otrs";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805230");
-  script_version("$Revision: 7000 $");
+  script_version("$Revision: 11402 $");
   script_cve_id("CVE-2014-9324");
   script_tag(name:"cvss_base", value:"6.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:S/C:P/I:P/A:P");
- script_tag(name:"qod_type", value:"remote_banner_unreliable");
-  script_tag(name:"last_modification", value:"$Date: 2017-08-24 13:51:46 +0200 (Thu, 24 Aug 2017) $");
+  script_tag(name:"qod_type", value:"remote_banner_unreliable");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:13:36 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2014-12-24 12:30:49 +0530 (Wed, 24 Dec 2014)");
   script_name("OTRS Help Desk Privilege Escalation Vulnerability - Dec14");
 
@@ -42,16 +42,13 @@ if(description)
   Ticket Request System) Help Desk and is prone to privilege escalation
   vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The error exists due to error in the
   'GenericInterface' that is due to a lack of sufficient permission checks.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to gain access to and make changes to ticket data of other users.
-
-  Impact Level: Application");
+  attackers to gain access to and make changes to ticket data of other users.");
 
   script_tag(name:"affected", value:"OTRS Help Desk versions 3.2.x before
   3.2.17, 3.3.x before 3.3.11, and 4.0.x before 4.0.3");
@@ -61,8 +58,8 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/59875");
-  script_xref(name : "URL" , value : "https://www.otrs.com/security-advisory-2014-06-incomplete-access-control");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/59875");
+  script_xref(name:"URL", value:"https://www.otrs.com/security-advisory-2014-06-incomplete-access-control");
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
   script_category(ACT_GATHER_INFO);
   script_family("Web application abuses");
@@ -73,25 +70,18 @@ if(description)
 
 include("version_func.inc");
 include("host_details.inc");
-include("global_settings.inc");
 
-## Variable initialisation
-otrsport = "";
-vers = "";
 
-## Get Application HTTP Port
 if(!otrsport = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get application version
 if(!vers = get_app_version(cpe:CPE, port:otrsport)){
   exit(0);
 }
 
 if(vers =~ "^(3|4)")
 {
-  ##Check for version 3.2.x before 3.2.17, 3.3.x before 3.3.11, and 4.0.x
   ## before 4.0.3
   if(version_in_range(version:vers, test_version:"3.2.0", test_version2:"3.2.16")||
      version_in_range(version:vers, test_version:"3.3.0", test_version2:"3.3.10")||

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apache_tomcat_denial_of_service_vuln_feb15.nasl 7546 2017-10-24 11:58:30Z cfischer $
+# $Id: gb_apache_tomcat_denial_of_service_vuln_feb15.nasl 11452 2018-09-18 11:24:16Z mmartin $
 #
 # Apache Tomcat Denial Of Service Vulnerability - Mar15
 #
@@ -29,19 +29,18 @@ CPE = "cpe:/a:apache:tomcat";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805474");
-  script_version("$Revision: 7546 $");
+  script_version("$Revision: 11452 $");
   script_cve_id("CVE-2014-0227");
   script_tag(name:"cvss_base", value:"6.4");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-24 13:58:30 +0200 (Tue, 24 Oct 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-18 13:24:16 +0200 (Tue, 18 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-03-06 17:41:16 +0530 (Fri, 06 Mar 2015)");
   script_name("Apache Tomcat Denial Of Service Vulnerability - Mar15");
 
   script_tag(name:"summary", value:"This host is installed with Apache Tomcat
   and is prone to denial of service vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with
-  the help of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw is due to ChunkedInputFilter
   implementation in Apache Tomcat did not fail subsequent attempts to read input
@@ -49,9 +48,7 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to perform a denial of service attack by streaming an unlimited
-  quantity of data, leading to excessive consumption of system resources.
-
-  Impact Level: Application");
+  quantity of data, leading to excessive consumption of system resources.");
 
   script_tag(name:"affected", value:"Apache Tomcat 6.x before 6.0.42, 7.x before
   7.0.55, and 8.x before 8.0.9");
@@ -70,7 +67,7 @@ if(description)
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Web Servers");
   script_dependencies("gb_apache_tomcat_detect.nasl", "os_detection.nasl");
-  script_mandatory_keys("ApacheTomcat/installed","Host/runs_windows");
+  script_mandatory_keys("ApacheTomcat/installed", "Host/runs_windows");
   script_require_ports("Services/www", 8080);
   exit(0);
 }
@@ -79,16 +76,10 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-appPort = "";
-appVer = "";
-
-## get the port
 if(!appPort = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get the version
 if(!appVer = get_app_version(cpe:CPE, port:appPort)){
   exit(0);
 }

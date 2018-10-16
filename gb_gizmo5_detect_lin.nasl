@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_gizmo5_detect_lin.nasl 9633 2018-04-26 14:07:08Z jschulte $
+# $Id: gb_gizmo5_detect_lin.nasl 11015 2018-08-17 06:31:19Z cfischer $
 #
 # Gizmo5 Version Detection (Linux)
 #
@@ -28,8 +28,8 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.800832");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9633 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
+  script_version("$Revision: 11015 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 08:31:19 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2009-07-15 13:05:34 +0200 (Wed, 15 Jul 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("Gizmo5 Version Detection (Linux)");
@@ -41,7 +41,7 @@ if(description)
   script_mandatory_keys("login/SSH/success");
   script_exclude_keys("ssh/no_linux_shell");
 
-  script_tag(name : "summary" , value : "The script is detects the installed version of Gizmo5 and sets
+  script_tag(name:"summary", value:"The script is detects the installed version of Gizmo5 and sets
   the version in KB.");
   exit(0);
 }

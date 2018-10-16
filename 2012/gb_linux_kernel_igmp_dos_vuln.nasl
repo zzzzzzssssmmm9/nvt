@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_linux_kernel_igmp_dos_vuln.nasl 10411 2018-07-05 10:15:10Z cfischer $
+# $Id: gb_linux_kernel_igmp_dos_vuln.nasl 11855 2018-10-12 07:34:51Z cfischer $
 #
 # Linux Kernel IGMP Remote Denial Of Service Vulnerability
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802295");
-  script_version("$Revision: 10411 $");
+  script_version("$Revision: 11855 $");
   script_bugtraq_id(51343);
   script_cve_id("CVE-2012-0207");
   script_tag(name:"cvss_base", value:"7.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-05 12:15:10 +0200 (Thu, 05 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 09:34:51 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-01-19 14:14:14 +0530 (Thu, 19 Jan 2012)");
   script_name("Linux Kernel IGMP Remote Denial Of Service Vulnerability");
   script_category(ACT_KILL_HOST);
@@ -49,18 +49,14 @@ if(description)
   script_xref(name:"URL", value:"http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=a8c1f65c79cbbb2f7da782d4c9d15639a9b94b27");
 
   script_tag(name:"impact", value:"Successful exploitation may allow remote attackers to cause a kernel crash,
-  denying service to legitimate users.
-
-  Impact Level: System");
+  denying service to legitimate users.");
 
   script_tag(name:"affected", value:"Linux Kernels above or equal to 2.6.36");
 
   script_tag(name:"insight", value:"The flaw is due to an error in IGMP protocol implementation, which
   can be exploited to cause a kernel crash via specially crafted IGMP queries.");
 
-  script_tag(name:"solution", value:"Upgrade to Linux Kernel version 3.0.17, 3.1.9 or 3.2.1
-
-  For updates refer to http://www.kernel.org");
+  script_tag(name:"solution", value:"Upgrade to Linux Kernel version 3.0.17, 3.1.9 or 3.2.1");
 
   script_tag(name:"summary", value:"This host is running Linux and prone to remote denial of service
   vulnerability.");
@@ -68,6 +64,7 @@ if(description)
   script_tag(name:"qod_type", value:"remote_vul");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://www.kernel.org");
   exit(0);
 }
 

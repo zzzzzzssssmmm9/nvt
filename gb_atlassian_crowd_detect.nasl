@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_atlassian_crowd_detect.nasl 4416 2016-11-04 10:46:30Z ckuerste $
+# $Id: gb_atlassian_crowd_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Atlassian Crowd Detection
 #
@@ -27,33 +27,33 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.106374");
- script_version ("$Revision: 4416 $");
- script_tag(name: "last_modification", value: "$Date: 2016-11-04 11:46:30 +0100 (Fri, 04 Nov 2016) $");
- script_tag(name: "creation_date", value: "2016-11-04 14:37:33 +0700 (Fri, 04 Nov 2016)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.106374");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-11-04 14:37:33 +0700 (Fri, 04 Nov 2016)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("Atlassian Crowd Detection");
+  script_name("Atlassian Crowd Detection");
 
- script_tag(name: "summary" , value: "Detection of Atlassian Crowd
+  script_tag(name:"summary", value:"Detection of Atlassian Crowd
 
 The script sends a connection request to the server and attempts to detect the presence of Atlassian Crowd and to
 extract its version");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_family("Product detection");
- script_dependencies("find_service.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("find_service.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_xref(name: "URL", value: "https://www.atlassian.com/software/crowd");
+  script_xref(name:"URL", value:"https://www.atlassian.com/software/crowd");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");

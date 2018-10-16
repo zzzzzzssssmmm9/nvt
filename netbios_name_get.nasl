@@ -1,19 +1,11 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: netbios_name_get.nasl 8140 2017-12-15 12:08:32Z cfischer $
+# $Id: netbios_name_get.nasl 11403 2018-09-15 09:16:15Z cfischer $
 #
-# Using NetBIOS to retrieve information from a Windows host
+# Using NetBIOS to retrieve information from a SMB host
 #
 # Authors:
 # Noam Rathaus <noamr@securiteam.com>
-# Changes by rd :
-# - bug fix in the adaptater conversion
-# - export results in the KB
-# rev 1.5 changes by ky :
-# - added full support for Win2k/WinXP/Win2k3
-# - added export of SMB/username KB
-# rev 1.6 changes by KK :
-# - added export of SMB/messenger KB
 #
 # Copyright:
 # Copyright (C) 1999 SecuriTeam
@@ -35,25 +27,19 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.10150");
-  script_version("$Revision: 8140 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 13:08:32 +0100 (Fri, 15 Dec 2017) $");
+  script_version("$Revision: 11403 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:16:15 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
-  script_name("Using NetBIOS to retrieve information from a Windows host");
+  script_name("Using NetBIOS to retrieve information from a SMB host");
   script_category(ACT_GATHER_INFO);
   script_copyright("This script is Copyright (C) 1999 SecuriTeam");
-  script_family("Windows");
+  script_family("Service detection");
   script_dependencies("cifs445.nasl");
 
-  tag_summary = "The NetBIOS port is open (UDP:137). A remote attacker may use this to gain
-  access to sensitive information such as computer name, workgroup/domain
-  name, currently logged on user name, etc.";
-
-  tag_solution = "Block those ports from outside communication";
-
-  script_tag(name:"solution", value:tag_solution);
-  script_tag(name:"summary", value:tag_summary);
+  script_tag(name:"summary", value:"This script is using NetBIOS (port UDP:137) to retrieve information
+  from a SMB host.");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
@@ -61,8 +47,10 @@ if(description)
 }
 
 include("host_details.inc");
+include("misc_func.inc");
 
-SCRIPT_DESC = 'Using NetBIOS to retrieve information from a Windows host';
+SCRIPT_DESC = "Using NetBIOS to retrieve information from a SMB host";
+BANNER_TYPE = "NetBIOS information";
 
 function isprint( c ) {
 
@@ -133,6 +121,8 @@ close( soc );
 
 if( strlen( result ) > 56 ) {
 
+  register_service( port:dsport, proto:"netbios-ns", ipproto:"udp" );
+
   hole_answer = "";
   hole_data = result;
   location = 0;
@@ -189,7 +179,7 @@ if( strlen( result ) > 56 ) {
         }
       }
 
-      # Set the current logged in user based on the last entry
+      # nb: Set the current logged in user based on the last entry
       if( hole_data[subloc] == raw_string( 3 ) ) {
         # Ugh, we can get multiple usernames with TS or Citrix
         # Also, the entry is the same for the local workstation or user name
@@ -219,7 +209,7 @@ if( strlen( result ) > 56 ) {
       }
     }
 
-    # Set the workgroup info on WinXP
+    # nb: Set the workgroup info on WinXP
     if( hole_data[loc] == raw_string( 196 ) ) {
 
       subloc = location + 15 + name_count * 18;
@@ -270,7 +260,7 @@ if( strlen( result ) > 56 ) {
         }
       }
 
-      # Set the current logged in user based on the last entry
+      # nb: Set the current logged in user based on the last entry
       if( hole_data[subloc] == raw_string( 3 ) ) {
         # Ugh, we can get multiple usernames with TS or Citrix
         username = name;
@@ -298,7 +288,7 @@ if( strlen( result ) > 56 ) {
 
     loc = location + 16 + name_count * 18;
 
-    # Set the workgroup info on WinNT
+    # nb: Set the workgroup info on WinNT
     if( hole_data[loc] == raw_string( 132 ) ) {
 
       subloc = location + 15 + name_count * 18;
@@ -340,18 +330,22 @@ if( strlen( result ) > 56 ) {
 
   for( adapter_count = 0; adapter_count < 6; adapter_count++ ) {
     loc = location + adapter_count;
-    if( adapter_count == 5 ) col = "";
-    else col = ":";
+    if( adapter_count == 5 )
+      col = "";
+    else
+      col = ":";
     adapter_name += tolower( string( hex( ord( hole_data[loc] ) ), col ) ) - "0x";
   }
 
   if( adapter_name == "00:00:00:00:00:00" ) {
     set_kb_item( name:"SMB/samba", value:TRUE );
     hole_answer += string( "\nThis SMB server seems to be a SAMBA server (this is not a security risk, this is for your information). This can be told because this server claims to have a null MAC address." );
+    register_and_report_os( os:"Linux/Unix", cpe:"cpe:/o:linux:kernel", banner_type:BANNER_TYPE, port:dsport, proto:"udp", banner:"null MAC address of a Samba server", desc:SCRIPT_DESC, runs_key:"unixoide" );
   } else {
     hole_answer += string( "\nThe remote host has the following MAC address on its adapter :\n" );
     hole_answer += " " + adapter_name;
     register_host_detail( name:"MAC", value:adapter_name, desc:SCRIPT_DESC );
+    register_and_report_os( os:"Microsoft Windows", cpe:"cpe:/o:microsoft:windows", banner_type:BANNER_TYPE, port:dsport, proto:"udp", desc:SCRIPT_DESC, runs_key:"windows" );
   }
   hole_answer += string( "\n\nIf you do not want to allow everyone to find the NetBIOS name of your computer, you should filter incoming traffic to this port." );
   log_message( port:dsport, data:hole_answer, protocol:"udp" );

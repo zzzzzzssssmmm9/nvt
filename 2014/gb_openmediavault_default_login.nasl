@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_openmediavault_default_login.nasl 9982 2018-05-28 12:00:03Z cfischer $
+# $Id: gb_openmediavault_default_login.nasl 11536 2018-09-21 19:44:30Z cfischer $
 #
 # OpenMediaVault Default Admin Credentials
 #
@@ -25,36 +25,36 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if (description)
+if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105089");
- script_version("$Revision: 9982 $");
- script_tag(name:"cvss_base", value:"7.5");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
- script_name("OpenMediaVault Default Admin Credentials");
- script_tag(name:"last_modification", value:"$Date: 2018-05-28 14:00:03 +0200 (Mon, 28 May 2018) $");
- script_tag(name:"creation_date", value:"2014-09-15 12:02:06 +0200 (Mon, 15 Sep 2014)");
- script_category(ACT_ATTACK);
- script_tag(name:"qod_type", value:"remote_vul");
- script_family("Default Accounts");
- script_copyright("This script is Copyright (C) 2014 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_oid("1.3.6.1.4.1.25623.1.0.105089");
+  script_version("$Revision: 11536 $");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_name("OpenMediaVault Default Admin Credentials");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 21:44:30 +0200 (Fri, 21 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2014-09-15 12:02:06 +0200 (Mon, 15 Sep 2014)");
+  script_category(ACT_ATTACK);
+  script_tag(name:"qod_type", value:"remote_vul");
+  script_family("Default Accounts");
+  script_copyright("This script is Copyright (C) 2014 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_tag(name: "summary" , value: 'The remote OpenMediaVault web interface is prone to a default
+  script_tag(name:"summary", value:'The remote OpenMediaVault web interface is prone to a default
 account authentication bypass vulnerability.');
 
- script_tag(name: "impact" , value:'This issue may be exploited by a remote attacker to gain
+  script_tag(name:"impact", value:'This issue may be exploited by a remote attacker to gain
 access to sensitive information or modify system configuration.');
 
- script_tag(name: "vuldetect" , value: 'Try to login with default credentials.');
- script_tag(name: "insight" , value: 'It was possible to login with default credentials admin/openmediavault');
- script_tag(name: "solution" , value: 'Change the password.');
+  script_tag(name:"vuldetect", value:'Try to login with default credentials.');
+  script_tag(name:"insight", value:'It was possible to login with default credentials admin/openmediavault');
+  script_tag(name:"solution", value:'Change the password.');
 
- script_tag(name:"solution_type", value:"Workaround");
+  script_tag(name:"solution_type", value:"Workaround");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");
@@ -67,16 +67,17 @@ if( "<title>OpenMediaVault web administration interface" >!< buf ) exit( 0 );
 
 valid_services = make_list( 'Authentication','Session' );
 
+useragent = get_http_user_agent();
+host = http_host_name( port:port );
+
 foreach vs ( valid_services )
 {
   data = '{"service":"' + vs  + '","method":"login","params":{"username":"admin","password":"openmediavault"}}';
   len = strlen( data );
 
-  host = http_host_name( port:port );
-
   req = 'POST /rpc.php HTTP/1.1\r\n' +
         'Host: ' + host + '\r\n' +
-        'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+        'User-Agent: ' + useragent + '\r\n' +
         'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
         'Accept-Language: de,en-US;q=0.7,en;q=0.3\r\n' +
         'Accept-Encoding: Identity\r\n' +

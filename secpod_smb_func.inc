@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: secpod_smb_func.inc 10552 2018-07-20 10:33:43Z cfischer $
+# $Id: secpod_smb_func.inc 11621 2018-09-26 10:00:23Z cfischer $
 #
 # SMB Functions
 #
@@ -23,13 +23,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 10552 $
+# $Revision: 11621 $
 #
 ###############################################################################
 
 ###############################################################################
 # GetVer(), bin_word(), bin_dword() are a derivative of smbcl_func.inc available
-# in the OpenVAS repository
+# in the VT repository.
 # This script was written by Carsten Koch-Mauthe <c.koch-mauthe at dn-systems.de>
 #
 # This script is released under the GNU GPLv2
@@ -41,6 +41,10 @@
 # indicate verstr="prod"
 
 function GetVersion( socket, uid, tid, fid, offset, verstr, debug ) {
+
+  # TODO: Remove once openvas-nasl-lint can handle such a missing include
+  # from within the same include.
+  if(!defined_func("smb_get_file_size")) include("smb_nt.inc");
 
   local_var socket, uid, tid, fid, offset, verstr, debug;
   local_var fsize, data, i, offset, tmp, version, ver, vers, len, ver_len, retVal;
@@ -127,25 +131,19 @@ function GetVersion( socket, uid, tid, fid, offset, verstr, debug ) {
   return NULL;
 }
 
-# @brief This function enumerates existing registry values for a given key.
-#        It will gather all required info about the SMB registry
-#        from the knowledge base.
+# @brief Enumerates existing registry values for a given key via SMB. It will gather all required
+#        info about the SMB registry from the knowledge base.
 #
-# @param key the registry key to enumerate for values
-# @param type the registry type HKCU, HKU or HKLM to enumerate
+# @param key  The registry key to enumerate for values, e.g. "SOFTWARE\Microsoft\Windows\CurrentVersion\SharedDlls\"
+# @param type The type of the registry tree to query. Valid values are "HKLM, HKU and HKCU". If no type was specified the function
+#             defaults to "HKLM".
 #
-# @return A list containing the existing values of the given key, otherwise an empty list
+# @return A list containing the existing/enumerated values of the given registry key, an empty list otherwise.
 #
 function registry_enum_values( key, type ) {
 
   local_var key, type, list, soc, r, prot, uid, tid, pipe, handle;
-  local_var name, login, pass, domain, port;
-
-  name    =  kb_smb_name();
-  login   =  kb_smb_login();
-  pass    =  kb_smb_password();
-  domain  =  kb_smb_domain();
-  port    =  kb_smb_transport();
+  local_var kb_proxy_key, kb_proxy, item, founditem, name, login, pass, domain, port;
 
   # This function is mostly called in foreach loops. Make sure to always return
   # an empty list here instead of the previously behavior to return FALSE if any of
@@ -158,133 +156,28 @@ function registry_enum_values( key, type ) {
     return list;
   }
 
-  if( ! type ) type = "HKLM";
-  if( ! port ) port = 445;
+  if( ! type )
+    type = "HKLM";
+  else
+    type = toupper( type );
 
-  soc = open_sock_tcp( port );
-  if( ! soc ) {
+  # Query KB ("proxy") first.
+  kb_proxy_key = "SMB//registry_enum_values//Registry//" + type + "//" + tolower( key );
+  kb_proxy = get_kb_list( kb_proxy_key );
+  if( ! isnull( kb_proxy ) && kb_proxy && typeof( kb_proxy ) == "array" )
+    return kb_proxy;
+
+  if( kb_smb_is_samba() ) {
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#Windows SMB NVT was started against a Samba Server" );
     return list;
   }
 
-  r = smb_session_request( soc:soc, remote:name );
-  if( ! r ) {
-    close( soc );
-    return list;
-  }
+  name = kb_smb_name();
+  if( ! name ) return list;
 
-  prot = smb_neg_prot( soc:soc );
-  if( ! prot ) {
-    close( soc );
-    return list;
-  }
-
-  r = smb_session_setup( soc:soc, login:login, password:pass, domain:domain, prot:prot );
-  if( ! r ) {
-    close( soc );
-    return list;
-  }
-
-  uid = session_extract_uid( reply:r );
-  if( ! uid ) {
-    close( soc );
-    return list;
-  }
-
-  r = smb_tconx( soc:soc, name:name, uid:uid, share:"IPC$" );
-  if( ! r ) {
-    close( soc );
-    return list;
-  }
-
-  tid = tconx_extract_tid( reply:r );
-  if( ! tid ) {
-    close( soc );
-    return list;
-  }
-
-  r = smbntcreatex( soc:soc, uid:uid, tid:tid, name:"\winreg" );
-  if( ! r ) {
-    close( soc );
-    return list;
-  }
-
-  pipe = smbntcreatex_extract_pipe( reply:r );
-  if( ! pipe ) {
-    close( soc );
-    return list;
-  }
-
-  r = pipe_accessible_registry( soc:soc, uid:uid, tid:tid, pipe:pipe );
-  if( ! r ) {
-    close( soc );
-    return list;
-  }
-
-  if( type == "HKLM" ) {
-    handle = registry_open_hklm( soc:soc, uid:uid, tid:tid, pipe:pipe );
-  } else if( type == "HKU" ) {
-    handle = registry_open_hku( soc:soc, uid:uid, tid:tid, pipe:pipe );
-  } else if( type == "HKCU" ) {
-    handle = registry_open_hkcu( soc:soc, uid:uid, tid:tid, pipe:pipe );
-  } else {
-    close( soc );
-    return list;
-  }
-
-  if( ! handle ) {
-    close( soc );
-    return list;
-  }
-
-  r = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:handle );
-  if( ! r ) {
-    close( soc );
-    return list;
-  }
-
-  list = registry_enum_value( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
-  close( soc );
-
-  # Always return a list for the reasons explained above
-  if( typeof( list ) != "array" ) list = make_list();
-
-  return list;
-}
-
-# @brief This function enumerates registry keys via SMB.
-#        It will gather all required info about the SMB registry
-#        from the knowledge base.
-#
-# @param key the registry key to enumerate
-# @param type the registry type HKCU, HKU or HKLM to enumerate
-#
-# @return A list containing the existing registry keys, otherwise an empty list
-#
-function registry_enum_keys( key, type ) {
-
-  local_var key, type, list, soc, r, prot, uid, tid, pipe, handle;
-  local_var name, login, pass, domain, port;
-
-  name    =  kb_smb_name();
-  login   =  kb_smb_login();
-  pass    =  kb_smb_password();
-  domain  =  kb_smb_domain();
-  port    =  kb_smb_transport();
-
-  # This function is mostly called in foreach loops. Make sure to always return
-  # an empty list here instead of the previously behavior to return FALSE if any of
-  # the calles between the last return failed. This old  behavior had caused a
-  # nasl_array_iterator: # unhandled type 57 (0x39) if FALSE was returned when failed.
-  list = make_list();
-
-  if( ! key ) {
-    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_enum_keys" );
-    return list;
-  }
-
-  if( ! type ) type = "HKLM";
-  if( ! port ) port = 445;
-
+  port = kb_smb_transport();
+  if( ! port ) return list;
+  if( ! get_port_state( port ) ) return list;
   soc = open_sock_tcp( port );
   if( ! soc ) return list;
 
@@ -300,6 +193,12 @@ function registry_enum_keys( key, type ) {
     return list;
   }
 
+  login  = kb_smb_login();
+  pass   = kb_smb_password();
+  domain = kb_smb_domain();
+  if( ! login ) login = "";
+  if( ! pass )  pass = "";
+
   r = smb_session_setup( soc:soc, login:login, password:pass, domain:domain, prot:prot );
   if( ! r ) {
     close( soc );
@@ -350,9 +249,10 @@ function registry_enum_keys( key, type ) {
     handle = registry_open_hkcu( soc:soc, uid:uid, tid:tid, pipe:pipe );
   } else {
     close( soc );
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#registry_enum_values: Unsupported '" + type + "' passed to type function parameter." );
     return list;
   }
-  
+
   if( ! handle ) {
     close( soc );
     return list;
@@ -360,16 +260,206 @@ function registry_enum_keys( key, type ) {
 
   r = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:handle );
   if( ! r ) {
+
+    if( ! isnull( r ) )
+      registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+
+    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:handle );
+    
+    # TBD: If the key doesn't exist this will return here. Save this as an empty list in the KB cache as well?
     close( soc );
     return list;
   }
 
-  list = registry_enum_key( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+  # TODO: Evaluate if the handle here needs to be closed via registry_close as well...
+  list = registry_enum_value( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+
+  registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+  registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:handle );
+
   close( soc );
 
   # Always return a list for the reasons explained above
-  if( typeof( list ) != "array" ) list = make_list();
+  # and place the values into the KB to be cached for later calls.
+  # Using string() as set_kb_item won't allow to set a value of 0 into the KB.
+  if( typeof( list ) != "array" ) {
+    list = make_list();
+    set_kb_item( name:kb_proxy_key, value:string("") );
+  } else {
+    founditem = FALSE;
+    foreach item( list ) {
+      founditem = TRUE;
+      set_kb_item( name:kb_proxy_key, value:string( item ) );
+    }
+    if( ! founditem )
+      set_kb_item( name:kb_proxy_key, value:string("") );
+  }
+  return list;
+}
 
+# @brief Enumerates registry keys via SMB. It will gather all required info about the SMB registry
+#        from the knowledge base.
+#
+# @param key  The registry key to enumerate, e.g. "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\"
+# @param type The type of the registry tree to query. Valid values are "HKLM, HKU and HKCU". If no type was specified the function
+#             defaults to "HKLM".
+#
+# @return A list containing the existing/enumerated registry keys, an empty list otherwise.
+#
+function registry_enum_keys( key, type ) {
+
+  local_var key, type, list, soc, r, prot, uid, tid, pipe, handle;
+  local_var kb_proxy_key, kb_proxy, item, founditem, name, login, pass, domain, port;
+
+  # This function is mostly called in foreach loops. Make sure to always return
+  # an empty list here instead of the previously behavior to return FALSE if any of
+  # the calles between the last return failed. This old  behavior had caused a
+  # nasl_array_iterator: # unhandled type 57 (0x39) if FALSE was returned when failed.
+  list = make_list();
+
+  if( ! key ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_enum_keys" );
+    return list;
+  }
+
+  if( ! type )
+    type = "HKLM";
+  else
+    type = toupper( type );
+
+  # Query KB ("proxy") first.
+  kb_proxy_key = "SMB//registry_enum_keys//Registry//" + type + "//" + tolower( key );
+  kb_proxy = get_kb_list( kb_proxy_key );
+  if( ! isnull( kb_proxy ) && kb_proxy && typeof( kb_proxy ) == "array" )
+    return kb_proxy;
+
+  if( kb_smb_is_samba() ) {
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#Windows SMB NVT was started against a Samba Server" );
+    return list;
+  }
+
+  name = kb_smb_name();
+  if( ! name ) return list;
+
+  port = kb_smb_transport();
+  if( ! port ) return list;
+  if( ! get_port_state( port ) ) return list;
+  soc = open_sock_tcp( port );
+  if( ! soc ) return list;
+
+  r = smb_session_request( soc:soc, remote:name );
+  if( ! r ) {
+    close( soc );
+    return list;
+  }
+
+  prot = smb_neg_prot( soc:soc );
+  if( ! prot ) {
+    close( soc );
+    return list;
+  }
+
+  login  = kb_smb_login();
+  pass   = kb_smb_password();
+  domain = kb_smb_domain();
+  if( ! login ) login = "";
+  if( ! pass )  pass = "";
+
+  r = smb_session_setup( soc:soc, login:login, password:pass, domain:domain, prot:prot );
+  if( ! r ) {
+    close( soc );
+    return list;
+  }
+
+  uid = session_extract_uid( reply:r );
+  if( ! uid ) {
+    close( soc );
+    return list;
+  }
+
+  r = smb_tconx( soc:soc, name:name, uid:uid, share:"IPC$" );
+  if( ! r ) {
+    close( soc );
+    return list;
+  }
+
+  tid = tconx_extract_tid( reply:r );
+  if( ! tid ) {
+    close( soc );
+    return list;
+  }
+
+  r = smbntcreatex( soc:soc, uid:uid, tid:tid, name:"\winreg" );
+  if( ! r ) {
+    close( soc );
+    return list;
+  }
+
+  pipe = smbntcreatex_extract_pipe( reply:r );
+  if( ! pipe ) {
+    close( soc );
+    return list;
+  }
+
+  r = pipe_accessible_registry( soc:soc, uid:uid, tid:tid, pipe:pipe );
+  if( ! r ) {
+    close( soc );
+    return list;
+  }
+
+  if( type == "HKLM" ) {
+    handle = registry_open_hklm( soc:soc, uid:uid, tid:tid, pipe:pipe );
+  } else if( type == "HKU" ) {
+    handle = registry_open_hku( soc:soc, uid:uid, tid:tid, pipe:pipe );
+  } else if( type == "HKCU" ) {
+    handle = registry_open_hkcu( soc:soc, uid:uid, tid:tid, pipe:pipe );
+  } else {
+    close( soc );
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#registry_enum_keys: Unsupported '" + type + "' passed to type function parameter." );
+    return list;
+  }
+
+  if( ! handle ) {
+    close( soc );
+    return list;
+  }
+
+  r = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:handle );
+  if( ! r ) {
+
+    if( ! isnull( r ) )
+      registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+
+    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:handle );
+
+    # TBD: If the key doesn't exist this will return here. Save this as an empty list in the KB cache as well?
+    close( soc );
+    return list;
+  }
+
+  # TODO: Evaluate if the handle here needs to be closed via registry_close as well...
+  list = registry_enum_key( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+
+  registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+  registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:handle );
+
+  close( soc );
+
+  # Always return a list for the reasons explained above
+  # and place the values into the KB to be cached for later calls.
+  # Using string() as set_kb_item won't allow to set a value of 0 into the KB.
+  if( typeof( list ) != "array" ) {
+    list = make_list();
+    set_kb_item( name:kb_proxy_key, value:string("") );
+  } else {
+    founditem = FALSE;
+    foreach item( list ) {
+      founditem = TRUE;
+      set_kb_item( name:kb_proxy_key, value:string( item ) );
+    }
+    if( ! founditem )
+      set_kb_item( name:kb_proxy_key, value:string("") );
+  }
   return list;
 }
 
@@ -615,8 +705,8 @@ function GetVer( file, share, prodvers ) {
     return NULL;
   }
 
-  sections_cnt = bin_word( data: read_file(share:share, file:file, offset:pe_offset+6, count:2 ) );
-  section_offset = pe_offset + bin_word( data:read_file(share:share, file:file, offset:pe_offset+20, count:2 ) ) + 24;
+  sections_cnt = bin_word( data:read_file( share:share, file:file, offset:pe_offset + 6, count:2 ) );
+  section_offset = pe_offset + bin_word( data:read_file( share:share, file:file, offset:pe_offset + 20, count:2 ) ) + 24;
   rsrc_start = NULL;
   max_recurs = 20;
 
@@ -636,7 +726,7 @@ function GetVer( file, share, prodvers ) {
   }
 
   dir_data = read_file( share:share, file:file, offset:rsrc_start, count:16 );
-  dir_entries = bin_word( data:substr( dir_data,12 ) ) + bin_word( data:substr( dir_data, 14 ) );
+  dir_entries = bin_word( data:substr( dir_data, 12 ) ) + bin_word( data:substr( dir_data, 14 ) );
   dir_offset = NULL;
   sub_dir = 0;
   max_recurs = 100;
@@ -706,42 +796,42 @@ function GetVer( file, share, prodvers ) {
 
 function bin_word( data ) {
 
-  local_var data, datatype;
+  local_var data;
 
-  if( isnull( data ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#share#-#open_file" );
-
-  ##Make sure type is not int
-  datatype = typeof( data );
-  if( datatype == "int" ) {
-    return NULL;
+  if( isnull( data ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#data#-#bin_word" );
+    return 0;
   }
 
-  if( ! data ) {
+  #nb: Make sure type is not int
+  if( typeof( data ) == "int" ) {
     return 0;
-  } else if( ! isnull( data[0] ) && ! isnull( data[1] ) ) {
+  }
+
+  if( strlen( data ) > 1 ) {
     return( ord( data[0] ) + ( ord( data[1] ) << 8 ) );
   }
+  return 0;
 }
 
 function bin_dword( data ) {
 
-  local_var data, datatype;
+  local_var data;
 
-  if( isnull( data ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#share#-#open_file" );
-
-  ##Make sure type is not int
-  datatype = typeof( data );
-  if( datatype == "int" ) {
-    return NULL;
-  }
-
-  if( ! data ){
+  if( isnull( data ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#data#-#bin_dword" );
     return 0;
-  } else {
-    if( ! isnull( data[0] ) && ! isnull( data[1] ) ) {
-      return( ord( data[0] ) + ( ord( data[1] ) << 8 ) + ( ord( data[2] ) << 16 ) + ( ord( data[3] ) << 24 ) );
-    }
   }
+
+  #nb: Make sure type is not int
+  if( typeof( data ) == "int" ) {
+    return 0;
+  }
+
+  if( strlen( data ) > 3 ) {
+    return( ord( data[0] ) + ( ord( data[1] ) << 8 ) + ( ord( data[2] ) << 16 ) + ( ord( data[3] ) << 24 ) );
+  }
+  return 0;
 }
 
 function GetVersionFromFile( file, verstr ) {

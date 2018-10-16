@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_freetype_detect_win.nasl 8846 2018-02-16 13:29:15Z jschulte $
+# $Id: secpod_freetype_detect_win.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # FreeType Version Detection (Windows)
 #
@@ -26,50 +26,37 @@
 
 if(description)
 {
-
   script_oid("1.3.6.1.4.1.25623.1.0.901144");
-  script_version("$Revision: 8846 $");
+  script_version("$Revision: 11279 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-02-16 14:29:15 +0100 (Fri, 16 Feb 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2010-09-01 09:34:36 +0200 (Wed, 01 Sep 2010)");
   script_tag(name:"qod_type", value:"registry");
   script_name("FreeType Version Detection (Windows)");
 
-tag_summary =
-"Detection of installed version of FreeType.
+  script_tag(name:"summary", value:"Detects the installed version of FreeType.
 
 The script logs in via smb, searches for FreeType in the registry and
-gets the version from registry.";
-
-
-  script_tag(name : "summary" , value : tag_summary);
+gets the version from registry.");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2010 SecPod");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
 }
-
 
 include("smb_nt.inc");
 include("secpod_smb_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-osArch = "";
-key_list = "";
-appName = "";
-appLoc = "";
-ftVer = "";
-
 osArch = get_kb_item("SMB/Windows/Arch");
-if(!osArch)
-{
-  exit(-1);
+if(!osArch){
+  exit(0);
 }
 
 if(!registry_key_exists(key:"SOFTWARE\GnuWin32\FreeType") &&
@@ -83,7 +70,6 @@ if("x86" >< osArch){
   key_list = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\";
 }
 
-## Check for 64 bit platform
 else if("x64" >< osArch){
  key_list = make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\",
                       "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\");
@@ -95,7 +81,6 @@ foreach key (key_list)
   {
     appName = registry_get_sz(key:key + item, item:"DisplayName");
 
-    # Confirm the application
     if("FreeType" >< appName)
     {
       ftVer = registry_get_sz(key:key + item, item:"DisplayVersion");
@@ -107,7 +92,6 @@ foreach key (key_list)
           appLoc = "Couldn find the install location from registry";
         }
 
-        # Set KB for FreeType
         set_kb_item(name:"FreeType/Win/Ver", value:ftVer);
 
         base = "cpe:/a:freetype:freetype:";
@@ -119,7 +103,6 @@ foreach key (key_list)
 
           base = "cpe:/a:freetype:freetype:x64:";
         }
-        ## Register Product and Build Report
         log_message( data: register_and_report_cpe( app: appName,
                                                     ver: ftVer,
                                                     concluded: ftVer,

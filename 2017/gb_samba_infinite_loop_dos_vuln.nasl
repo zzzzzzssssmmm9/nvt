@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_samba_infinite_loop_dos_vuln.nasl 10398 2018-07-04 12:11:48Z cfischer $
+# $Id: gb_samba_infinite_loop_dos_vuln.nasl 11816 2018-10-10 10:42:56Z mmartin $
 #
 # Samba 'fd_open_atomic infinite loop' Denial-of-Service Vulnerability
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:samba:samba";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.811083");
-  script_version("$Revision: 10398 $");
+  script_version("$Revision: 11816 $");
   script_cve_id("CVE-2017-9461");
   script_tag(name:"cvss_base", value:"7.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-04 14:11:48 +0200 (Wed, 04 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-10 12:42:56 +0200 (Wed, 10 Oct 2018) $");
   script_tag(name:"creation_date", value:"2017-06-07 17:35:53 +0530 (Wed, 07 Jun 2017)");
   script_name("Samba 'fd_open_atomic infinite loop' Denial-of-Service Vulnerability");
   script_category(ACT_GATHER_INFO);
@@ -55,19 +55,17 @@ if(description)
 
   script_tag(name:"impact", value:"Successfully exploiting this issue will allow
   remote attackers to conduct a denial-of-service condition(infinite loop with
-  high CPU usage and memory consumption).
-
-  Impact Level: Application");
+  high CPU usage and memory consumption).");
 
   script_tag(name:"affected", value:"Samba versions before 4.4.10 and 4.5.x
   before 4.5.6");
 
-  script_tag(name:"solution", value:"Upgrade to Samba 4.4.10 or 4.5.6 or later.
-  For updates refer to https://www.samba.org ");
+  script_tag(name:"solution", value:"Upgrade to Samba 4.4.10 or 4.5.6 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_banner_unreliable");
 
+  script_xref(name:"URL", value:"https://www.samba.org");
   exit(0);
 }
 

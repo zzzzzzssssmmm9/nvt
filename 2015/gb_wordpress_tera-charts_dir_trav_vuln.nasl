@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wordpress_tera-charts_dir_trav_vuln.nasl 9998 2018-05-29 08:15:38Z cfischer $
+# $Id: gb_wordpress_tera-charts_dir_trav_vuln.nasl 11424 2018-09-17 08:03:52Z mmartin $
 #
 # Wordpress Tera Charts Multiple Directory Traversal Vulnerability
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805123");
-  script_version("$Revision: 9998 $");
+  script_version("$Revision: 11424 $");
   script_cve_id("CVE-2014-4940");
   script_bugtraq_id(68662);
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-29 10:15:38 +0200 (Tue, 29 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 10:03:52 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-01-13 12:03:15 +0530 (Tue, 13 Jan 2015)");
   script_name("Wordpress Tera Charts Multiple Directory Traversal Vulnerability");
 
@@ -49,9 +49,7 @@ if(description)
   specifically path traversal style attacks (e.g. '../') via the 'fn' parameter.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to download arbitrary files.
-
-  Impact Level: Application");
+  attackers to download arbitrary files.");
 
   script_tag(name:"affected", value:"Wordpress Tera Charts plugin version 0.1");
 
@@ -60,7 +58,7 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://codevigilant.com/disclosure/wp-plugin-tera-chart-local-file-inclusion");
+  script_xref(name:"URL", value:"https://codevigilant.com/disclosure/wp-plugin-tera-chart-local-file-inclusion");
 
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");

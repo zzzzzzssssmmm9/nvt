@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: http_func.inc 10406 2018-07-05 05:54:02Z cfischer $
+# $Id: http_func.inc 11896 2018-10-13 14:47:25Z cfischer $
 #
 # Methods to handle HTTP
 #
@@ -24,14 +24,47 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 10406 $
+# $Revision: 11896 $
 #
 ###############################################################################
 
-global_var OPENVAS_HTTP_USER_AGENT;
+# @brief Returns a HTTP User Agent string which can be used by VTs within the
+#        User-Agent: header of HTTP requests.
+#
+# @return A string containing a HTTP user agent
+#
+function get_http_user_agent() {
 
-if ( ! OPENVAS_HTTP_USER_AGENT = get_kb_item( "http/user-agent" ) )
-  OPENVAS_HTTP_USER_AGENT = 'Mozilla/5.0 [en] (X11, U; OpenVAS ' + OPENVAS_VERSION + ')';
+  local_var default, ua;
+  # nb: __http_func_user_agent is global var
+
+  # nb: Only used if the function is called by a VT running via openvas-nasl
+  # and if global_settings.nasl wasn't called before that VT.
+  # TBD: On master we don't have a "OPENVAS_VERSION" defined...
+  if( OPENVAS_VERSION )
+    default = "Mozilla/5.0 [en] (X11, U; OpenVAS-VT " + OPENVAS_VERSION + ")";
+  else
+    default = "Mozilla/5.0 [en] (X11, U; OpenVAS-VT)";
+
+  if( ! isnull( __http_func_user_agent ) ) {
+    ua = string( __http_func_user_agent );
+  } else {
+    ua = get_kb_item( "http/user-agent" );
+    if( ! isnull( ua ) ) {
+      __http_func_user_agent = string( ua );
+    } else {
+      __http_func_user_agent = default;
+      ua = default;
+    }
+  }
+  return ua;
+}
+
+global_var OPENVAS_HTTP_USER_AGENT;
+OPENVAS_HTTP_USER_AGENT = get_http_user_agent();
+
+# Global key to avoid that we're repeatedly asking redis for something we already know
+global_var __http_func_user_agent;
 
 # Enables debugging output for a few functions below
 global_var _http_debug;
@@ -43,15 +76,20 @@ http_cgi_disabled     = get_kb_item( "Settings/disable_cgi_scanning" );
 optimize_test_enabled = get_preference( "optimize_test" );
 
 # Global keys to avoid that we're repeatedly asking redis for something we already know
-global_var _http_is_broken_array;
-# nb: key is the port or NULL (if not previously checked, value TRUE/FALSE if broken or not
+global_var _http_is_broken_array, _http_no404_string_array, _http_has_generic_xss_array;
+# nb: key is the host+port or NULL (if not previously checked), value TRUE/FALSE if broken or not
 _http_is_broken_array = make_array();
+# nb: key is the host+port or NULL (if not previously checked), value a string or FALSE
+_http_no404_string_array = make_array();
+# nb: key is the host+port or NULL (if not previously checked), value TRUE/FALSE if it has a
+# generic XSS or not
+_http_has_generic_xss_array = make_array();
 
 function headers_split( h ) {
 
   local_var ret, array, item, subarray, end;
 
-  if( ! h ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#h#-#headers_split" );
+  if( ! h ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#h#-#headers_split" );
 
   end = strstr( h, '\r\n\r\n' );
   if( end ) h -= end;
@@ -83,7 +121,7 @@ function hex2dec( xvalue ) {
   local_var ret, l, i, n, m;
 
   if( ! xvalue ) {
-    set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#xvalue#-#hex2dec" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#xvalue#-#hex2dec" );
     return(0);
   }
 
@@ -111,8 +149,8 @@ function hex2dec( xvalue ) {
   return int( ret );
 }
 
-# @brief This function creates a HTTP GET request for "/" or a specific URL,
-#        sends the request to the target, receives the response and extracts
+# @brief Creates a HTTP GET request for "/" or a specific URL, sends
+#        the request to the target, receives the response and extracts
 #        the HTTP header (banner) without the body from the response.
 #        If a header was received it is saved into the knowledge base.
 #        If a header was requested which was requested previously the cached
@@ -130,7 +168,7 @@ function get_http_banner( port, file, ignore_broken ) {
   local_var soc, sb, banner, req, body;
 
   if( ! port ) {
-    set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_banner" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_banner" );
     return NULL;
   }
 
@@ -141,15 +179,16 @@ function get_http_banner( port, file, ignore_broken ) {
   banner = get_kb_item( sb );
   if( banner ) return banner;
 
+  # nb: This is set in nasl/nasl_builtin_find_service.c of openvas-scanner as well...
   sb = strcat( "www/banner/", port, file );
   banner = get_kb_item( sb );
   if( banner ) return banner;
 
   if( ! ignore_broken )
-    if( http_is_marked_broken( port:port ) ) return NULL; # TBD: Really return NULL if marked as broken? We still could use the banner version in NVTs...
+    if( get_http_is_marked_broken( port:port, host:"*" ) ) return NULL; # TBD: Really return NULL if marked as broken? We still could use the banner version in NVTs...
 
   # nb: Always keep http_get() before http_open_socket() as the first could
-  # fork with multiple vhosts and the childs would share the same socket
+  # fork with multiple vhosts and the child's would share the same socket
   # causing race conditions and similar.
   req = http_get( item:file, port:port );
   soc = http_open_socket( port );
@@ -164,27 +203,40 @@ function get_http_banner( port, file, ignore_broken ) {
   return banner;
 }
 
-# @brief This function returns all HTTP ports of the target system which
-#        are saved in the KB entry "Services/www" found by the scanner.
-#        If no ports where found open it will exit. In the case if the
-#        "unscanned_closed" scanner setting is set to "no" it will return
-#        the port passed via the default parameter.
+# @brief Returns all HTTP ports of the target system which are saved
+#        in the KB entry "Services/www" found by the scanner. If no
+#        ports where found open or no "default" parameter is passed
+#        (if "nodefault" isn't set to TRUE) it will exit. In the case
+#        where the "unscanned_closed" scanner setting is set to "no"
+#        it will return the port passed via the default parameter.
 #
-# @param default             the port to return if "unscanned_closed" is set to "no" and no ports have been found open
-# @param ignore_broken       returns the ports even if they are known to be "broken"
-# @param ignore_cgi_disabled returns the ports even if CGI scanning is disabled
+# @param default             the port to return if "unscanned_closed" is set to "no" and no ports have been found open.
+# @param nodefault           don't exit if no "default" parameter is passed, it still will return if no HTTP servers are detected at all.
+# @param host                the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#                            parameter or get_host_name) of the remote server. If no host parameter
+#                            is passed http_host_name will be called automatically and a debug
+#                            message is logged into the KB (currently commented out).
+# @param ignore_broken       returns the ports even if they are known to be "broken".
+# @param ignore_cgi_disabled returns the ports even if CGI scanning is disabled.
+# @param dont_use_vhosts     allows to specify if http_host_name is called internally (which would fork on multiple vhosts).
 #
-# @return the open / found HTTP ports or the port passed via the default parameter in the case of no found ports and "unscanned_closed" is set to "no"
+# @return the open / found HTTP ports or the port passed via the default parameter in the case of no found ports
+#         and "unscanned_closed" is set to "no".
 #
-function get_http_port( default, ignore_broken, ignore_cgi_disabled ) {
+function get_http_port( default, nodefault, host, ignore_broken, ignore_cgi_disabled, dont_use_vhosts ) {
 
-  local_var default, port, p, ignore_broken, ignore_cgi_disabled;
+  local_var default, nodefault, host, ignore_broken, ignore_cgi_disabled, dont_use_vhosts;
+  local_var port, p;
   # nb: http_cgi_disabled and optimize_test_enabled are global vars
 
-  if( ! default ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#default#-#get_http_port" );
+  if( ! default && ! nodefault ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#default#-#get_http_port" );
+    exit( 0 );
+  }
 
-  port = get_kb_item( "Services/www" );
+  port = get_kb_item( "Services/www" ); # nb: This will fork on multiple open ports
   if( port ) default = port;
+  if( ! default ) exit( 0 ); # TBD: Try/return 80?
 
   # Includes e.g. PJL ports which are printing everything
   # sent to them so exit for such a port here
@@ -199,11 +251,18 @@ function get_http_port( default, ignore_broken, ignore_cgi_disabled ) {
     }
   }
 
+  if( ! dont_use_vhosts && ! host ) {
+    host = http_host_name( dont_add_port:TRUE );
+    #set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#get_http_port" );
+  }
+
   if( ! ignore_broken ) {
-    p = http_is_marked_broken( port:default );
+    if( ! host ) host = "*";
+    p = get_http_is_marked_broken( port:default, host:host );
     if( p ) exit( 0 );
   }
 
+  # TBD: It seems this is never set...
   p = get_kb_item( "Services/www/" + default + "/working" );
   if( p ) return default;
 
@@ -224,8 +283,8 @@ function php_ver_match( banner, pattern ) {
 
   local_var line;
 
-  if( ! banner ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#banner#-#php_ver_match" );
-  if( ! pattern ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#pattern#-#php_ver_match" );
+  if( ! banner ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#banner#-#php_ver_match" );
+  if( ! pattern ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#pattern#-#php_ver_match" );
 
   line = egrep( pattern:"^Server:.*", string:banner, icase:TRUE );
 
@@ -240,8 +299,8 @@ function php_ver_match( banner, pattern ) {
   return( 0 );
 }
 
-# @brief This function checks if the remote web server is responding
-#        to an HTTP GET request.
+# @brief Checks if the remote web server is responding
+#        to a HTTP GET request.
 #
 # @param port  the port of the remote server to check
 # @param retry the amount of retries until the check is considered as failed.
@@ -264,7 +323,7 @@ function http_is_dead( port, retry ) {
 
   # nb: http_head does not work against SWAT & VNC (& probably others...)
   # nb: Always keep http_get() before http_open_socket() as the first could
-  # fork with multiple vhosts and the childs would share the same socket
+  # fork with multiple vhosts and the child's would share the same socket
   # causing race conditions and similar.
   url = strcat( "/OpenVASTest", rand(), ".html" );
   req = http_get( item:url, port:port );
@@ -298,8 +357,8 @@ function http_is_dead( port, retry ) {
   return FALSE;
 }
 
-# @brief This function requests a specified URL and checks the response if it
-#        is containing pattern for windows related files (autoexec.bat, win.ini
+# @brief Requests a specified URL and checks the response if it contains
+#        a pattern for windows related files (autoexec.bat, win.ini
 #        and boot.ini).
 #
 # @param port        the port of the remote server to check
@@ -327,7 +386,7 @@ function do_check_win_dir_trav( port, url, quickcheck ) {
   if( _http_debug ) display( "DEBUG: check_win_dir_trav(port=", port, ", url=", url, ", quickcheck=", quickcheck, ")\n" );
 
   # nb: Always keep http_get() before http_open_socket() as the first could
-  # fork with multiple vhosts and the childs would share the same socket
+  # fork with multiple vhosts and the child's would share the same socket
   # causing race conditions and similar.
   req = http_get( item:url, port:port );
   soc = http_open_socket( port );
@@ -355,8 +414,8 @@ function do_check_win_dir_trav( port, url, quickcheck ) {
   return FALSE;
 }
 
-# @brief This function requests a specified URL and checks the response if it
-#        is containing pattern for windows related files (autoexec.bat, win.ini
+# @brief Requests a specified URL and checks the response if it contains
+#        a pattern for windows related files (autoexec.bat, win.ini
 #        and boot.ini). It is an extension to @ref do_check_win_dir_trav and
 #        is additionally checking if the web server is responding with the
 #        expected pattern on a non-existent random file.
@@ -382,7 +441,7 @@ function http_recv_headers2( socket ) {
 
   local_var buf, line, counter;
 
-  if( ! socket ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#socket#-#http_recv_headers2" );
+  if( ! socket ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#socket#-#http_recv_headers2" );
 
   while( TRUE ) {
     counter ++;
@@ -408,7 +467,7 @@ function http_recv_body( socket, headers, length ) {
 
   local_var h, cl, l, min, max, x, n, to, gzip;
 
-  if( ! socket ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#socket#-#http_recv_body" );
+  if( ! socket ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#socket#-#http_recv_body" );
 
   if( ! headers ) {
     h = http_recv_headers2( socket:socket );
@@ -435,7 +494,10 @@ function http_recv_body( socket, headers, length ) {
 
     while( 1 ) {
       tmp = recv_line( socket:socket, length:4096 );
-      l = hex2dec( xvalue:tmp );
+      if( ! tmp )
+        l = 0;
+      else
+        l = hex2dec( xvalue:tmp );
       body = strcat( body, recv( socket:socket, length:l, min:l ) );
       # "\r\n"
       recv( socket:socket, length:2, min:2 );
@@ -480,7 +542,7 @@ function http_recv( socket, code ) {
 
   local_var h, b, l;
 
-  if( ! socket ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#socket#-#http_recv" );
+  if( ! socket ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#socket#-#http_recv" );
 
   if( code ) {
     h = strcat( code ); # Convert to string, just in case
@@ -505,8 +567,8 @@ function http_recv_length( socket, bodylength ) {
 
   local_var h, b;
 
-  if( ! socket ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#socket#-#http_recv_length" );
-  if( ! bodylength ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#bodylength#-#http_recv_length" );
+  if( ! socket ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#socket#-#http_recv_length" );
+  if( ! bodylength ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#bodylength#-#http_recv_length" );
 
   h = http_recv_headers2( socket:socket );
   b = http_recv_body( socket:socket, headers:h, length:bodylength );
@@ -517,8 +579,31 @@ function http_send_recv( port, data ) {
 
   local_var s, r;
 
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_send_recv" );
-  if( ! data ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#data#-#http_send_recv" );
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_send_recv" );
+    return NULL;
+  }
+
+  if( ! data ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#data#-#http_send_recv" );
+    return NULL;
+  }
+
+  # nb: We should expect at least a request like: "GET / HTTP/1.1\r\n" (length: 16).
+  # But for some specific cases we're just checking for some less data.
+  if( strlen( data ) < 8 || data !~ "^(DELETE|PROPFIND|PUT|GET|HEAD|POST|OPTIONS|REPORT|MKCOL|MOVE|PROPPATCH|COPY|PATCH|CONNECT|TRACE|LOCK|UNLOCK|TRACK|M-POST|CHECKOUT|CHECKIN|UNCHECKOUT|VERSION-CONTROL|BASELINE-CONTROL).*HTTP/(1\.[01]|2)" ) {
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#http_send_recv(): Invalid HTTP request (length < 8, invalid HTTP method or missing HTTP/ header) passed in 'data' variable." );
+  }
+
+  # http_get() won't add a Host: header if only HTTP/1.0 support was detected
+  # nb: Commented out for now as quite a lot older VTs are probably passing a HTTP request without the Host: header
+  #if( "Host:" >!< data && "HTTP/1.0" >!< data ) {
+  #  set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#http_send_recv(): No 'Host:' header passed in data variable. This might lead to issues if SNI is enabled on the remote host." );
+  #}
+
+  if( data !~ "^(DELETE|PROPFIND|PUT|GET|HEAD|POST|OPTIONS|REPORT|MKCOL|MOVE|PROPPATCH|COPY|PATCH|CONNECT|TRACE|LOCK|UNLOCK|TRACK|M-POST|CHECKOUT|CHECKIN|UNCHECKOUT|VERSION-CONTROL|BASELINE-CONTROL) (/|\.+/|https?:|\*).* HTTP" ) {
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#http_send_recv(): URL/URI of the HTTP request passed in 'data' variable doesn't start with one of the following: '/, ./, http, *'." );
+  }
 
   s = http_open_socket( port );
   if( ! s ) return;
@@ -540,15 +625,30 @@ function http_send_recv( port, data ) {
     return http_gunzip( buf:r );
 
   return r;
-
 }
 
-function cgi_dirs( port ) {
+# @brief Returns the detected directories (e.g. by webmirror.nasl and/or
+#        DDI_Directory_Scanner.nasl) on the remote web server. Additionally
+#        it includes all user specified directories via the scanner preference
+#        'cgi_path'. If CGI Scanning is is disabled the function will exit.
+#
+# @param port the port of the remote server for which the detected directories
+#             should be returned. This parameter is optional and if not passed
+#             the directories of all web servers on the remote host are returned.
+# @param host the hostname of the remote server (e.g. from http_host_name with the
+#             dont_add_port:TRUE parameter or get_host_name) for which the detected
+#             directories should be returned. This parameter is optional and if not
+#             passed the directories of all web servers and all hostnames of the
+#             remote host are returned.
+#
+# @return The directories on the remote web server as defined in the description above.
+#
+function cgi_dirs( port, host ) {
 
-  local_var port, kb, optimize, usercgis;
+  local_var port, host, kb, optimize, usercgis;
   # nb: http_cgi_disabled and optimize_test_enabled are global vars
 
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#cgi_dirs" );
+  if( ! port ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#cgi_dirs" );
 
   if( http_cgi_disabled ) {
     if( optimize_test_enabled && "yes" >< optimize_test_enabled ) {
@@ -558,10 +658,18 @@ function cgi_dirs( port ) {
     exit( 0 ); # Throws a "nasl_array_iterator: unhandled type 57" message if cgi_dirs() is called within a foreach but not within a make_list()
   }
 
-  if( port ) {
-    kb = get_kb_list( "www/" + port + "/content/directories" );
+  # TBD: Use http_host_name(dont_add_port:TRUE) if(!host) ?
+  # This would require an additional parameter to skip this if
+  # the NVT dev wants to get the directories of all hosts...
+
+  if( port && host ) {
+    kb = get_kb_list( "www/" + host + "/" + port + "/content/directories" );
+  } else if( port && ! host ) {
+    kb = get_kb_list( "www/*/" + port + "/content/directories" );
+  } else if( ! port && host ) {
+    kb = get_kb_list( "www/" + host + "/*/content/directories" );
   } else {
-    kb = get_kb_list( "www/*/content/directories" );
+    kb = get_kb_list( "www/*/*/content/directories" );
   }
 
   usercgis = get_kb_list( "/user/cgis" );
@@ -575,6 +683,13 @@ function cgi_dirs( port ) {
   return( make_list_unique( kb ) );
 }
 
+# @brief Returns if a remote web server is able to host or support hosting PHP files.
+#
+# @param port the port of the remote server to check
+#
+# @return TRUE if the remote web server is able to host or support hosting PHP files,
+#         FALSE otherwise and NULL in the case where no port parameter was passed.
+#
 function can_host_php( port ) {
 
   local_var port, banner, files, srv_pattern;
@@ -586,7 +701,9 @@ function can_host_php( port ) {
 
   if( get_kb_item( "www/" + port + "/PHP" ) ) return TRUE;
 
-  files = get_kb_list( "www/" + port + "/content/extensions/php*" );
+  # nb: * in host is expected as webserver hosting .php* files on one vhost
+  # is most likely supporting PHP on another vhost as well.
+  files = get_http_kb_file_extensions( port:port, host:"*", ext:"php*" );
   if( ! isnull( files ) ) return TRUE; # Hosting .php* files
 
   if( get_kb_item( "greenbone/gos/http/" + port + "/detected" ) ) return FALSE;
@@ -625,6 +742,13 @@ function can_host_php( port ) {
   }
 }
 
+# @brief Returns if a remote web server is able to host or support hosting .asp and/or .aspx files.
+#
+# @param port the port of the remote server to check
+#
+# @return TRUE if the remote web server is able to host or support hosting .asp and/or .aspx files,
+#         FALSE otherwise and NULL in the case where no port parameter was passed.
+#
 function can_host_asp( port ) {
 
   local_var port, banner, files, srv_pattern;
@@ -634,7 +758,9 @@ function can_host_asp( port ) {
     return;
   }
 
-  files = get_kb_list( "www/" + port + "/content/extensions/asp*" );
+  # nb: * in host is expected as webserver hosting .asp* files on one vhost
+  # is most likely supporting .asp/.aspx on another vhost as well.
+  files = get_http_kb_file_extensions( port:port, host:"*", ext:"asp*" );
   if( ! isnull( files ) ) return TRUE; # Hosting .asp / .aspx files
 
   if( get_kb_item( "greenbone/gos/http/" + port + "/detected" ) ) return FALSE;
@@ -672,28 +798,12 @@ function can_host_asp( port ) {
   }
 }
 
-function http_40x( port, code ) {
-
-  local_var no404;
-
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_40x" );
-  if( ! code ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#code#-#http_40x" );
-
-  if( ereg( string:code, pattern:"^HTTP/1\.[01] +40[0-9]" ) )
-    return TRUE;
-
-  no404 = get_kb_item( "www/no404/" + port );
-  if( no404 && no404 >< code )
-    return TRUE;
-  return FALSE;
-}
-
 function http_gunzip( buf, onlybody ) {
 
   local_var onlybody, lines, line, sep, header, body, h, tmpdir, tmpfile, tmpfile_gz, res;
 
   if( ! buf ) {
-    set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#buf#-#http_gunzip" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#buf#-#http_gunzip" );
     return FALSE;
   }
 
@@ -770,11 +880,20 @@ function http_gunzip( buf, onlybody ) {
   return buf;
 }
 
-function http_host_name( port, use_ip ) {
+# @brief Returns the hostname of the remote HTTP server. If the port parameter
+#        is passed the function is also adding the port of the remote server
+#        to the hostname if the port is not 80 and not 443. If no port is passed
+#        the dont_add_port parameter needs to be set to TRUE.
+#
+# @param port          the port of the remote server
+# @param use_ip        if set to TRUE the IP of the remote server is returned, otherwise the hostname
+# @param dont_add_port if set to TRUE no port is added to the IP/hostname, otherwise the port is added
+#
+# @return The hostname or IP of the remote server controlled by the described parameters.
+#
+function http_host_name( port, use_ip, dont_add_port ) {
 
-  local_var port, use_ip, host;
-
-  if( ! port ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_host_name" );
+  local_var port, use_ip, dont_add_port, host;
 
   if( use_ip ) {
     host = get_host_ip();
@@ -782,7 +901,15 @@ function http_host_name( port, use_ip ) {
     host = get_host_name();
   }
 
+  if( dont_add_port )
+    return host;
+
+  if( ! port ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_host_name" );
+
   if( port ) {
+    # nb: Some IPS/WAF might block our requests if we're adding a port to the
+    # Host: header so at least don't include it for 80 and 443 which complies
+    # with the RFC.
     if( port != 80 && port != 443 )
       host += ':' + port;
   }
@@ -894,7 +1021,7 @@ function extract_location_from_redirect( port, data, debug ) {
     # The location header is pointing to the same hostname / ip
     if( host >< location_host || ip >< location_host ) {
       loc = ereg_replace( string:location, pattern:"(https:|http:)?//[^/]*/([^?]*)", replace:"/\2", icase:TRUE );
-      if( debug || _http_debug ) display( 'DEBUG: Location header is pointing to "' + location + '" on the same host/ip. Returning this location.\n' );
+      if( debug || _http_debug ) display( 'DEBUG: Location header is pointing to "' + location + '" on the same host/ip. Returning the "' + loc + '" part of the location.\n' );
       return loc;
     # If its not pointing to the same hostname / ip we can't follow it
     } else {
@@ -993,39 +1120,747 @@ function extract_basic_auth( data ) {
   return infos;
 }
 
-# @brief This function returns the info if a remote web server was internally
-#        (in the KB) marked as "broken". It will also save the information in
-#        an internal array to avoid that redis is queried.
+# @brief Returns the info if a remote web server was internally (in the KB)
+#        marked as "broken" by no404.nasl. It will also save the information
+#        in an internal array to avoid that redis is queried again for the
+#        same info.
 #
 # @param port the port of the remote server
+# @param host the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#             parameter or get_host_name) of the remote server. If no host parameter
+#             is passed http_host_name will be called automatically and a debug
+#             message is logged into the KB. A special "*" string can be passed
+#             where the function will return TRUE if any of the remote hostnames
+#             are marked as "broken".
 #
 # @return TRUE if the remote web server was marked as broken, FALSE otherwise and
 #         NULL in the case where the port parameter wasn't passed.
 #
-function http_is_marked_broken( port ) {
+function get_http_is_marked_broken( port, host ) {
 
-  local_var port, marked_broken;
+  local_var port, host, marked_broken, marked_broken_list, mb;
   # nb: _http_is_broken_array is a global_var (see on top)
 
   if( ! port ) {
-    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#extract_location_from_redirect" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_is_marked_broken" );
     return NULL;
+  }
+
+  if( ! host ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#get_http_is_marked_broken" );
+    host = http_host_name( dont_add_port:TRUE );
   }
 
   # Used to not query redis with the get_kb_item below
   # to save some requests.
-  if( ! isnull( _http_is_broken_array[port] ) ) {
-    if( _http_is_broken_array[port] )
+  if( ! isnull( _http_is_broken_array[host+port] ) ) {
+    if( _http_is_broken_array[host+port] )
       return TRUE;
     else
       return FALSE;
   }
 
-  marked_broken = get_kb_item( "Services/www/" + port + "/broken" );
+  if( host == "*" ) {
+    marked_broken_list = get_kb_list( "www/*/" + port + "/is_broken" );
+    # TODO: Just use is_array() from misc_func.inc once openvas-nasl-lint is able
+    # to not report an undefined function within includes if the calling function
+    # is never used.
+    if( ! marked_broken_list || typeof( marked_broken_list ) != "array" ) {
+      marked_broken = FALSE;
+    } else {
+      foreach mb( marked_broken_list ) {
+        if( mb ) {
+          marked_broken = TRUE;
+          break;
+        }
+      }
+    }
+  } else {
+    marked_broken = get_kb_item( "www/" + host + "/" + port + "/is_broken" );
+  }
+
   if( marked_broken )
-    _http_is_broken_array[port] = TRUE;
+    _http_is_broken_array[host+port] = TRUE;
   else
-    _http_is_broken_array[port] = FALSE;
+    _http_is_broken_array[host+port] = FALSE;
 
   return marked_broken;
+}
+
+# @brief Sets if a remote web server should be marked as "broken" to other NVTs.
+#        The status is set within the following KB entry:
+#        "www/" + host + "/" + port + "/is_broken"
+#
+# @param port the port of the remote server
+# @param host the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#             parameter or get_host_name) of the remote server.
+#
+# @return TRUE if the status was successfully saved within the KB and
+#         NULL if no port or host parameter was passed.
+#
+function set_http_is_marked_broken( port, host ) {
+
+  local_var port, host;
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#set_http_is_marked_broken" );
+    return NULL;
+  }
+
+  if( ! host ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#set_http_is_marked_broken" );
+    return NULL;
+  }
+  set_kb_item( name:"www/" + host + "/" + port + "/is_broken", value:TRUE );
+  return TRUE;
+}
+
+# @brief Returns all files identified on a remote web page and which are saved in
+#        the knowledge base (by e.g. webmirror.nasl) within the following KB tree:
+#        "www/" + host + "/" + port + "/content/extensions/".
+#
+# @note Add a dependency to at least DDI_Directory_Scanner.nasl and webmirror.nasl
+#       when using this function within an NVT.
+#
+# @param port the port of the remote server for which the detected files should
+#             be returned. This parameter is optional and if not passed the
+#             files of all web servers on the remote host are returned.
+# @param host the hostname of the remote server (e.g. from http_host_name with the
+#             dont_add_port:TRUE parameter or get_host_name) for which the detected
+#             files should be returned. This parameter is optional and if not passed
+#             the files of all web servers and all hostnames of the remote host are
+#             returned.
+# @param ext  the file extension for which the detected files should be returned.
+#             A "php" passed to this parameter would e.g. return /index.php
+#             and /index2.php. A wildcard like "php*" could be used as well which
+#             would return /index.php and /index.php5. Similar a full wildcard like
+#             "*" can be passed as well which would return all detected files. This
+#             parameter is optional and if not passed the files of all web servers
+#             and all hostnames of the remote host are returned.
+#
+# @return a list of files matching the specified parameters, NULL in the case no files
+#         have matched the parameters or none have been identified at all.
+#
+function get_http_kb_file_extensions( port, host, ext ) {
+
+  local_var port, host, ext, list, item;
+
+  if( ! port ) port = "*";
+  if( ! host ) host = "*";
+  if( ! ext  ) ext  = "*";
+
+  list = get_kb_list( "www/" + host + "/" + port + "/content/extensions/" + ext );
+
+  # TODO: Just use is_array() from misc_func.inc once openvas-nasl-lint is able
+  # to not report an undefined function within includes if the calling function
+  # is never used.
+  if( ! list || typeof( list ) != "array" )
+    return NULL;
+
+  if( max_index( list ) == 0 ) {
+    foreach item( list )
+      return list;
+
+    return NULL;
+  }
+  return list;
+}
+
+# @brief Returns all files/directories requiring authentication on a remote web page and
+#        which are saved in the knowledge base (by e.g. webmirror.nasl) within the following
+#        KB tree: "www/" + host + "/" + port + "/content/auth_required".
+#
+# @note Add a dependency to at least DDI_Directory_Scanner.nasl and webmirror.nasl
+#       when using this function within an NVT.
+#
+# @param port the port of the remote server for which the detected files/directories
+#             should be returned. This parameter is optional and if not passed the
+#             files/directories of all web servers on the remote host are returned.
+# @param host the hostname of the remote server (e.g. from http_host_name with the
+#             dont_add_port:TRUE parameter or get_host_name) for which the detected
+#             files/directories should be returned. This parameter is optional and if
+#             not passed the files/directories of all web servers and all hostnames
+#             of the remote host are returned.
+#
+# @return a list of files/directories requiring authentication, NULL in the case no files/
+#         directories have matched the parameters or none have been identified at all.
+#
+function get_http_kb_auth_required( port, host ) {
+
+  local_var port, host, list, item;
+
+  if( ! port ) port = "*";
+  if( ! host ) host = "*";
+
+  list = get_kb_list( "www/" + host + "/" + port + "/content/auth_required" );
+
+  # TODO: Just use is_array() from misc_func.inc once openvas-nasl-lint is able
+  # to not report an undefined function within includes if the calling function
+  # is never used.
+  if( ! list || typeof( list ) != "array" )
+    return NULL;
+
+  if( max_index( list ) == 0 ) {
+    foreach item( list )
+      return list;
+
+    return NULL;
+  }
+  return list;
+}
+
+# @brief Returns all CGIs (namely scripts with a parameter) on a remote web page and
+#        which are saved in the knowledge base (by e.g. webmirror.nasl) within the
+#        following KB tree: "www/" + host + "/" + port + "/content/cgis/plain_cgis".
+#        The returned syntax is the following:
+#        /url - var [] -> This would match to http://example.com/url?var=
+#        /url - var [param] -> This would match to http://example.com/url?var=param
+#
+# @note Add a dependency to at least DDI_Directory_Scanner.nasl and webmirror.nasl
+#       when using this function within an NVT.
+#
+# @param port the port of the remote server for which the detected CGIs should
+#             be returned. This parameter is optional and if not passed the
+#             CGIs of all web servers on the remote host are returned.
+# @param host the hostname of the remote server (e.g. from http_host_name with the
+#             dont_add_port:TRUE parameter or get_host_name) for which the detected
+#             CGIs should be returned. This parameter is optional and if not passed
+#             the CGIs of all web servers and all hostnames of the remote host are
+#             returned.
+#
+# @return a list of CGIs in the syntax shown in the function description, NULL in the
+#         case no CGIs have matched the parameters or none have been identified at all.
+#
+function get_http_kb_cgis( port, host ) {
+
+  local_var port, host, list, item;
+
+  if( ! port ) port = "*";
+  if( ! host ) host = "*";
+
+  list = get_kb_list( "www/" + host + "/" + port + "/content/cgis/plain_cgis" );
+
+  # TODO: Just use is_array() from misc_func.inc once openvas-nasl-lint is able
+  # to not report an undefined function within includes if the calling function
+  # is never used.
+  if( ! list || typeof( list ) != "array" )
+    return NULL;
+
+  if( max_index( list ) == 0 ) {
+    foreach item( list )
+      return list;
+
+    return NULL;
+  }
+  return list;
+}
+
+# @brief Returns a string which was identified by no404.nasl for a remote web server
+#        returning a 200 HTTP (Found) status code for non-existing pages. The string
+#        contains a pattern like e.g. "not found" which can be used by a NVT as a sign
+#        that the web server hasn't returned the expected result about the existence
+#        of a file/url. It will also save the information in an internal array to avoid
+#        that redis is queried again for the same info.
+#
+# @param port the port of the remote server
+# @param host the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#             parameter or get_host_name) of the remote server. If no host parameter
+#             is passed http_host_name will be called automatically and a debug
+#             message is logged into the KB. A special "*" string can be passed
+#             where the function will return the string of the first hostname.
+#
+# @return An identified string if the remote web server is returning a 200 status code
+#         to non-existing pages, FALSE otherwise and NULL in the case where the port
+#         parameter wasn't passed.
+#
+# @todo Maybe implement an additional "subdir" check as some pages might return different
+#       strings based on different subdirs. This would require an update to no404.nasl as well.
+#
+function get_http_no404_string( port, host ) {
+
+  local_var port, host, no404_string, _no404_string, no404_string_list;
+  # nb: _http_no404_string_array is a global_var (see on top)
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_no404_string" );
+    return NULL;
+  }
+
+  if( ! host ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#get_http_no404_string" );
+    host = http_host_name( dont_add_port:TRUE );
+  }
+
+  # Used to not query redis with the get_kb_item below
+  # to save some requests.
+  if( ! isnull( _http_no404_string_array[host+port] ) ) {
+    if( no404_string = _http_no404_string_array[host+port] )
+      return no404_string;
+    else
+      return FALSE;
+  }
+
+  if( host == "*" ) {
+    no404_string_list = get_kb_list( "www/*/" + port + "/no404_string" );
+    # TODO: Just use is_array() from misc_func.inc once openvas-nasl-lint is able
+    # to not report an undefined function within includes if the calling function
+    # is never used.
+    if( ! no404_string_list || typeof( no404_string_list ) != "array" ) {
+      no404_string = FALSE;
+    } else {
+      foreach _no404_string( no404_string_list ) {
+        if( _no404_string && strlen( _no404_string > 0 ) ) {
+          no404_string = _no404_string;
+          break;
+        }
+      }
+    }
+  } else {
+    no404_string = get_kb_item( "www/" + host + "/" + port + "/no404_string" );
+  }
+
+  if( no404_string && strlen( no404_string ) > 0 )
+    _http_no404_string_array[host+port] = no404_string;
+  else
+    _http_no404_string_array[host+port] = FALSE;
+
+  return no404_string;
+}
+
+# @brief Sets a specific string which should be assumed by NVTs as a sign for a
+#        "file not found" if a remote web server isn't responding with a 200 HTTP
+#        status code to non-existent files. The string is set within the following
+#        KB entry: "www/" + host "/" + port + "/no404_string"
+#
+# @param port   the port of the remote server
+# @param host   the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#               parameter or get_host_name) of the remote server.
+# @param string the string to set within the mentioned KB entry.
+#
+# @return TRUE if the string was successfully saved within the KB and
+#         NULL if no port, host or string parameter was passed.
+#
+# @todo See the todo for @ref get_http_no404_string above.
+#
+function set_http_no404_string( port, host, string ) {
+
+  local_var port, host, string;
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#set_http_no404_string" );
+    return NULL;
+  }
+
+  if( ! host ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#set_http_no404_string" );
+    return NULL;
+  }
+
+  if( ! string ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#string#-#set_http_no404_string" );
+    return NULL;
+  }
+  set_kb_item( name:"www/" + host + "/" + port + "/no404_string", value:string );
+  return TRUE;
+}
+
+# @brief Checks if a specific passed data contains a 40x HTTP status code.
+#        If no such status code was identified the KB is checked additionally
+#        (by using @ref get_http_no404_string) if the remote web server is
+#        responding with a 200 HTTP status code to a non-existent file/url.
+#
+# @param port the port of the remote server
+# @param host the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#             parameter or get_host_name) of the remote server.
+# @param data The data which is checked in form of a HTTP response.
+#
+# @return TRUE if the passed data contains a 40x HTTP status code or a string
+#         as described in @ref get_http_no404_string was identified by no404.nasl,
+#         FALSE otherwise and NULL if no port, host or data parameter was passed
+#         or the data parameter doesn't contain a valid HTTP response.
+#
+# @todo See the todo for @ref get_http_no404_string above.
+#
+function http_data_has_40x( port, host, data ) {
+
+  local_var port, host, data, no404;
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_data_has_40x" );
+    return NULL;
+  }
+
+  if( ! host ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#http_data_has_40x" );
+    return NULL;
+  }
+
+  if( ! data ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#data#-#http_data_has_40x" );
+    return NULL;
+  }
+
+  if( ! ereg( string:data, pattern:"^HTTP/1\.[01] +[0-9]+" ) ) {
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#No data containing a valid HTTP status code passed in data variable of http_data_has_40x." );
+    return NULL;
+  }
+
+  if( ereg( string:data, pattern:"^HTTP/1\.[01] +40[0-9]" ) )
+    return TRUE;
+
+  no404 = get_http_no404_string( port:port, host:host );
+  if( no404 && no404 >< data )
+    return TRUE;
+  return FALSE;
+}
+
+# @brief Checks if a specific passed data contains a 200 HTTP status code.
+#        If no such status code was identified the KB is checked additionally
+#        (by using @ref get_http_no404_string) if the remote web server is
+#        responding with a 200 HTTP status code to a non-existent file/url.
+#
+# @param port the port of the remote server
+# @param host the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#             parameter or get_host_name) of the remote server.
+# @param data The data which is checked in form of a HTTP response.
+#
+# @return TRUE if the passed data contains a 200 HTTP status code or a string
+#         as described in @ref get_http_no404_string was identified by no404.nasl,
+#         FALSE otherwise and NULL if no port, host or data parameter was passed
+#         or the data parameter doesn't contain a valid HTTP response.
+#
+# @todo See the todo for @ref get_http_no404_string above.
+#
+function http_data_has_200( port, host, data ) {
+
+  local_var port, host, data, no404;
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_data_has_200" );
+    return NULL;
+  }
+
+  if( ! host ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#http_data_has_200" );
+    return NULL;
+  }
+
+  if( ! data ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#data#-#http_data_has_200" );
+    return NULL;
+  }
+
+  if( ! ereg( string:data, pattern:"^HTTP/1\.[01] +[0-9]+" ) ) {
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#No data containing a valid HTTP status code passed in data variable of http_data_has_200." );
+    return NULL;
+  }
+
+  if( ereg( string:data, pattern:"^HTTP/1\.[01] +200" ) ) {
+    no404 = get_http_no404_string( port:port, host:host );
+    if( ! no404 || no404 >!< data )
+      return TRUE;
+  }
+  return FALSE;
+}
+
+# @brief Creates and returns report containing the URL to a "vulnerable" location on the
+#        remote web server.
+#
+# @param port     the port of the remote server
+# @param url      the URL to the "vulnerable" location which should be included in the report
+# @param url_only If set to TRUE the "Vulnerable url:" text won't be added to the report
+#                 and only the plain URL is returned within the report.
+#
+# @return A string containing the generated report or NULL if no port or url parameter
+#         was passed.
+#
+function report_vuln_url( port, url, url_only ) {
+
+  local_var port, url, url_only, proto, host, report;
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#report_vuln_url" );
+    return NULL;
+  }
+
+  if( ! url ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#url#-#report_vuln_url" );
+    return NULL;
+  }
+
+  proto = "http";
+  if( get_port_transport( port ) > ENCAPS_IP )
+    proto = "https";
+
+  host = http_host_name( port:port );
+
+  if( url_only ) {
+    report = proto + "://" + host + url;
+  } else {
+    report = "Vulnerable url: " + proto + "://" + host + url;
+  }
+  return report;
+}
+
+# @brief Crafts a raw HTTP POST request (without sending it to the target) and returns it as a string.
+#
+# @param port               the port of the remote server.
+# @param url                the URL to request, if not passed "/" will be used.
+# @param data               the data which needs to be added in the body of the HTTP POST request
+# @param add_headers        additional headers which should be added to the HTTP POST request. Needs to be an
+#                           array in form of e.g. make_array( "Content-Type", "application/x-www-form-urlencoded" )
+# @param accept_header      the Accept: header to use (e.g. application/json), defaults to "*/*" if not passed.
+# @param user_agent         The User-Agent to use within the User-Agent: header, defaults to the return of the
+#                           get_http_user_agent() function if not passed.
+# @param host_header_use_ip If set to TRUE the request will contain the IP instead of the target
+#                           hostname in the Host: header. This can be used for special targets not
+#                           accepting the hostname in the request.
+#
+# @return A string containing the raw HTTP POST request or NULL if no port parameter was passed or
+#         the data passed in the add_headers parameter isn't an array.
+#
+# @example req = http_post_req( port:port, url:"/", data:data, accept_header:"application/json", add_headers:make_array( "Content-Type", "application/x-www-form-urlencoded" ) );
+#
+function http_post_req( port, url, data, add_headers, accept_header, user_agent, host_header_use_ip ) {
+
+  local_var port, url, data, add_headers, accept_header, user_agent, host_header_use_ip;
+  local_var x_header, x_scanner_string, host, req, header, len;
+
+  if( ! isnull( add_headers ) ) {
+    if( typeof( add_headers ) != "array" ) {
+      set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#add_headers_no-array#-#http_post_req" );
+      return;
+    }
+  }
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_post_req" );
+    return;
+  }
+
+  if( ! url ) url = "/";
+  x_header = FALSE;
+
+  if( data ) len = strlen( data );
+
+  if( ! accept_header ) accept_header = '*/*';
+
+  if ( ! user_agent ) {
+    user_agent = get_http_user_agent();
+  } else {
+    x_header = TRUE;
+    if( OPENVAS_VERSION )
+      x_scanner_string = "X-Scanner: " + get_vt_string() + " " + OPENVAS_VERSION;
+    else
+      x_scanner_string = "X-Scanner: " + get_vt_string();
+  }
+
+  if( host_header_use_ip ) {
+    host = http_host_name( port:port, use_ip:TRUE );
+  } else {
+    host = http_host_name( port:port );
+  }
+
+  req = 'POST ' + url + ' HTTP/1.1\r\n' +
+        'Host: ' + host + '\r\n' +
+        'Pragma: no-cache\r\n' +
+        'User-Agent: ' + user_agent + '\r\n' +
+        'Accept-Language: en\r\n' +
+        'Accept-Charset: iso-8859-1,utf-8;q=0.9,*;q=0.1\r\n' +
+        'Accept: ' + accept_header + '\r\n' +
+        'Accept-Encoding: identity\r\n';
+
+  if( data ) req += 'Content-Length: ' + len + '\r\n';
+
+  if( x_header )
+    req += x_scanner_string + '\r\n';
+
+  if( ! isnull( add_headers ) ) {
+    foreach header( keys( add_headers ) )
+      req += header +': ' + add_headers[header] + '\r\n';
+  }
+
+  req += '\r\n';
+
+  if( data ) req += data;
+
+  return req;
+}
+
+# @brief Crafts a raw HTTP GET request (without sending it to the target) and returns it as a string.
+#
+# @param port               the port of the remote server.
+# @param url                the URL to request, if not passed "/" will be used.
+# @param add_headers        additional headers which should be added to the HTTP GET request. Needs to be an
+#                           array in form of e.g. make_array( "Cookie", "PHPSESSID=" + sessid )
+# @param accept_header      the Accept: header to use (e.g. text/html), defaults to the following if not passed:
+#                           image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, image/png, */*
+# @param user_agent         The User-Agent to use within the User-Agent: header, defaults to the result of the
+#                           get_http_user_agent() function if not passed.
+# @param host_header_use_ip If set to TRUE the request will contain the IP instead of the target
+#                           hostname in the Host: header. This can be used for special targets not
+#                           accepting the hostname in the request.
+#
+# @return A string containing the raw HTTP GET request or NULL if no port parameter was passed or
+#         the data passed in the add_headers parameter isn't an array.
+#
+# @example req = http_get_req( port:port, url:"/", accept_header:"text/html", add_headers:make_array( "Cookie", "PHPSESSID=" + sessid ) );
+#
+function http_get_req( port, url, add_headers, accept_header, user_agent, host_header_use_ip ) {
+
+  local_var port, url, add_headers, accept_header, user_agent, host_header_use_ip;
+  local_var x_header, x_scanner_string, host, req, header;
+
+  if( ! isnull( add_headers ) ) {
+    if( typeof( add_headers ) != "array" ) {
+      set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#add_headers_no-array#-#http_get_req" );
+      return;
+    }
+  }
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_get_req" );
+    return;
+  }
+
+  if( ! url ) url = "/";
+  x_header = FALSE;
+
+  if( ! accept_header ) accept_header = 'image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, image/png, */*';
+
+  if ( ! user_agent ) {
+    user_agent = get_http_user_agent();
+  } else {
+    x_header = TRUE;
+    if( OPENVAS_VERSION )
+      x_scanner_string = "X-Scanner: " + get_vt_string() + " " + OPENVAS_VERSION;
+    else
+      x_scanner_string = "X-Scanner: " + get_vt_string();
+  }
+
+  if( host_header_use_ip ) {
+    host = http_host_name( port:port, use_ip:TRUE );
+  } else {
+    host = http_host_name( port:port );
+  }
+
+  req = 'GET ' + url + ' HTTP/1.1\r\n' +
+        'Connection: Close\r\n' +
+        'Host: ' + host + '\r\n' +
+        'Pragma: no-cache\r\n' +
+        'Cache-Control: no-cache\r\n' +
+        'User-Agent: ' + user_agent + '\r\n' +
+        'Accept: ' + accept_header + '\r\n' +
+        'Accept-Language: en\r\n' +
+        'Accept-Charset: iso-8859-1,*,utf-8\r\n';
+
+  if( x_header )
+    req += x_scanner_string + '\r\n';
+
+  if( ! isnull( add_headers ) ) {
+    foreach header( keys( add_headers ) )
+      req += header +': ' + add_headers[header] + '\r\n';
+  }
+
+  req += '\r\n';
+
+  return req;
+}
+
+# @brief Returns the info if a "generic" XSS was found on the remote web server
+#        to avoid that e.g. more then one NVT is reporting the same XSS multiple
+#        times. It will also save the information in an internal array to avoid
+#        that redis is queried again for the same info.
+#
+# @param port the port of the remote server
+# @param host the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#             parameter or get_host_name) of the remote server. If no host parameter
+#             is passed http_host_name will be called automatically and a debug
+#             message is logged into the KB. A special "*" string can be passed
+#             where the function will return TRUE if a "generic" XSS was found on
+#             any of the remote hostnames.
+#
+# @return TRUE if the remote web server has a "generic" XSS, FALSE otherwise and
+#         NULL in the case where the port parameter wasn't passed.
+#
+function get_http_has_generic_xss( port, host ) {
+
+  local_var port, host, generic_xss, generic_xss_list, gxss;
+  # nb: _http_has_generic_xss_array is a global_var (see on top)
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_has_generic_xss" );
+    return NULL;
+  }
+
+  if( ! host ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#get_http_has_generic_xss" );
+    host = http_host_name( dont_add_port:TRUE );
+  }
+
+  # Used to not query redis with the get_kb_item below
+  # to save some requests.
+  if( ! isnull( _http_has_generic_xss_array[host+port] ) ) {
+    if( _http_has_generic_xss_array[host+port] )
+      return TRUE;
+    else
+      return FALSE;
+  }
+
+  if( host == "*" ) {
+    generic_xss_list = get_kb_list( "www/*/" + port + "/generic_xss" );
+    # TODO: Just use is_array() from misc_func.inc once openvas-nasl-lint is able
+    # to not report an undefined function within includes if the calling function
+    # is never used.
+    if( ! generic_xss_list || typeof( generic_xss_list ) != "array" ) {
+      generic_xss = FALSE;
+    } else {
+      foreach gxss( generic_xss_list ) {
+        if( gxss ) {
+          generic_xss = TRUE;
+          break;
+        }
+      }
+    }
+  } else {
+    generic_xss = get_kb_item( "www/" + host + "/" + port + "/generic_xss" );
+  }
+
+  if( generic_xss )
+    _http_has_generic_xss_array[host+port] = TRUE;
+  else
+    _http_has_generic_xss_array[host+port] = FALSE;
+
+  return generic_xss;
+}
+
+# @brief Sets the info if a "generic" XSS was found on the remote web server to
+#        avoid that e.g. more then one NVT is reporting the same XSS multiple
+#        times. The status is set within the following KB entry:
+#        "www/" + host + "/" + port + "/generic_xss"
+#
+# @param port the port of the remote server
+# @param host the hostname (e.g. from http_host_name with the dont_add_port:TRUE
+#             parameter or get_host_name) of the remote server.
+#
+# @return TRUE if the status was successfully saved within the KB and
+#         NULL if no port or host parameter was passed.
+#
+# @todo Maybe also save the "location" of the generic XSS?
+#
+function set_http_has_generic_xss( port, host ) {
+
+  local_var port, host;
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#set_http_has_generic_xss" );
+    return NULL;
+  }
+
+  if( ! host ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#host#-#set_http_has_generic_xss" );
+    return NULL;
+  }
+  set_kb_item( name:"www/" + host + "/" + port + "/generic_xss", value:TRUE );
+  return TRUE;
 }

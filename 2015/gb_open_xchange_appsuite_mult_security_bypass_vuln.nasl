@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_open_xchange_appsuite_mult_security_bypass_vuln.nasl 9384 2018-04-06 12:20:19Z cfischer $
+# $Id: gb_open_xchange_appsuite_mult_security_bypass_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Open-Xchange (OX) AppSuite Multiple Security Bypass Vulnerabilities Oct15
 #
@@ -29,42 +29,37 @@ CPE = "cpe:/a:open-xchange:open-xchange_appsuite";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806073");
-  script_version("$Revision: 9384 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2014-2391", "CVE-2014-2392");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 14:20:19 +0200 (Fri, 06 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-10-06 12:24:33 +0530 (Tue, 06 Oct 2015)");
   script_tag(name:"qod_type", value:"remote_banner");
   script_name("Open-Xchange (OX) AppSuite Multiple Security Bypass Vulnerabilities Oct15");
 
-  script_tag(name: "summary" , value:"The host is installed with
+  script_tag(name:"summary", value:"The host is installed with
   Open-Xchange (OX) AppSuite and is prone to multiple security bypass
   vulnerabilities.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"Multiple flaws exist due to password
+  script_tag(name:"insight", value:"Multiple flaws exist due to password
   recovery service and E-Mail autoconfiguration feature does not handle password
   properly.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow attackers
-  to obtain potentially useful password-pattern information .
-
-  Impact Level: Application");
+  to obtain potentially useful password-pattern information .");
 
   script_tag(name:"affected", value:"Open-Xchange (OX) AppSuite versins before
   7.2.2-rev20, 7.4.1 before 7.4.1-rev11, and 7.4.2 before 7.4.2-rev13");
 
   script_tag(name:"solution", value:"Upgrade to Open-Xchange (OX) AppSuite
-  version 7.2.2-rev20, 7.4.1-rev11, 7.4.2-rev13 or later.
-
-  For updates refer to https://www.open-xchange.com");
+  version 7.2.2-rev20, 7.4.1-rev11, 7.4.2-rev13 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://www.securityfocus.com/archive/1/531762");
+  script_xref(name:"URL", value:"http://www.securityfocus.com/archive/1/531762");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
@@ -72,6 +67,7 @@ if(description)
   script_dependencies("gb_ox_app_suite_detect.nasl");
   script_mandatory_keys("open_xchange_appsuite/installed");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"https://www.open-xchange.com");
   exit(0);
 }
 
@@ -95,7 +91,6 @@ if(oxRev)
   ## Updating version with revision number
   oxVer = oxVer + "." + oxRev;
 
-  ##Check for vulnerable version
   if(version_is_less( version:oxVer, test_version:"7.2.2.20"))
   {
     fix = "7.2.2.20";

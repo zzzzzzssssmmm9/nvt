@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: smb_nt.inc 10406 2018-07-05 05:54:02Z cfischer $
+# $Id: smb_nt.inc 11621 2018-09-26 10:00:23Z cfischer $
 #
 # Methods for handling SMB
 #
@@ -23,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 10406 $
+# $Revision: 11621 $
 #
 ###############################################################################
 
@@ -71,6 +71,11 @@ isSignActive = 0;
 g_mhi = multiplex_id / 256;
 g_mlo = multiplex_id % 256;
 
+# @brief Returns the known NetBIOS name of the target host saved within the knowledge base. To avoid
+#        querying the KB for the same info again it will be cached within an internal variable.
+#
+# @return The known NetBIOS name of the target host and (if none is known) the IP of the target.
+#
 function kb_smb_name() {
 
   local_var name;
@@ -79,7 +84,12 @@ function kb_smb_name() {
     name = string( __kb_smb_name );
   } else {
     name = string( get_kb_item( "SMB/name" ) );
-    __kb_smb_name = name;
+    if( strlen( name ) > 0 ) {
+      __kb_smb_name = name;
+    } else {
+      name = get_host_ip();
+      __kb_smb_name = name;
+    }
   }
   return name;
 }
@@ -143,7 +153,56 @@ function kb_smb_transport() {
   return transport;
 }
 
-# @brief This function returns the info if the remote host is a Samba server.
+# @brief Returns an array containing all required info to do a connection to a WMI or SMB endpoint.
+#
+# @return An array containing all required connection info with the following keys and values:
+#
+#         array["domain"]           -> The user specified domain.
+#         array["host"]             -> The IP of the target host.
+#         array["netbios_name"]     -> The NetBIOS name of the target.
+#         array["password"]         -> The user specified password.
+#         array["transport_port"]   -> The identified port/transport for a SMB connection.
+#         array["username_plain"]   -> The plain user specified username.
+#         array["username_wmi_smb"] -> The user specified username and in case a domain was specified also contains the domain in a form of domain\username.
+#         array["username_wincmd"]  -> The user specified username and in case a domain was specified also contains the domain in a form of domain/username.
+#
+#         FALSE in the case if any of the required data (host, username or password) is missing in the knowledge base.
+#
+function kb_smb_wmi_connectinfo() {
+
+  local_var host, usrname, passwd, usrname_wmi_smb, usrname_wincmd, domain, netbios_name, transport_port, ret;
+
+  host    = get_host_ip();
+  usrname = kb_smb_login();
+  passwd  = kb_smb_password();
+  if( ! host || ! usrname || ! passwd )
+    return FALSE;
+
+  usrname_wmi_smb = usrname;
+  usrname_wincmd  = usrname;
+
+  domain = kb_smb_domain();
+  if( domain ) {
+    usrname_wmi_smb = domain + '\\' + usrname;
+    usrname_wincmd  = domain + '/' + usrname;
+  }
+
+  netbios_name   = kb_smb_name();
+  transport_port = kb_smb_transport();
+
+  ret = make_array();
+  ret["domain"]           = domain;
+  ret["host"]             = host;
+  ret["netbios_name"]     = netbios_name;
+  ret["password"]         = passwd;
+  ret["transport_port"]   = transport_port;
+  ret["username_plain"]   = usrname;
+  ret["username_wmi_smb"] = usrname_wmi_smb;
+  ret["username_wincmd"]  = usrname_wincmd;
+  return ret;
+}
+
+# @brief Returns the info if the remote host is a Samba server.
 #
 # @note NVTs calling this function needs a dependency to netbios_name_get.nasl
 #       and smb_nativelanman.nasl.
@@ -157,7 +216,6 @@ function kb_smb_is_samba() {
   if( ! isnull( __kb_smb_is_samba ) ) {
     is_samba = __kb_smb_is_samba;
   } else {
-
     lanman = get_kb_item( "SMB/NativeLanManager" );
     if( strlen( lanman ) > 0 ) {
       if( "samba" >< tolower( lanman ) ) {
@@ -4550,19 +4608,60 @@ function registry_enum_value( soc, uid, tid, pipe, reply ) {
   return list;
 }
 
-#---------------------------------------------------------------------#
-# RegOpenKey()                                                        #
-#---------------------------------------------------------------------#
+# @brief Implementation of RegOpenKey() to open a specific registry key on the remote registry
+#        of the target. The function is mostly called internally by other functions like @ref registry_enum_keys
+#        or @ref registry_key_exists.
+#
+# @param soc   The TCP socket for the current connection
+# @param uid   TODO: ?
+# @param tid   TODO: ?
+# @param pipe  TODO: ?
+# @param key   The specific key to open, e.g. "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\"
+# @param reply TODO: ?
+#
+# @note Functions calling this function should close the handle via @ref registry_close in a form like:
+#
+#       r = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:handle );
+#       if( ! isnull( r ) registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+#
+# @return The handle to the opened registry-key (in binary form) for later use within other functions,
+#         FALSE if the registry key doesn't exist and NULL if any of the mandatory function parameters
+#         are missing or the connection to the registry or opening the specific registry key failed
+#         due to e.g. connectivity issues or permission problems.
+#
 function registry_get_key( soc, uid, tid, pipe, key, reply ) {
 
   local_var soc, uid, tid, pipe, key, reply, res;
 
-  if( isnull( soc ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#soc#-#registry_get_key" );
-  if( isnull( uid ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#uid#-#registry_get_key" );
-  if( isnull( tid ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#tid#-#registry_get_key" );
-  if( isnull( pipe ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#pipe#-#registry_get_key" );
-  if( isnull( key ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_get_key" );
-  if( isnull( reply ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#reply#-#registry_get_key" );
+  if( isnull( soc ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#soc#-#registry_get_key" );
+    return NULL;
+  }
+
+  if( isnull( uid ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#uid#-#registry_get_key" );
+    return NULL;
+  }
+
+  if( isnull( tid ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#tid#-#registry_get_key" );
+    return NULL;
+  }
+
+  if( isnull( pipe ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#pipe#-#registry_get_key" );
+    return NULL;
+  }
+
+  if( isnull( key ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_get_key" );
+    return NULL;
+  }
+
+  if( isnull( reply ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#reply#-#registry_get_key" );
+    return NULL;
+  }
 
   if( strlen( uid ) == 8 ) {
     res = registry2_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:reply );
@@ -4573,6 +4672,8 @@ function registry_get_key( soc, uid, tid, pipe, key, reply ) {
   }
 }
 
+# @brief internal function which shouldn't be called directly, please see @ref registry_get_key
+#        for a description.
 function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
 
   # isSignActive, ntlmssp_flag, seq_number, s_sign_key, g_mlo, g_mhi and multiplex_id are global_vars!!!
@@ -4584,12 +4685,35 @@ function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
   local_var magic1, req, magic, packet, r, server_resp, orig_sign, serv_sign;
   local_var _na_start, _na_cnt, _na_data;
 
-  if( isnull( soc ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#soc#-#registry1_get_key" );
-  if( isnull( uid ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#uid#-#registry1_get_key" );
-  if( isnull( tid ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#tid#-#registry1_get_key" );
-  if( isnull( pipe ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#pipe#-#registry1_get_key" );
-  if( isnull( key ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry1_get_key" );
-  if( isnull( reply ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#reply#-#registry1_get_key" );
+  if( isnull( soc ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#soc#-#registry1_get_key" );
+    return NULL;
+  }
+
+  if( isnull( uid ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#uid#-#registry1_get_key" );
+    return NULL;
+  }
+
+  if( isnull( tid ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#tid#-#registry1_get_key" );
+    return NULL;
+  }
+
+  if( isnull( pipe ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#pipe#-#registry1_get_key" );
+    return NULL;
+  }
+
+  if( isnull( key ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry1_get_key" );
+    return NULL;
+  }
+
+  if( isnull( reply ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#reply#-#registry1_get_key" );
+    return NULL;
+  }
 
   key_len = strlen( key ) + 1;
   key_len_hi = key_len / 256;
@@ -4642,16 +4766,16 @@ function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
       req += raw_string( 0x03, 0x80 );
     }
   } else {
-    req += raw_string(0x03, 0x80);
+    req += raw_string( 0x03, 0x80 );
   }
 
   req += magic1 + raw_string( 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                               0x00, 0x00,tid_low, tid_high );
+                              0x00, 0x00,tid_low, tid_high );
 
   if( ntlmssp_flag ) {
-    req+= raw_string(0x33, 0x0c);
+    req+= raw_string( 0x33, 0x0c );
   } else {
-     req+= raw_string(0x00, 0x28);
+    req+= raw_string( 0x00, 0x28 );
   }
 
   req += raw_string( uid_low, uid_high, g_mlo, g_mhi, 0x10, 0x00, 0x00, x_lo,
@@ -4665,7 +4789,7 @@ function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
                      x_lo, x_hi, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
                      z_lo, z_hi, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x00 );
 
-  if( strlen( reply ) < 85 ) return FALSE ;
+  if( strlen( reply ) < 85 ) return NULL;
 
   magic = raw_string( ord(reply[84] ) );
   for( i = 1; i < 20; i++ ) {
@@ -4689,13 +4813,13 @@ function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
       seq_number += 1;
       packet = req;
       req = get_signature( key:s_sign_key, buf:packet, buflen:len, seq_number:seq_number );
-      if( isnull( req ) ) return FALSE;
+      if( isnull( req ) ) return NULL;
     }
   }
 
   send( socket:soc, data:req );
   r = smb_recv( socket:soc );
-  if( strlen( r ) < 10 ) return FALSE;
+  if( strlen( r ) < 10 ) return NULL;
 
   if( ntlmssp_flag ) {
     multiplex_id += 1;
@@ -4704,15 +4828,14 @@ function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
       seq_number += 1;
       len = strlen( r );
       server_resp = get_signature( key:s_sign_key, buf:r, buflen:len, seq_number:seq_number );
-      if( isnull( server_resp ) ) return FALSE;
-      if( ( strlen( server_resp ) < 24 ) || ( len < 24 ) ) {
-        return FALSE;
+      if( isnull( server_resp ) || ( strlen( server_resp ) < 24 ) || ( len < 24 ) ) {
+        return NULL;
       }
 
       orig_sign = substr( r, 18, 23 );
       serv_sign = substr( server_resp, 18, 23 );
       if( orig_sign != serv_sign ) {
-        return FALSE;
+        return NULL;
       }
     }
   }
@@ -4720,7 +4843,7 @@ function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
 
   len = ord( r[2] ) * 256;
   len = len + ord( r[3] );
-  if( len < 100 ) return FALSE;
+  if( len < 100 ) return NULL;
 
   # pull the last 4 bytes off the end
   _na_start = ( strlen( r ) - 4 );
@@ -4731,7 +4854,7 @@ function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
   # access denied, returned by Windows XP+
   if( _na_data == raw_string( 0x05, 0x00, 0x00, 0x00 ) ||
       _na_data == raw_string( 0x02, 0x00, 0x00, 0x00 ) ) {
-    return FALSE;
+    return NULL;
   }
 
   if( ord( r[9] ) == 0 ) {
@@ -4741,7 +4864,8 @@ function registry1_get_key( soc, uid, tid, pipe, key, reply, write ) {
   }
 }
 
-##########SMB2 Registry get key################
+# @brief internal function for SMBv2 similar to @ref registry1_get_key which shouldn't be called directly,
+#        please see @ref registry_get_key for a description.
 function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
 
   # isSignActive, ntlmssp_flag, seq_number, sign_key, g_mlo, g_mhi and multiplex_id are global_vars!!!
@@ -4754,12 +4878,35 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
   local_var orig_sign, server_resp, serv_sign, len;
   local_var _na_start, _na_cnt, _na_data;
 
-  if( isnull( soc ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#soc#-#registry2_get_key" );
-  if( isnull( uid ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#uid#-#registry2_get_key" );
-  if( isnull( tid ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#tid#-#registry2_get_key" );
-  if( isnull( pipe ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#pipe#-#registry2_get_key" );
-  if( isnull( key ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry2_get_key" );
-  if( isnull( reply ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#reply#-#registry2_get_key" );
+  if( isnull( soc ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#soc#-#registry2_get_key" );
+    return NULL;
+  }
+
+  if( isnull( uid ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#uid#-#registry2_get_key" );
+    return NULL;
+  }
+
+  if( isnull( tid ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#tid#-#registry2_get_key" );
+    return NULL;
+  }
+
+  if( isnull( pipe ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#pipe#-#registry2_get_key" );
+    return NULL;
+  }
+
+  if( isnull( key ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry2_get_key" );
+    return NULL;
+  }
+
+  if( isnull( reply ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#reply#-#registry2_get_key" );
+    return NULL;
+  }
 
   key_len = strlen( key ) + 1;
   key_len_hi = key_len / 256;
@@ -4805,7 +4952,7 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
   dcerpc_req2 = raw_string( 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x34, 0x00,
                             0x00, 0x00, 0x00, 0x00, 0x0f, 0x00 );
 
-  if( strlen( reply ) < 141 ) return FALSE ;
+  if( strlen( reply ) < 141 ) return NULL;
 
   magic = raw_string( ord( reply[140] ) );
   for( i = 1; i < 20; i++ ){
@@ -4843,7 +4990,7 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
     sig = get_smb2_signature( buf:req, key:sign_key );
     if( isnull( sig ) ) {
       set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#registry2_get_key: buf or key passed to get_smb2_signature empty / too short" );
-      return FALSE;
+      return NULL;
     }
     req = raw_string( 0x00, 0x00, len_hi, len_lo ) + sig;
   } else {
@@ -4853,7 +5000,7 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
   # <- START TODO: Deduplicate this code, this is duplicated many times in this include...
   send( socket:soc, data:req );
   r = smb_recv( socket:soc );
-  if( strlen( r ) < 14 ) return FALSE;
+  if( strlen( r ) < 14 ) return NULL;
 
   ##If status is pending, wait for response
   status = ord( r[12] );
@@ -4861,7 +5008,7 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
   while( status == 3 && status2 == 1 ) {
     ##PDU will arrive late
     r = smb_recv(socket:soc);
-    if( strlen( r ) < 14 ) return FALSE;
+    if( strlen( r ) < 14 ) return NULL;
     status = ord( r[12] );
     status2 = ord( r[13] );
   }
@@ -4873,17 +5020,16 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
       seq_number += 1;
       r_head = substr( r, 0, 3 );
       r = substr( r, 4, strlen( r ) - 1 );
-      if( strlen( r ) < 64 ) return FALSE;
+      if( strlen( r ) < 64 ) return NULL;
 
       orig_sign = substr( r, 48, 63 );
       server_resp = get_smb2_signature( buf:r, key:sign_key );
-      if( isnull( server_resp ) ) return FALSE;
-      if( strlen( server_resp ) < 64 ) return FALSE;
+      if( isnull( server_resp ) || strlen( server_resp ) < 64 ) return NULL;
 
       serv_sign = substr( server_resp, 48, 63 );
 
       if( orig_sign != serv_sign ) {
-        return FALSE;
+        return NULL;
       } else {
         r = r_head + r;
       }
@@ -4893,7 +5039,7 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
 
   len = ord( r[2] ) * 256;
   len = len + ord( r[3] );
-  if( len < 100 ) return FALSE;
+  if( len < 100 ) return NULL;
 
   # pull the last 4 bytes off the end
   _na_start = ( strlen( r ) - 4 );
@@ -4904,7 +5050,7 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
   # access denied, returned by Windows XP+
   if( _na_data == raw_string( 0x05, 0x00, 0x00, 0x00 ) ||
       _na_data == raw_string( 0x02, 0x00, 0x00, 0x00 ) ) {
-    return FALSE;
+    return NULL;
   }
 
   ## 8 + BIOS-4bytes
@@ -4915,104 +5061,118 @@ function registry2_get_key( soc, uid, tid, pipe, key, reply, write ) {
   }
 }
 
-#---------------------------------------------------------------------#
-# returns 'TRUE' if <key> exists                                      #
-#---------------------------------------------------------------------#
+# @brief Checks if a specified key exists in the remote registry.
+#
+# @param key  The registry key to check, e.g. "SOFTWARE\Microsoft\Office"
+# @param type The type of the registry tree to query. Valid values are "HKLM, HKU and HKCU". If no type was specified the function
+#             defaults to "HKLM".
+#
+# @return NULL if important connection parameters are missing or a connection couldn't be established,
+#         TRUE if the key exist and FALSE otherwise.
+#
 function registry_key_exists( key, type ) {
 
   local_var key, type, name, _smb_port, login, pass, domain, soc, r, prot, uid, tid, pipe, r2, i;
+  local_var kb_proxy_key, kb_proxy;
 
   if( ! key ) {
     set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_key_exists" );
     return NULL;
   }
 
+  if( ! type )
+    type = "HKLM";
+  else
+    type = toupper( type );
+
+  # Query KB ("proxy") first.
+  kb_proxy_key = "SMB//registry_key_exists//Registry//" + type + "//" + tolower( key );
+  kb_proxy = get_kb_item( kb_proxy_key );
+  if( ! isnull( kb_proxy ) )
+    return int( kb_proxy );
+
   if( kb_smb_is_samba() ) {
     set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#Windows SMB NVT was started against a Samba Server" );
     return NULL;
   }
-
-  if( ! type ) type = "HKLM";
 
   name = kb_smb_name();
   if( ! name ) return NULL;
 
   _smb_port = kb_smb_transport();
   if( ! _smb_port ) return NULL;
-
-  if( ! get_port_state( _smb_port ) ) return(FALSE);
-
-  login  = kb_smb_login();
-  pass   = kb_smb_password();
-  domain = kb_smb_domain();
-
-  if( ! login ) login = "";
-  if( ! pass )  pass  = "";
+  if( ! get_port_state( _smb_port ) ) return NULL;
 
   soc = open_sock_tcp( _smb_port );
-  if( ! soc ) return FALSE;
+  if( ! soc ) return NULL;
 
   # Request the session
   r = smb_session_request( soc:soc, remote:name );
   if( ! r ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   # Negotiate the protocol
   prot = smb_neg_prot( soc:soc );
   if( ! prot ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
+
+  login  = kb_smb_login();
+  pass   = kb_smb_password();
+  domain = kb_smb_domain();
+  if( ! login ) login = "";
+  if( ! pass )  pass  = "";
 
   # Set up our session
   r = smb_session_setup( soc:soc, login:login, password:pass, domain:domain, prot:prot );
   if( ! r ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   # and extract our uid
   uid = session_extract_uid( reply:r );
   if( ! uid ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   # Connect to the remote IPC and extract the TID we are attributed
   r = smb_tconx( soc:soc, name:name, uid:uid, share:"IPC$" );
   if( ! r ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   # and extract our tree id
   tid = tconx_extract_tid( reply:r );
   if( ! tid ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   # Create a pipe to \winreg
   r = smbntcreatex( soc:soc, uid:uid, tid:tid, name:"\winreg" );
   if( ! r ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   # and extract its ID
   pipe = smbntcreatex_extract_pipe( reply:r );
   if( ! pipe ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   # Setup things
   r = pipe_accessible_registry( soc:soc, uid:uid, tid:tid, pipe:pipe );
   if( ! r ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   if( type == "HKLM" ) {
@@ -5023,30 +5183,34 @@ function registry_key_exists( key, type ) {
     r = registry_open_hkcu( soc:soc, uid:uid, tid:tid, pipe:pipe );
   } else {
     close( soc );
-    return FALSE;
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#registry_key_exists: Unsupported '" + type + "' passed to type function parameter." );
+    return NULL;
   }
 
   if( ! r ) {
     close( soc );
-    return FALSE;
+    return NULL;
   }
 
   r2 = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:r );
-  registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
+  if( ! isnull( r2 ) )
+    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
   registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
 
   close( soc );
   if( ! r2 && strlen( r2 ) < 104 ) {
-    return NULL;
+    # Using string() as set_kb_item won't allow to set a value of 0 into the KB.
+    # It will be converted to an int again when querying the KB above.
+    set_kb_item( name:kb_proxy_key, value:string( "0" ) );
+    return FALSE;
   }
 
-  #flag = 0;
   if( strlen( uid ) == 8 ) {
     for( i = 1; i < 20; i++ ) {
       if( strlen( r2 ) > ( 140 + i ) ) {
         if( ord( r2[140+i] ) != 0 ) {
+          set_kb_item( name:kb_proxy_key, value:TRUE );
           return TRUE;
-          #flag = 1;
         }
       }
     }
@@ -5054,13 +5218,16 @@ function registry_key_exists( key, type ) {
     for( i = 1; i < 20; i++ ) {
       if( strlen( r2 ) > ( 84 + i ) ) {
         if( ord( r2[84+i] ) != 0 ) {
+          set_kb_item( name:kb_proxy_key, value:TRUE );
           return TRUE;
-          #flag = 1;
         }
       }
     }
   }
-  return NULL;
+  # Using string() as set_kb_item won't allow to set a value of 0 into the KB.
+  # It will be converted to an int again when querying the KB above.
+  set_kb_item( name:kb_proxy_key, value:string( "0" ) );
+  return FALSE;
 }
 
 #---------------------------------------------------------------------#
@@ -5982,29 +6149,41 @@ function registry2_decode_dword( data ) {
   return t;
 }
 
-#---------------------------------------------------------------------#
-# registry_get_dword()                                                #
-# Queries the knowledge base, if item not found, tries to establish a #
-# smb connection to the remote host.                                  #
-# Returns NULL  if important connection parameters are missing,       #
-#               connection couldn't be established or                  #
-#               if key or item could not be found                     #
-#               --> No FALSE because a DWORD could be 0               #
-#         and the value of the queried key otherwise                  #
-#---------------------------------------------------------------------#
+# @brief Get the DWORD value of a specified key and item from the remote registry. The function queries the knowledge base first
+#        to check if an item was already found and cached and if not it tries to establish a SMB connection to the remote host.
+#
+# @param key  The registry key to query, e.g. "SYSTEM\CurrentControlSet\Services\mrxsmb10"
+# @param item The item within the specified key to query, e.g. "Start"
+# @param type The type of the registry tree to query. Valid values are "HKLM, HKU and HKCU". If no type was specified the function
+#             defaults to "HKLM".
+#
+# @return NULL if important connection parameters are missing, a connection couldn't be established or
+#         if the key or item could not be found (no FALSE because a DWORD could be 0) and the value
+#         of the queried item within the specified key otherwise.
+#
 function registry_get_dword( key, item, type ) {
 
   local_var key, item, type;
   local_var kb_proxy_key, kb_proxy, name, _smb_port, login, pass, domain, soc;
   local_var r, prot, uid, tid, pipe, r2, r3, r3_value;
 
-  if( isnull( key ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_get_dword" );
-  if( isnull( item ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#registry_get_dword" );
+  if( isnull( key ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_get_dword" );
+    return NULL;
+  }
 
-  if( ! type ) type = "HKLM";
+  if( isnull( item ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#registry_get_dword" );
+    return NULL;
+  }
+
+  if( ! type )
+    type = "HKLM";
+  else
+    type = toupper( type );
 
   # Query KB ("proxy") first.
-  kb_proxy_key = "SMB//registry_get_dword//Registry//" + type + "//" + key + "//" + item;
+  kb_proxy_key = "SMB//registry_get_dword//Registry//" + type + "//" + tolower( key ) + "//" + tolower( item );
   kb_proxy = get_kb_item( kb_proxy_key );
   if( ! isnull( kb_proxy ) || kb_proxy )
     return kb_proxy;
@@ -6014,22 +6193,12 @@ function registry_get_dword( key, item, type ) {
     return NULL;
   }
 
-  # Value has not been previously written to KB, fetch it.
   name = kb_smb_name();
   if( ! name ) return NULL;
 
   _smb_port = kb_smb_transport();
   if( ! _smb_port ) return NULL;
-
   if( ! get_port_state( _smb_port ) ) return NULL;
-
-  login  = kb_smb_login();
-  pass   = kb_smb_password();
-  domain = kb_smb_domain();
-
-  if( ! login ) login = "";
-  if( ! pass )  pass = "";
-
   soc = open_sock_tcp( _smb_port );
   if( ! soc ) return NULL;
 
@@ -6046,6 +6215,12 @@ function registry_get_dword( key, item, type ) {
     close( soc );
     return NULL;
   }
+
+  login  = kb_smb_login();
+  pass   = kb_smb_password();
+  domain = kb_smb_domain();
+  if( ! login ) login = "";
+  if( ! pass )  pass = "";
 
   # Set up our session
   r = smb_session_setup( soc:soc, login:login, password:pass, domain:domain, prot:prot );
@@ -6104,6 +6279,7 @@ function registry_get_dword( key, item, type ) {
     r = registry_open_hkcu( soc:soc, uid:uid, tid:tid, pipe:pipe );
   } else {
     close( soc );
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#registry_get_dword: Unsupported '" + type + "' passed to type function parameter." );
     return NULL;
   }
 
@@ -6114,11 +6290,14 @@ function registry_get_dword( key, item, type ) {
 
   r2 = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:r );
   if( r2 ) {
+
     r3 = registry_get_item_dword( soc:soc, uid:uid, tid:tid, pipe:pipe, item:item, reply:r2 );
+
     registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
     registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
 
-    if( r3 ) r3_value = registry_decode_dword( data:r3 );
+    if( r3 )
+      r3_value = registry_decode_dword( data:r3 );
 
     close( soc );
 
@@ -6129,186 +6308,56 @@ function registry_get_dword( key, item, type ) {
     }
     return r3_value;
   }
+
+  if( ! isnull( r2 ) )
+    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
+  registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
   close( soc );
   return NULL;
 }
 
-#---------------------------------------------------------------------#
-# registry_get_binary()                                               #
-#---------------------------------------------------------------------#
+# @brief Get the BIN value of a specified key and item from the remote registry.
+#
+# @param key  The registry key to query, e.g. "SYSTEM\CurrentControlSet\Services\mrxsmb10"
+# @param item The item within the specified key to query, e.g. "Start"
+# @param type The type of the registry tree to query. Valid values are "HKLM, HKU and HKCU". If no type was specified the function
+#             defaults to "HKLM".
+#
+# @return NULL if important connection parameters are missing or a connection couldn't be established,
+#         FALSE if the key or item could not be found and the value of the queried item within the specified key otherwise.
+#
 function registry_get_binary( key, item, type ) {
 
   local_var key, item, type;
   local_var name, _smb_port, login, pass, domain, soc, r, prot, uid, tid, pipe;
   local_var r2, r3, r3_value;
 
-  if( isnull( key ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_get_binary" );
-  if( isnull( item ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#registry_get_binary" );
+  if( isnull( key ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_get_binary" );
+    return NULL;
+  }
+
+  if( isnull( item ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#registry_get_binary" );
+    return NULL;
+  }
 
   if( kb_smb_is_samba() ) {
     set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#Windows SMB NVT was started against a Samba Server" );
     return NULL;
   }
 
-  if( ! type ) type = "HKLM";
+  if( ! type )
+    type = "HKLM";
+  else
+    type = toupper( type );
 
   name = kb_smb_name();
   if( ! name ) return NULL;
 
   _smb_port = kb_smb_transport();
   if( ! _smb_port ) return NULL;
-
-  if( ! get_port_state( _smb_port ) ) return(FALSE);
-
-  login  = kb_smb_login();
-  pass   = kb_smb_password();
-  domain = kb_smb_domain();
-
-  if( ! login ) login = "";
-  if( ! pass )  pass = "";
-
-  soc = open_sock_tcp( _smb_port );
-  if( ! soc ) return FALSE;
-
-  # Request the session
-  r = smb_session_request( soc:soc, remote:name );
-  if( ! r ) {
-    close(soc);
-    return(FALSE);
-  }
-
-  # Negotiate the protocol
-  prot = smb_neg_prot( soc:soc );
-  if( ! prot ) {
-    close(soc);
-    return(FALSE);
-  }
-
-  # Set up our session
-  r = smb_session_setup( soc:soc, login:login, password:pass, domain:domain, prot:prot );
-  if( ! r ) {
-    close(soc);
-    return(FALSE);
-  }
-
-  # and extract our uid
-  uid = session_extract_uid( reply:r );
-  if( ! uid ) {
-    close(soc);
-    return NULL;
-  }
-
-  # Connect to the remote IPC and extract the TID we are attributed
-  r = smb_tconx( soc:soc, name:name, uid:uid, share:"IPC$" );
-  if( ! r ) {
-    close(soc);
-    return NULL;
-  }
-
-  # and extract our tree id
-  tid = tconx_extract_tid( reply:r );
-  if( ! tid ) {
-    close(soc);
-    return(FALSE);
-  }
-
-  # Create a pipe to \winreg
-  r = smbntcreatex( soc:soc, uid:uid, tid:tid, name:"\winreg" );
-  if( ! r ) {
-    close(soc);
-    return(FALSE);
-  }
-
-  # and extract its ID
-  pipe = smbntcreatex_extract_pipe( reply:r );
-  if( ! pipe ) {
-    close(soc);
-    return(FALSE);
-  }
-
-  # Setup things
-  r = pipe_accessible_registry( soc:soc, uid:uid, tid:tid, pipe:pipe );
-  if( ! r ) {
-    close(soc);
-    return(FALSE);
-  }
-
-  if( type == "HKLM" ) {
-    r = registry_open_hklm( soc:soc, uid:uid, tid:tid, pipe:pipe );
-  } else if( type == "HKU" ) {
-    r = registry_open_hku( soc:soc, uid:uid, tid:tid, pipe:pipe );
-  } else if( type == "HKCU" ) {
-    r = registry_open_hkcu( soc:soc, uid:uid, tid:tid, pipe:pipe );
-  } else {
-    close(soc);
-    return(FALSE);
-  }
-
-  if( ! r ) {
-    close(soc);
-    return NULL;
-  }
-
-  r2 = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:r );
-  if( r2 ) {
-    r3 = registry_get_item_sz( soc:soc, uid:uid, tid:tid, pipe:pipe, item:item, reply:r2 );
-    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
-    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
-    r3_value = registry_decode_binary( data:r3, uid:uid );
-    close( soc );
-    return r3_value;
-  }
-  close( soc );
-  return FALSE;
-}
-
-#---------------------------------------------------------------------#
-# registry_get_sz()                                                   #
-# Queries the knowledge base, if item not found, tries to establish a #
-# smb connection to the remote host.                                  #
-# Returns NULL  if important connection parameters are missing        #
-#               or connection couldn't be established                  #
-#         FALSE if key or item could not be found                     #
-#         and the value of the queried key otherwise                  #
-#---------------------------------------------------------------------#
-function registry_get_sz( key, item, type ) {
-
-  local_var key, item, type;
-  local_var kb_proxy_key, kb_proxy, name, _smb_port, login, pass, domain, soc;
-  local_var r, prot, uid, tid, pipe, r2, r3, r3_value;
-
-  if( isnull( key ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_get_sz" );
-  if( isnull( item ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#registry_get_sz" );
-
-  if( ! type ) type = "HKLM";
-
-  # Query KB ("proxy") first.
-  kb_proxy_key = "SMB//registry_get_sz//Registry//" + type + "//" + key + "//" + item;
-  kb_proxy = get_kb_item( kb_proxy_key );
-  if( ! isnull( kb_proxy ) || kb_proxy )
-  return kb_proxy;
-
-  if( kb_smb_is_samba() ) {
-    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#Windows SMB NVT was started against a Samba Server" );
-    return NULL;
-  }
-
-  # Value has not been previously written to KB, fetch it.
-  name = kb_smb_name();
-  if( ! name ) return NULL;
-
-  _smb_port = kb_smb_transport();
-  if( ! _smb_port ) return NULL;
-
   if( ! get_port_state( _smb_port ) ) return NULL;
-
-  login  = kb_smb_login();
-  pass   = kb_smb_password();
-  domain = kb_smb_domain();
-
-  if( ! login ) login = "";
-  if( ! pass )  pass = "";
-
   soc = open_sock_tcp( _smb_port );
   if( ! soc ) return NULL;
 
@@ -6326,6 +6375,12 @@ function registry_get_sz( key, item, type ) {
     return NULL;
   }
 
+  login  = kb_smb_login();
+  pass   = kb_smb_password();
+  domain = kb_smb_domain();
+  if( ! login ) login = "";
+  if( ! pass )  pass = "";
+
   # Set up our session
   r = smb_session_setup( soc:soc, login:login, password:pass, domain:domain, prot:prot );
   if( ! r ) {
@@ -6383,6 +6438,7 @@ function registry_get_sz( key, item, type ) {
     r = registry_open_hkcu( soc:soc, uid:uid, tid:tid, pipe:pipe );
   } else {
     close( soc );
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#registry_get_binary: Unsupported '" + type + "' passed to type function parameter." );
     return NULL;
   }
 
@@ -6393,11 +6449,174 @@ function registry_get_sz( key, item, type ) {
 
   r2 = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:r );
   if( r2 ) {
-    r3 =  registry_get_item_sz( soc:soc, uid:uid, tid:tid, pipe:pipe, item:item, reply:r2 );
+
+    r3 = registry_get_item_sz( soc:soc, uid:uid, tid:tid, pipe:pipe, item:item, reply:r2 );
+
     registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
     registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
 
-    if( r3 ) r3_value = registry_decode_sz( data:r3, uid:uid );
+    r3_value = registry_decode_binary( data:r3, uid:uid );
+    close( soc );
+
+    return r3_value;
+  }
+
+  if( ! isnull( r2 ) )
+    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
+  registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+  close( soc );
+  return FALSE;
+}
+
+# @brief Get the SZ value of a specified key and item from the remote registry. The function queries the knowledge base first
+#        to check if an item was already found and cached and if not it tries to establish a SMB connection to the remote host.
+#
+# @param key  The registry key to query, e.g. "SYSTEM\CurrentControlSet\Services\mrxsmb10"
+# @param item The item within the specified key to query, e.g. "Start"
+# @param type The type of the registry tree to query. Valid values are "HKLM, HKU and HKCU". If no type was specified the function
+#             defaults to "HKLM".
+#
+# @return NULL if important connection parameters are missing or a connection couldn't be established,
+#         FALSE if the key or item could not be found and the value of the queried item within the specified key otherwise.
+#
+function registry_get_sz( key, item, type ) {
+
+  local_var key, item, type;
+  local_var kb_proxy_key, kb_proxy, name, _smb_port, login, pass, domain, soc;
+  local_var r, prot, uid, tid, pipe, r2, r3, r3_value;
+
+  if( isnull( key ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#key#-#registry_get_sz" );
+    return NULL;
+  }
+
+  if( isnull( item ) ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#registry_get_sz" );
+    return NULL;
+  }
+
+  if( ! type )
+    type = "HKLM";
+  else
+    type = toupper( type );
+
+  # Query KB ("proxy") first.
+  kb_proxy_key = "SMB//registry_get_sz//Registry//" + type + "//" + tolower( key ) + "//" + tolower( item );
+  kb_proxy = get_kb_item( kb_proxy_key );
+  if( ! isnull( kb_proxy ) || kb_proxy )
+    return kb_proxy;
+
+  if( kb_smb_is_samba() ) {
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#Windows SMB NVT was started against a Samba Server" );
+    return NULL;
+  }
+
+  name = kb_smb_name();
+  if( ! name ) return NULL;
+
+  _smb_port = kb_smb_transport();
+  if( ! _smb_port ) return NULL;
+  if( ! get_port_state( _smb_port ) ) return NULL;
+  soc = open_sock_tcp( _smb_port );
+  if( ! soc ) return NULL;
+
+  # Request the session
+  r = smb_session_request( soc:soc, remote:name );
+  if( ! r ) {
+    close( soc );
+    return NULL;
+  }
+
+  # Negotiate the protocol
+  prot = smb_neg_prot( soc:soc );
+  if( ! prot ) {
+    close( soc );
+    return NULL;
+  }
+
+  login  = kb_smb_login();
+  pass   = kb_smb_password();
+  domain = kb_smb_domain();
+  if( ! login ) login = "";
+  if( ! pass )  pass = "";
+
+  # Set up our session
+  r = smb_session_setup( soc:soc, login:login, password:pass, domain:domain, prot:prot );
+  if( ! r ) {
+    close( soc );
+    return NULL;
+  }
+
+  # and extract our uid
+  uid = session_extract_uid( reply:r );
+  if( ! uid ) {
+    close( soc );
+    return NULL;
+  }
+
+  # Connect to the remote IPC and extract the TID we are attributed
+  r = smb_tconx( soc:soc, name:name, uid:uid, share:"IPC$" );
+  if( ! r ) {
+    close( soc );
+    return NULL;
+  }
+
+  # and extract our tree id
+  tid = tconx_extract_tid( reply:r );
+  if( ! tid ) {
+    close( soc );
+    return NULL;
+  }
+
+  # Create a pipe to \winreg
+  r = smbntcreatex( soc:soc, uid:uid, tid:tid, name:"\winreg" );
+  if( ! r ) {
+    close( soc );
+    return NULL;
+  }
+
+  # and extract its ID
+  pipe = smbntcreatex_extract_pipe( reply:r );
+  if( ! pipe ) {
+    close( soc );
+    return NULL;
+  }
+
+  # Setup things
+  r = pipe_accessible_registry( soc:soc, uid:uid, tid:tid, pipe:pipe );
+  if( ! r ) {
+    close( soc );
+    return NULL;
+  }
+
+  if( type == "HKLM" ) {
+    r = registry_open_hklm( soc:soc, uid:uid, tid:tid, pipe:pipe );
+  } else if( type == "HKU" ) {
+    r = registry_open_hku( soc:soc, uid:uid, tid:tid, pipe:pipe );
+  } else if( type == "HKCU" ) {
+    r = registry_open_hkcu( soc:soc, uid:uid, tid:tid, pipe:pipe );
+  } else {
+    set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#registry_get_sz: Unsupported '" + type + "' passed to type function parameter." );
+    close( soc );
+    return NULL;
+  }
+
+  if( ! r ) {
+    close( soc );
+    return NULL;
+  }
+
+  r2 = registry_get_key( soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:r );
+  if( r2 ) {
+
+    r3 =  registry_get_item_sz( soc:soc, uid:uid, tid:tid, pipe:pipe, item:item, reply:r2 );
+
+    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
+    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
+
+    if( r3 )
+      r3_value = registry_decode_sz( data:r3, uid:uid );
+
     close( soc );
 
     # Place value into the KB
@@ -6408,6 +6627,10 @@ function registry_get_sz( key, item, type ) {
     }
     return r3_value;
   }
+
+  if( ! isnull( r2 ) )
+    registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r2 );
+  registry_close( soc:soc, uid:uid, tid:tid, pipe:pipe, reply:r );
   close( soc );
   return FALSE;
 }

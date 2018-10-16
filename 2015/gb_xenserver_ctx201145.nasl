@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_xenserver_ctx201145.nasl 6211 2017-05-25 09:04:14Z teissa $
+# $Id: gb_xenserver_ctx201145.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Citrix XenServer Multiple Security Updates (CTX201145)
 #
@@ -29,51 +29,57 @@ CPE = "cpe:/a:citrix:xenserver";
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105296");
- script_cve_id("CVE-2015-4106","CVE-2015-4163","CVE-2015-4164","CVE-2015-2756","CVE-2015-4103","CVE-2015-4104","CVE-2015-4105");
- script_tag(name:"cvss_base", value:"7.8");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
- script_version ("$Revision: 6211 $");
+  script_oid("1.3.6.1.4.1.25623.1.0.105296");
+  script_cve_id("CVE-2015-4106", "CVE-2015-4163", "CVE-2015-4164", "CVE-2015-2756", "CVE-2015-4103", "CVE-2015-4104", "CVE-2015-4105");
+  script_tag(name:"cvss_base", value:"7.8");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
+  script_version("$Revision: 11872 $");
 
- script_name("Citrix XenServer Multiple Security Updates (CTX201145)");
+  script_name("Citrix XenServer Multiple Security Updates (CTX201145)");
 
- script_xref(name:"URL", value:"http://support.citrix.com/article/CTX201145");
+  script_xref(name:"URL", value:"http://support.citrix.com/article/CTX201145");
 
- script_tag(name: "vuldetect" , value:"Check the installed hotfixes");
- script_tag(name: "solution" , value:"Apply the hotfix referenced in the advisory");
+  script_tag(name:"vuldetect", value:"Check the installed hotfixes");
+  script_tag(name:"solution", value:"Apply the hotfix referenced in the advisory.");
 
- script_tag(name: "summary" , value:"A number of security vulnerabilities have been identified in Citrix XenServer that may allow a malicious administrator
+  script_tag(name:"summary", value:"A number of security vulnerabilities have been identified in Citrix XenServer that may allow a malicious administrator
 of a guest VM to crash the host. These vulnerabilities affect all currently supported versions of Citrix XenServer up to and including
 Citrix XenServer 6.5 Service Pack 1.
 
 The following vulnerabilities have been addressed:
 
- - CVE-2015-4106: Unmediated PCI register access in qemu.
- - CVE-2015-4163: GNTTABOP_swap_grant_ref operation misbehavior.
- - CVE-2015-4164: vulnerability in the iret hypercall handler
- - CVE-2015-2756: Unmediated PCI command register access in qemu
- - CVE-2015-4103: Potential unintended writes to host MSI message data field via qemu.
- - CVE-2015-4104: PCI MSI mask bits inadvertently exposed to guests.
- - CVE-2015-4105: Guest triggerable qemu MSI-X pass-through error messages");
+  - CVE-2015-4106: Unmediated PCI register access in qemu.
 
- script_tag(name: "affected" , value:"XenServer 6.5
+  - CVE-2015-4163: GNTTABOP_swap_grant_ref operation misbehavior.
+
+  - CVE-2015-4164: vulnerability in the iret hypercall handler
+
+  - CVE-2015-2756: Unmediated PCI command register access in qemu
+
+  - CVE-2015-4103: Potential unintended writes to host MSI message data field via qemu.
+
+  - CVE-2015-4104: PCI MSI mask bits inadvertently exposed to guests.
+
+  - CVE-2015-4105: Guest triggerable qemu MSI-X pass-through error messages");
+
+  script_tag(name:"affected", value:"XenServer 6.5
 XenServer 6.2.0
 XenServer 6.0
 XenServer 6.0.2
 XenServer 6.1.0");
 
- script_tag(name:"solution_type", value: "VendorFix");
- script_tag(name:"qod_type", value:"package");
+  script_tag(name:"solution_type", value:"VendorFix");
+  script_tag(name:"qod_type", value:"package");
 
- script_tag(name:"last_modification", value:"$Date: 2017-05-25 11:04:14 +0200 (Thu, 25 May 2017) $");
- script_tag(name:"creation_date", value:"2015-06-12 16:17:32 +0200 (Fri, 12 Jun 2015)");
- script_category(ACT_GATHER_INFO);
- script_family("Citrix Xenserver Local Security Checks");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("gb_xenserver_version.nasl");
- script_mandatory_keys("xenserver/product_version","xenserver/patches");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-06-12 16:17:32 +0200 (Fri, 12 Jun 2015)");
+  script_category(ACT_GATHER_INFO);
+  script_family("Citrix Xenserver Local Security Checks");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("gb_xenserver_version.nasl");
+  script_mandatory_keys("xenserver/product_version", "xenserver/patches");
 
- exit(0);
+  exit(0);
 }
 
 include("host_details.inc");

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: find_service3.nasl 8078 2017-12-11 14:28:55Z cfischer $
+# $Id: find_service3.nasl 11018 2018-08-17 07:13:05Z cfischer $
 #
 # Service Detection with '<xml/>' Request
 #
@@ -28,13 +28,13 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108198");
-  script_version("$Revision: 8078 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-11 15:28:55 +0100 (Mon, 11 Dec 2017) $");
+  script_version("$Revision: 11018 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 09:13:05 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2017-07-20 14:08:04 +0200 (Thu, 20 Jul 2017)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("Service Detection with '<xml/>' Request");
-  script_category(ACT_GATHER_INFO); 
+  script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2017 Greenbone Networks GmbH");
   script_family("Service detection");
   script_dependencies("find_service1.nasl", "find_service2.nasl", "find_service_3digits.nasl");
@@ -42,7 +42,7 @@ if(description)
 
   script_tag(name:"summary", value:"This plugin performs service detection.
 
-  This plugin is a complement of find_service.nasl. It sends a '<xml/>' 
+  This plugin is a complement of find_service.nasl. It sends a '<xml/>'
   request to the remaining unknown services and tries to identify them.");
 
   script_tag(name:"qod_type", value:"remote_banner");
@@ -90,10 +90,10 @@ if( "omp_response" >< r && "GET_VERSION" >< r ) {
   exit( 0 );
 }
 
-# Check_MK Agent, find_service1.nasl should already do the job but sometimes the Agent behaves strange
+# nb: Check_MK Agent, find_service1.nasl should already do the job but sometimes the Agent behaves strange
 # and only sends data too late. This is a fallback for such a case.
 if( "<<<check_mk>>>" >< r || "<<<uptime>>>" >< r || "<<<services>>>" >< r || "<<<mem>>>" >< r ) {
-  # Check_MK Agents seems to not answer to repeated requests in a short amount of time so saving the response here for later processing.
+  # nb: Check_MK Agents seems to not answer to repeated requests in a short amount of time so saving the response here for later processing.
   replace_kb_item( name:"check_mk_agent/banner/" + port, value:r );
   register_service( port:port, proto:"check_mk_agent", message:"A Check_MK Agent seems to be running on this port." );
   log_message( port:port, data:"A Check_MK Agent seems to be running on this port." );

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_3697_2.nasl 10424 2018-07-05 14:01:21Z cfischer $
+# $Id: gb_ubuntu_USN_3697_2.nasl 11151 2018-08-29 03:47:27Z ckuersteiner $
 #
 # Ubuntu Update for linux-oem USN-3697-2
 #
@@ -27,13 +27,13 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.843573");
-  script_version("$Revision: 10424 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-05 16:01:21 +0200 (Thu, 05 Jul 2018) $");
+  script_version("$Revision: 11151 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-29 05:47:27 +0200 (Wed, 29 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-07-03 05:47:03 +0200 (Tue, 03 Jul 2018)");
-  script_cve_id("CVE-2018-1130", "CVE-2018-11508", "CVE-2018-5750", "CVE-2018-5803", 
-                "CVE-2018-6927", "CVE-2018-7755", "CVE-2018-7757"); 
-  script_tag(name:"cvss_base", value:"5.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
+  script_cve_id("CVE-2018-1130", "CVE-2018-11508", "CVE-2018-5750", "CVE-2018-5803",
+                "CVE-2018-6927", "CVE-2018-7755", "CVE-2018-7757");
+  script_tag(name:"cvss_base", value:"4.9");
+  script_tag(name:"cvss_base_vector", value:"AV:L/AC:L/Au:N/C:N/I:N/A:C");
   script_tag(name:"qod_type", value:"package");
   script_name("Ubuntu Update for linux-oem USN-3697-2");
   script_tag(name:"summary", value:"Check the version of linux-oem");
@@ -72,7 +72,7 @@ service (memory exhaustion). (CVE-2018-7757)");
   script_tag(name:"solution", value:"Please install the updated packages.");
 
   script_xref(name:"USN", value:"3697-2");
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-3697-2/");
+  script_xref(name:"URL", value:"http://www.ubuntu.com/usn/usn-3697-2/");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -85,7 +85,7 @@ service (memory exhaustion). (CVE-2018-7757)");
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 res = "";
 if(release == NULL){

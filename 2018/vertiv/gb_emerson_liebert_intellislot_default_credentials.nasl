@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_emerson_liebert_intellislot_default_credentials.nasl 10589 2018-07-24 11:47:37Z jschulte $
+# $Id: gb_emerson_liebert_intellislot_default_credentials.nasl 11151 2018-08-29 03:47:27Z ckuersteiner $
 #
 # Emerson Liebert IntelliSlot Devices Default Credentials
 #
@@ -28,11 +28,11 @@
 if( description )
 {
   script_oid("1.3.6.1.4.1.25623.1.0.113235");
-  script_version("$Revision: 10589 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-24 13:47:37 +0200 (Tue, 24 Jul 2018) $");
+  script_version("$Revision: 11151 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-29 05:47:27 +0200 (Wed, 29 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-07-24 13:03:33 +0200 (Tue, 24 Jul 2018)");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"5.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:P/A:N");
 
   script_tag(name:"qod_type", value:"remote_vul");
 
@@ -52,7 +52,7 @@ if( description )
 
   script_tag(name:"summary", value:"Emerson Liebert IntelliSlot devices use default credentials.");
   script_tag(name:"vuldetect", value:"Tries to login using the default credentials.");
-  script_tag(name:"insight", value:"The default administrator account is called'Liebert',
+  script_tag(name:"insight", value:"The default administrator account is called 'Liebert',
   using the password 'Liebert'.");
   script_tag(name:"impact", value:"Successful exploitation would give an attecker full
   administrative access over the target device.");

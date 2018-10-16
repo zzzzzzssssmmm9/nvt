@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_intrasrv_simple_webserver_rce_n_bof_vuln.nasl 6698 2017-07-12 12:00:17Z cfischer $
+# $Id: secpod_intrasrv_simple_webserver_rce_n_bof_vuln.nasl 11401 2018-09-15 08:45:50Z cfischer $
 #
 # Intrasrv Simple Web Server RCE and Buffer Overflow Vulnerability
 #
@@ -27,10 +27,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902973");
-  script_version("$Revision: 6698 $");
+  script_version("$Revision: 11401 $");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 14:00:17 +0200 (Wed, 12 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 10:45:50 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2013-05-31 11:32:38 +0530 (Fri, 31 May 2013)");
 
   script_name("Intrasrv Simple Web Server RCE and Buffer Overflow Vulnerability");
@@ -46,16 +46,17 @@ if(description)
   script_mandatory_keys("intrasrv/banner");
 
   script_tag(name:"impact", value:"Successful exploitation will let remote unauthenticated attackers
-  to cause a denial of service or execute arbitrary code.
+  to cause a denial of service or execute arbitrary code.");
 
-  Impact Level: System/Application");
   script_tag(name:"affected", value:"Intrasrv Simple Web Server version 1.0");
+
   script_tag(name:"insight", value:"The flaw is due to an error when handling certain Long requests,
   which can be exploited to cause a denial of service or remote code execution.");
-  script_tag(name:"solution", value:"No solution or patch was made available for at least one year
-  since disclosure of this vulnerability. Likely none will be provided anymore.
-  General solution options are to upgrade to a newer release, disable respective
-  features, remove the product or replace the product by another one.");
+
+  script_tag(name:"solution", value:"No known solution was made available for at least one year since the disclosure
+  of this vulnerability. Likely none will be provided anymore. General solution options are to upgrade to a newer
+  release, disable respective features, remove the product or replace the product by another one.");
+
   script_tag(name:"summary", value:"This host is running Intrasrv Simple Web Server and is prone to remote code
   execution vulnerability.");
 
@@ -65,33 +66,23 @@ if(description)
   exit(0);
 }
 
-
 include("http_func.inc");
 include("http_keepalive.inc");
 
-req = "";
-res = "";
-port = "";
-
-## Get HTTP Port
 port = get_http_port(default:80);
 
 banner = get_http_banner(port:port);
 
-## Confirm the application before trying exploit
 if("Server: intrasrv" >!< banner){
   exit(0);
 }
 
-## Send crafted data to server
 req = http_get(item:crap(data:"A", length:2500), port:port);
 res = http_send_recv(port:port, data:req);
 
-## Send and Receive the response
 req = http_get(item:"/",  port:port);
 res = http_keepalive_send_recv(port:port, data:req);
 
-## Confirm the server is dead or not
 if(!res && http_is_dead(port:port))
 {
   security_message(port:port);

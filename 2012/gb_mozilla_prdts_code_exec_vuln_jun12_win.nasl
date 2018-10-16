@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mozilla_prdts_code_exec_vuln_jun12_win.nasl 10135 2018-06-08 11:42:28Z asteins $
+# $Id: gb_mozilla_prdts_code_exec_vuln_jun12_win.nasl 11861 2018-10-12 09:29:59Z cfischer $
 #
 # Mozilla Products 'nsHTMLSelectElement' Remote Code Execution Vulnerability (Windows)
 #
@@ -27,18 +27,18 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802874");
-  script_version("$Revision: 10135 $");
+  script_version("$Revision: 11861 $");
   script_cve_id("CVE-2011-3671");
   script_bugtraq_id(54080);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-08 13:42:28 +0200 (Fri, 08 Jun 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 11:29:59 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-06-20 13:13:30 +0530 (Wed, 20 Jun 2012)");
   script_name("Mozilla Products 'nsHTMLSelectElement' Remote Code Execution Vulnerability (Windows)");
 
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/47302");
-  script_xref(name : "URL" , value : "http://securitytracker.com/id/1027183");
-  script_xref(name : "URL" , value : "http://www.mozilla.org/security/announce/2012/mfsa2012-41.html");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/47302");
+  script_xref(name:"URL", value:"http://securitytracker.com/id/1027183");
+  script_xref(name:"URL", value:"http://www.mozilla.org/security/announce/2012/mfsa2012-41.html");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2012 Greenbone Networks GmbH");
@@ -46,36 +46,31 @@ if(description)
   script_dependencies("gb_firefox_detect_portable_win.nasl", "gb_seamonkey_detect_win.nasl",
                       "gb_thunderbird_detect_portable_win.nasl");
   script_mandatory_keys("Mozilla/Firefox_or_Seamonkey_or_Thunderbird/Installed");
-  script_tag(name : "impact" , value : "Successful exploitation could allow remote attackers to execute arbitrary
-  code in the context of the browser.
-  Impact Level: System/Application");
-  script_tag(name : "affected" , value : "SeaMonkey version before 2.6,
+  script_tag(name:"impact", value:"Successful exploitation could allow remote attackers to execute arbitrary
+  code in the context of the browser.");
+  script_tag(name:"affected", value:"SeaMonkey version before 2.6,
   Thunderbird version 5.0 through 8.0,
   Mozilla Firefox version 4.x through 8.0 on Windows.");
-  script_tag(name : "insight" , value : "A use-after-free error exists in 'nsHTMLSelectElement' when the parent node
+  script_tag(name:"insight", value:"A use-after-free error exists in 'nsHTMLSelectElement' when the parent node
   of the element is no longer active.");
-  script_tag(name : "summary" , value : "This host is installed with Mozilla firefox/thunderbird/seamonkey and is prone
+  script_tag(name:"summary", value:"This host is installed with Mozilla firefox/thunderbird/seamonkey and is prone
   to remote code execution vulnerability.");
-  script_tag(name : "solution" , value : "Upgrade to Mozilla Firefox version 9.0 or later,
-  For updates refer to http://www.mozilla.com/en-US/firefox/all.html
-
-  Upgrade to SeaMonkey version to 2.6 or later,
-  http://www.mozilla.org/projects/seamonkey/
-
-  Upgrade to Thunderbird version to 9.0 or later,
-  http://www.mozilla.org/en-US/thunderbird/");
+  script_tag(name:"solution", value:"Upgrade to Mozilla Firefox version 9.0 or later, upgrade to SeaMonkey version to 2.6 or later,
+  upgrade to Thunderbird version to 9.0 or later.");
   script_tag(name:"qod_type", value:"registry");
   script_tag(name:"solution_type", value:"VendorFix");
+
+  script_xref(name:"URL", value:"http://www.mozilla.com/en-US/firefox/all.html");
+  script_xref(name:"URL", value:"http://www.mozilla.org/projects/seamonkey/");
+  script_xref(name:"URL", value:"http://www.mozilla.org/en-US/thunderbird/");
+
   exit(0);
 }
 
 
 include("version_func.inc");
 
-
-ffVer = "";
 ffVer = get_kb_item("Firefox/Win/Ver");
-
 if(ffVer)
 {
   if(version_in_range(version:ffVer, test_version:"4.0", test_version2:"8.0"))
@@ -85,10 +80,7 @@ if(ffVer)
   }
 }
 
-# SeaMonkey Check
-seaVer = "";
 seaVer = get_kb_item("Seamonkey/Win/Ver");
-
 if(seaVer)
 {
   if(version_is_less(version:seaVer, test_version:"2.6"))
@@ -98,10 +90,7 @@ if(seaVer)
   }
 }
 
-# Thunderbird Check
-tbVer = "";
 tbVer = get_kb_item("Thunderbird/Win/Ver");
-
 if(tbVer)
 {
   if(version_in_range(version:tbVer, test_version:"5.0", test_version2:"8.0"))

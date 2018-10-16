@@ -1,8 +1,8 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_qnap_nas_photo_station_detect.nasl 9802 2018-05-11 11:53:28Z santu $
+# $Id: gb_qnap_nas_photo_station_detect.nasl 11446 2018-09-18 09:05:56Z ckuersteiner $
 #
-# QNAP QTS Photo Station Detection 
+# QNAP QTS Photo Station Detection
 #
 # Authors:
 # Shakeel <bshakeel@secpod.com>
@@ -28,14 +28,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.813164");
-  script_version("$Revision: 9802 $");
+  script_version("$Revision: 11446 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-11 13:53:28 +0200 (Fri, 11 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-18 11:05:56 +0200 (Tue, 18 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-05-03 19:51:43 +0530 (Thu, 03 May 2018)");
   script_name("QNAP QTS Photo Station Detection");
 
-  script_tag(name:"summary", value:"Detection of installed version of
+  script_tag(name:"summary", value:"Detects the installed version of
   QNAP QTS Photo Station.
 
   The script sends a connection request to the server and attempts to extract
@@ -45,9 +45,9 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("find_service.nasl", "http_version.nasl");
-  script_require_ports("Services/www", 80, 8080, 443);
-  script_exclude_keys("Settings/disable_cgi_scanning");
+  script_dependencies("gb_qnap_nas_detect.nasl");
+  script_mandatory_keys("qnap/qts", "qnap/port");
+
   exit(0);
 }
 
@@ -55,19 +55,17 @@ include("cpe.inc");
 include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
+include("misc_func.inc");
 
-if(!qtsPort = get_http_port(default:80)){
+# Photo Station is part of QNAP QTS
+if (!qtsPort = get_kb_item("qnap/port"))
   exit(0);
-}
 
-dirs = make_list("/photo/", "/photo/gallery/", "/gallery/");
-
-foreach dir (dirs)
+foreach dir (make_list("/photo/", "/photo/gallery/", "/gallery/"))
 {
   req = http_get_req( url:dir, port:qtsPort, add_headers:make_array("Accept-Encoding", "gzip, deflate"));
   res = http_keepalive_send_recv(port:qtsPort, data:req);
 
-  ##Handle redirection
   if(res =~ "^HTTP/1.. 30.")
   {
     url = eregmatch(pattern: 'Location: ([^\r\n]+)', string: res);
@@ -78,11 +76,10 @@ foreach dir (dirs)
       res = http_keepalive_send_recv(port:qtsPort, data:req);
       if(!(res =~ "HTTP/1.. 200 OK")){
         continue ;
-      } 
+      }
     }
   }
 
-  ##Confirm Photo Station
   if(res =~ "HTTP/1.. 200 OK" && "title>Photo Station</title" >< res)
   {
     url = eregmatch(pattern:"'\.js\?([0-9.]+)", string:res);
@@ -90,14 +87,12 @@ foreach dir (dirs)
     req = http_get_req( url:new_url, port:qtsPort);
     res = http_keepalive_send_recv(port:qtsPort, data:req);
 
-    ##Confirm for QNAP QTS
     if(res =~ "HTTP/1.. 200 OK" && "QTS Login" >< res && res =~ "COPYRIGHT=.*QNAP Systems" &&
       "LANG_QTS" >< res)
     {
       photoVer = "Unknown";
       set_kb_item(name:"QNAP/QTS/PhotoStation/detected", value:TRUE);
 
-      ##Try to get Photo Station version
       url = dir + "/api/user.php" ;
       req = http_get_req( url:url, port:qtsPort);
       res = http_keepalive_send_recv(port:qtsPort, data:req);
@@ -105,33 +100,30 @@ foreach dir (dirs)
       {
         version = eregmatch(pattern:'<appVersion>([0-9.]+)</appVersion><appBuildNum>([0-9]+)<', string:res);
         baseQTSVersion = eregmatch(pattern:'<builtinFirmwareVersion>([0-9.]+)</builtinFirmwareVersion>', string:res);
-        if(version[1])
-        {
+        if(!isnull(version[1])) {
           photoVer = version [1];
+          concUrl = url;
           set_kb_item(name:"QNAP/QTS/PhotoStation/version", value: photoVer);
-          if(version[2]){
+          if(version[2]) {
             photoBuild = version [2];
             set_kb_item(name:"QNAP/QTS/PhotoStation/build", value: photoBuild);
           }
-          if(baseQTSVersion[1]){
+          if(baseQTSVersion[1]) {
             baseQTSVer = baseQTSVersion[1];
             set_kb_item(name:"QNAP/QTS/PS/baseQTSVer", value: baseQTSVer);
           }
-
-          cpe = build_cpe(value:photoVer, exp:"^([0-9.]+)", base:"cpe:/o:qnap:qts_photo_station:");
-          if(isnull(cpe))
-            cpe = "cpe:/o:qnap:qts_photo_station:";
-
-          register_product(cpe:cpe, location:dir, port:qtsPort);
-
-          log_message(data: build_detection_report(app:"QNAP QTS Photo Station",
-                                           version:photoVer,
-                                           install:dir,
-                                           cpe:cpe,
-                                           concluded: photoVer + " Build " + photoBuild + " on QTS "+ baseQTSVer),
-                                           port:qtsPort);
-          exit(0);
         }
+
+        cpe = build_cpe(value:photoVer, exp:"^([0-9.]+)", base:"cpe:/a:qnap:photo_station");
+        if(isnull(cpe))
+          cpe = "cpe:/a:qnap:photo_station";
+
+        register_product(cpe:cpe, location:dir, port:qtsPort);
+
+        log_message(data: build_detection_report(app:"QNAP QTS Photo Station", version:photoVer, install:dir,
+                                                 cpe:cpe, concludedUrl:concUrl, concluded: version[0]),
+                    port:qtsPort);
+        exit(0);
       }
     }
   }

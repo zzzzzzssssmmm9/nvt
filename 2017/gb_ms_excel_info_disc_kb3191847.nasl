@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_excel_info_disc_kb3191847.nasl 6012 2017-04-24 04:58:27Z teissa $
+# $Id: gb_ms_excel_info_disc_kb3191847.nasl 11816 2018-10-10 10:42:56Z mmartin $
 #
 # Microsoft Office Excel Information Disclosure Vulnerability (KB3191847)
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.810684");
-  script_version("$Revision: 6012 $");
+  script_version("$Revision: 11816 $");
   script_cve_id("CVE-2017-0194");
   script_bugtraq_id(97436);
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-04-24 06:58:27 +0200 (Mon, 24 Apr 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-10 12:42:56 +0200 (Wed, 10 Oct 2018) $");
   script_tag(name:"creation_date", value:"2017-04-12 09:03:42 +0530 (Wed, 12 Apr 2017)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Microsoft Office Excel Information Disclosure Vulnerability (KB3191847)");
@@ -40,34 +40,30 @@ if(description)
   script_tag(name:"summary", value:"This host is missing an important security
   update for Microsoft Office Excel according to Microsoft security update KB3191847.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw exists as Microsoft Office improperly
   discloses the contents of its memory.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to gain access to potentially sensitive information and use the
-  information to compromise the user's computer or data.
-
-  Impact Level: Application");
+  information to compromise the user's computer or data.");
 
   script_tag(name:"affected", value:"Microsoft Excel 2010 Service Pack 2");
 
   script_tag(name:"solution", value:"Run Windows Update and update the listed
-  hotfixes or download and update mentioned hotfixes in the advisory from the
-  below link,
-  https://support.microsoft.com/en-us/help/3191847");
+  hotfixes or download and update mentioned hotfixes in the advisory ");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/help/3191847");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/help/3191847");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
   script_dependencies("secpod_office_products_version_900032.nasl");
   script_mandatory_keys("SMB/Office/Excel/Version");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/help/3191847");
   exit(0);
 }
 
@@ -75,22 +71,16 @@ if(description)
 include("smb_nt.inc");
 include("version_func.inc");
 
-# Variable Initialization
-excelVer = "";
-
-## Check for Office Excel 2010 Version
 excelVer = get_kb_item("SMB/Office/Excel/Version");
 if(!excelVer){
   exit(0);
 }
 
-## Check for Office Excel 2010 Path
 excelPath = get_kb_item("SMB/Office/Excel/Install/Path");
 if(!excelPath){
    excelPath = "Unable to fetch the install path";
 }
 
-##Check for Office Excel 2010
 if((excelVer =~ "^14\.") && version_in_range(version:excelVer, test_version:"14.0", test_version2:"14.0.7180.4999"))
 {
   report = 'File checked:     ' + excelPath + "Excel.exe" + '\n' +

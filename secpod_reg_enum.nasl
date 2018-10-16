@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_reg_enum.nasl 10207 2018-06-15 07:38:47Z cfischer $
+# $Id: secpod_reg_enum.nasl 11706 2018-10-01 09:48:48Z cfischer $
 #
 # Enumerates List of Windows Hotfixes
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.900012");
-  script_version("$Revision: 10207 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-15 09:38:47 +0200 (Fri, 15 Jun 2018) $");
+  script_version("$Revision: 11706 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-01 11:48:48 +0200 (Mon, 01 Oct 2018) $");
   script_tag(name:"creation_date", value:"2008-08-19 14:38:55 +0200 (Tue, 19 Aug 2008)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -40,8 +40,8 @@ if(description)
   script_require_ports(139, 445);
   script_mandatory_keys("SMB/WindowsName");
 
-  script_tag(name:"summary", value:"This script will enumerates the list of all installed hotfixes
-  on the remote host and sets Knowledge Base.");
+  script_tag(name:"summary", value:"This script is enumerating the list of all installed Windows hotfixes
+  on the remote host and saves the enumerated info into the internal Knowledge Base for later use.");
 
   script_tag(name:"qod_type", value:"registry");
 
@@ -65,6 +65,9 @@ function crawlLevel(key, level, maxlevel, soc, uid, tid, pipe, handle){
   key_h = registry_get_key(soc:soc, uid:uid, tid:tid, pipe:pipe, key:key, reply:handle);
   if(key_h){
     entries = registry_enum_key(soc:soc, uid:uid, tid:tid, pipe:pipe, reply:key_h);
+  }
+
+  if(!isnull(key_h)){
     registry_close(soc:soc, uid:uid, tid:tid, pipe:pipe, reply:key_h);
   }
 
@@ -106,36 +109,15 @@ function crawl(key, level, maxlevel, soc, uid, tid, pipe, handle){
   return enum;
 }
 
-name = kb_smb_name();
-if(!name){
-  exit(0);
-}
+infos = kb_smb_wmi_connectinfo();
+if( ! infos ) exit( 0 );
 
-port = kb_smb_transport();
-if(!port){
-  exit(0);
-}
-
-if(!get_port_state(port)){
-  exit(0);
-}
-
-login  = kb_smb_login();
-pass   = kb_smb_password();
-domain = kb_smb_domain();
-
-if(!login){
-  login = "";
-}
-if(!pass){
-  pass = "";
-}
-
-soc = open_sock_tcp(port);
+soc = open_sock_tcp(infos["transport_port"]);
 if(!soc){
   exit(0);
 }
 
+name = infos["netbios_name"];
 r = smb_session_request(soc:soc, remote:name);
 if(!r){
   close(soc);
@@ -148,7 +130,7 @@ if(!prot){
   exit(0);
 }
 
-r = smb_session_setup(soc:soc, login:login, password:pass, domain:domain, prot:prot);
+r = smb_session_setup(soc:soc, login:infos["username_plain"], password:infos["password"], domain:infos["domain"], prot:prot);
 if(!r){
   close(soc);
   exit(0);
@@ -185,6 +167,7 @@ if(!r){
   exit(0);
 }
 
+# nb: Windows XP and similar
 handle = registry_open_hklm(soc:soc, uid:uid, tid:tid, pipe:pipe);
 location1 = "SOFTWARE\Microsoft\Updates";
 location2 = "SOFTWARE\Microsoft\Windows NT\CurrentVersion\HotFix";
@@ -192,33 +175,44 @@ location2 = "SOFTWARE\Microsoft\Windows NT\CurrentVersion\HotFix";
 list = make_list(crawl(key:location1, level:0, maxlevel:3, soc:soc, uid:uid, tid:tid, pipe:pipe, handle:handle),
                  crawl(key:location2, level:0, maxlevel:1, soc:soc, uid:uid, tid:tid, pipe:pipe, handle:handle));
 
+close(soc);
+
 if(max_index(list) > 0){
   set_kb_item(name:"SMB/registry_enumerated", value:TRUE);
 }
 
-foreach item(list){
+# e.g.:
+# SOFTWARE\Microsoft\Updates\Windows XP\SP4\KB951376-v2
+# SOFTWARE\Microsoft\Updates\Windows Media Format 11 SDK\KB929399
+# SOFTWARE\Microsoft\Updates\Windows XP\SP-1\KB909520
+# SOFTWARE\Microsoft\Windows NT\CurrentVersion\HotFix\KB982381-IE8
+# SOFTWARE\Microsoft\Windows NT\CurrentVersion\HotFix\Q147222
+foreach item (list){
   if(egrep(pattern:"\\(KB|Q|M)[0-9]+", string:item)){
     item = str_replace(find:"\", replace:"/", string:item);
-    name = "SMB/Registry/HKLM/" + item;
-    set_kb_item(name:name, value:TRUE);
+    set_kb_item(name:"SMB/Registry/HKLM/" + item, value:TRUE);
   }
 }
 
-close(soc);
-
-## Check for Windows Vista, Windows 7, windows 2008
+# nb: Windows Vista, Windows 7, Windows 2008
 key = "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\Packages\";
 if(!registry_key_exists(key:key)){
   exit(0);
 }
 
-foreach item (registry_enum_keys(key:key)){
-  Name = registry_get_sz(key:key + item , item:"InstallName");
-  if(egrep(pattern:"\KB[0-9]+", string:Name)){
-    path = key + item + Name ;
-    Name = str_replace(find:"\", replace:"/", string:path);
-    name = "SMB/Registry/HKLM/" + Name ;
-    set_kb_item(name:name, value:TRUE);
+list = registry_enum_keys(key:key);
+if(max_index(list) > 0){
+  set_kb_item(name:"SMB/registry_enumerated", value:TRUE);
+}
+
+# e.g.
+# Package_8_for_KB938371~31bf3856ad364e35~amd64~~6.0.1.25
+# Package_for_KB937287_client~31bf3856ad364e35~amd64~~6.0.1.18000
+foreach item (list){
+  if(egrep(pattern:"[P|p]ackage.?[0-9]*.?for.?KB.*", string:item)){
+    path = key + item;
+    path = str_replace(find:"\", replace:"/", string:path);
+    set_kb_item(name:"SMB/Registry/HKLM/" + path, value:TRUE);
   }
 }
 

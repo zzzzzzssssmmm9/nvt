@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mediawiki_lang_variants_xss_vuln.nasl 7174 2017-09-18 11:48:08Z asteins $
+# $Id: gb_mediawiki_lang_variants_xss_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # MediaWiki Language Variants Cross-site scripting Vulnerability
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:mediawiki:mediawiki";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805387");
-  script_version("$Revision: 7174 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-2933");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-18 13:48:08 +0200 (Mon, 18 Sep 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-05-19 11:28:49 +0530 (Tue, 19 May 2015)");
   script_name("MediaWiki Language Variants Cross-site scripting Vulnerability");
 
@@ -49,27 +49,25 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow
   remote attacker to execute arbitrary script code in a user's browser
-  session within the trust relationship between their browser and the server.
-
-  Impact Level: Application");
+  session within the trust relationship between their browser and the server.");
 
   script_tag(name:"affected", value:"Language variants for Mediawiki before 1.19.24,
   1.2x before 1.23.9, and 1.24.x before 1.24.2");
 
-  script_tag(name:"solution", value:"Upgrade to Mediawiki 1.19.24, 1.23.9 or 1.24.2 or later.
-  For updates refer to http://www.mediawiki.org");
+  script_tag(name:"solution", value:"Upgrade to Mediawiki 1.19.24, 1.23.9 or 1.24.2 or later.");
 
   script_tag(name:"qod_type", value:"remote_active");
   script_tag(name:"solution_type", value:"VendorFix");
-  script_xref(name : "URL" , value : "https://lists.wikimedia.org/pipermail/mediawiki-announce/2015-March/000175.html");
-  script_xref(name : "URL" , value : "https://phabricator.wikimedia.org/T73394");
-  script_xref(name : "URL" , value : "http://www.openwall.com/lists/oss-security/2015/04/07/3");
+  script_xref(name:"URL", value:"https://lists.wikimedia.org/pipermail/mediawiki-announce/2015-March/000175.html");
+  script_xref(name:"URL", value:"https://phabricator.wikimedia.org/T73394");
+  script_xref(name:"URL", value:"http://www.openwall.com/lists/oss-security/2015/04/07/3");
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Web application abuses");
   script_dependencies("find_service.nasl", "secpod_mediawiki_detect.nasl");
   script_mandatory_keys("mediawiki/installed");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"http://www.mediawiki.org");
   exit(0);
 }
 
@@ -82,18 +80,15 @@ if( ! dir = get_app_location( cpe:CPE, port:port ) ) exit( 0 );
 
 if( dir == "/" ) dir = "";
 
-## Vulnerable Url
 url = dir + "/index.php?title=%E9%A6%96%E9%A1%B5&action=edit";
 reqwiki = http_get(item:url, port:port);
 reswiki = http_keepalive_send_recv(port:port, data:reqwiki);
 
-##Check for Vulnerable Language
 wplang = eregmatch(pattern:'lang="([a-zA-Z]*)" ', string:reswiki);
 if(wplang[1] != 'zh'){
   exit(0);
 }
 
-## Get the session id
 wpStarttime = eregmatch(pattern:'value="([0-9]*)" name="wpStarttime"', string:reswiki);
 if(!wpStarttime[1]){
    exit(0);
@@ -114,7 +109,6 @@ if(!oldid[1]){
    exit(0);
 }
 
-## Construct the attack request
 postData = string('-----------------------------7523421607973306651860038372\r\n',
                   'Content-Disposition: form-data; name="wpAntispam"\r\n\r\n\r\n',
                   '-----------------------------7523421607973306651860038372\r\n',
@@ -160,7 +154,6 @@ url = dir + "/index.php/%E9%A6%96%E9%A1%B5";
 sndReq = http_get(item:url, port:port);
 rcvRes = http_keepalive_send_recv(port:port, data:sndReq);
 
-#Confirm Exploit
 if( rcvRes =~ "HTTP/1\.. 200" && "alert(document.cookie)" >< rcvRes ) {
   report = report_vuln_url( port:port, url:url );
   security_message( port:port, data:report );

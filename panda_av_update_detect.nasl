@@ -1,5 +1,6 @@
 ###################################################################
 # OpenVAS Vulnerability Test
+# $Id: panda_av_update_detect.nasl 11543 2018-09-21 20:25:26Z cfischer $
 #
 # Panda Antivirus Update Detect
 #
@@ -26,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.102048");
-  script_version("$Revision: 8217 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-21 14:24:55 +0100 (Thu, 21 Dec 2017) $");
+  script_version("$Revision: 11543 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 22:25:26 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2010-07-08 10:59:30 +0200 (Thu, 08 Jul 2010)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -39,10 +40,8 @@ if(description)
   script_require_ports(139, 445);
   script_mandatory_keys("Panda/Products/Installed");
 
-  tag_summary = "Extracts date of the last update for Panda Antivirus software, from the 
-  Titanium.ini file and stores it to KB.";
-
-  script_tag(name:"summary", value:tag_summary);
+  script_tag(name:"summary", value:"Extracts date of the last update for Panda Antivirus software, from the
+  Titanium.ini file and stores it to KB.");
 
   script_tag(name:"qod_type", value:"registry");
 
@@ -50,12 +49,11 @@ if(description)
 }
 
 # This script is tested on Panda Antivirus 2005 through 2007
-# For other versions of Panda software might not work due to non-existent titanium.ini file 
+# For other versions of Panda software might not work due to non-existent titanium.ini file
 
 include("smb_nt.inc");
 include("secpod_smb_func.inc");
 
-#Detect if there is any Panda software installed
 if(!registry_key_exists(key:"SOFTWARE\Panda Software")){
   exit(0);
 }
@@ -74,11 +72,11 @@ foreach item (registry_enum_keys(key:key))
 
   ##  Check for the Antivirus
   if("Panda Antivirus" >< item)
-    paths[2] = registry_get_sz(key:key + item, item:"DIR");   
+    paths[2] = registry_get_sz(key:key + item, item:"DIR");
 }
-  
+
 for(i = 0; i < 3; i++){
-   
+
   if(paths[i]){
     share = ereg_replace(pattern:"([A-Z]):.*", replace:"\1$", string:paths[i]);
     file = ereg_replace(pattern:"[A-Z]:(.*)", replace:"\1", string:paths[i]) + "\Titanium.ini";
@@ -89,12 +87,11 @@ for(i = 0; i < 3; i++){
 
     if(!last_update) {
       log_message(data:"Could not find last date of signature base update in file Titanium.ini");
-      exit(-1);
+      exit(0);
     }
 
     set_kb_item(name:"Panda/LastUpdate/Available", value:TRUE);
 
-    #setting KB items
     if(i == 0)
       set_kb_item(name:"Panda/InternetSecurity/LastUpdate", value:last_update);
     if(i == 1)

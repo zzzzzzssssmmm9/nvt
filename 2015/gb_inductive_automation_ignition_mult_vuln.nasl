@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_inductive_automation_ignition_mult_vuln.nasl 9978 2018-05-28 08:52:24Z cfischer $
+# $Id: gb_inductive_automation_ignition_mult_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Inductive Automation Ignition Multiple Vulnerabilities
 #
@@ -27,13 +27,13 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805472");
-  script_version("$Revision: 9978 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-0995", "CVE-2015-0994", "CVE-2015-0993", "CVE-2015-0992",
                 "CVE-2015-0991", "CVE-2015-0976");
   script_bugtraq_id(73475, 73474, 73473, 73471, 73469, 73468);
   script_tag(name:"cvss_base", value:"6.4");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-28 10:52:24 +0200 (Mon, 28 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-04-11 14:20:21 +0530 (Sat, 11 Apr 2015)");
   script_tag(name:"qod_type", value:"remote_banner");
   script_name("Inductive Automation Ignition Multiple Vulnerabilities");
@@ -68,18 +68,15 @@ if(description)
   attackers to gain access to potentially sensitive information, hijack an active
   session, bypass the anti-bruteforce mechanism, create malicious applications
   or conduct other spoofing attacks, and create a specially crafted request that
-  would execute arbitrary script code in a user's browser session.
-
-  Impact Level: Application");
+  would execute arbitrary script code in a user's browser session.");
 
   script_tag(name:"affected", value:"Inductive Automation Ignition version 7.7.2");
 
-  script_tag(name: "solution" , value:"Upgrade to Inductive Automation Ignition
-  version 7.7.4 or later.
-  For updates refer to https://www.inductiveautomation.com/downloads/ignition");
+  script_tag(name:"solution", value:"Upgrade to Inductive Automation Ignition
+  version 7.7.4 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
-  script_xref(name : "URL" , value : "https://ics-cert.us-cert.gov/advisories/ICSA-15-090-01");
+  script_xref(name:"URL", value:"https://ics-cert.us-cert.gov/advisories/ICSA-15-090-01");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
@@ -88,6 +85,7 @@ if(description)
   script_require_ports("Services/www", 8088);
   script_exclude_keys("Settings/disable_cgi_scanning");
 
+  script_xref(name:"URL", value:"https://www.inductiveautomation.com/downloads/ignition");
   exit(0);
 }
 

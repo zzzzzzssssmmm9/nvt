@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: family_connections_detect.nasl 9689 2018-05-02 09:58:46Z ckuersteiner $
+# $Id: family_connections_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Family Connections Detection
 #
@@ -26,29 +26,29 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100407");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9689 $");
- script_tag(name:"last_modification", value:"$Date: 2018-05-02 11:58:46 +0200 (Wed, 02 May 2018) $");
- script_tag(name:"creation_date", value:"2009-12-17 19:46:08 +0100 (Thu, 17 Dec 2009)");
- script_tag(name:"cvss_base", value:"0.0");
+  script_oid("1.3.6.1.4.1.25623.1.0.100407");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2009-12-17 19:46:08 +0100 (Thu, 17 Dec 2009)");
+  script_tag(name:"cvss_base", value:"0.0");
 
- script_name("Family Connections Detection");
+  script_name("Family Connections Detection");
 
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_tag(name: "summary", value: "This host is running Family Connections, an easy-to-use website where you can
+  script_tag(name:"summary", value:"This host is running Family Connections, an easy-to-use website where you can
 connect with your friends and family. Share photos, messages, documents and more.");
 
- script_xref(name : "URL" , value : "http://www.familycms.com/");
+  script_xref(name:"URL", value:"http://www.familycms.com/");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");

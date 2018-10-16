@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apache_tomcat_detect.nasl 8235 2017-12-22 10:14:03Z cfischer $
+# $Id: gb_apache_tomcat_detect.nasl 11020 2018-08-17 07:35:00Z cfischer $
 #
 # Apache Tomcat Version Detection
 #
@@ -27,10 +27,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.800371");
-  script_version("$Revision: 8235 $");
+  script_version("$Revision: 11020 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-22 11:14:03 +0100 (Fri, 22 Dec 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 09:35:00 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2009-03-18 14:25:01 +0100 (Wed, 18 Mar 2009)");
   script_name("Apache Tomcat Version Detection");
   script_category(ACT_GATHER_INFO);
@@ -59,6 +59,7 @@ verPattern = "<strong>Tomcat ([0-9.]+)(-(RC|M)([0-9.]+))?"; # For /tomcat-docs/c
 verPattern2 = "Apache Tomcat( Version |\/)([0-9.]+)(-(RC|M)([0-9.]+))?"; # For other files
 
 port = get_http_port( default:8080 );
+host = http_host_name( dont_add_port:TRUE );
 
 identified = FALSE;
 verFound = FALSE;
@@ -67,8 +68,7 @@ extraUrls = "";
 
 foreach file( make_list( "/tomcat-docs/changelog.html", "/index.jsp", "/RELEASE-NOTES.txt", "/docs/RELEASE-NOTES.txt" ) ) {
 
-  req = http_get( item:file, port:port );
-  res = http_keepalive_send_recv( port:port, data:req, bodyonly:FALSE );
+  res = http_get_cache( item:file, port:port );
 
   if( res =~ "^HTTP/1\.[0-1] 200" && "Apache Tomcat" >< res ) {
     identified = TRUE;
@@ -103,7 +103,7 @@ if( ! verFound ) {
   }
 }
 
-authDirs = get_kb_list( "www/" + port + "/content/auth_required" );
+authDirs = get_http_kb_auth_required( port:port, host:host );
 if( authDirs ) {
 
   # Sort to not report changes on delta reports if just the order is different
@@ -119,7 +119,7 @@ if( authDirs ) {
     if( authRes =~ "^HTTP/1\.[01] 401" ) {
       if( "Tomcat Manager Application" >< authRes || "Tomcat Host Manager Application" >< authRes ||
           "Tomcat Manager Application" >< authRes ) {
-        set_kb_item( name:"www/" + port + "/ApacheTomcat/auth_required", value:url );
+        set_kb_item( name:"www/" + host + "/" + port + "/ApacheTomcat/auth_required", value:url );
         set_kb_item( name:"ApacheTomcat/auth_required", value:TRUE );
         identified = TRUE;
         extraUrls += report_vuln_url( port:port, url:url, url_only:TRUE ) + '\n';
@@ -154,7 +154,7 @@ if( identified ) {
     }
   }
 
-  set_kb_item( name:"www/" + port + "/ApacheTomcat", value:vers );
+  set_kb_item( name:"www/" + host + "/" + port + "/ApacheTomcat", value:vers );
   set_kb_item( name:"ApacheTomcat/installed", value:TRUE );
 
   cpe = build_cpe( value:vers, exp:"^([0-9.RCM]+)", base:"cpe:/a:apache:tomcat:" );

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_bisonware_bisonftp_server_dir_trav_vuln.nasl 6486 2017-06-29 09:59:06Z teissa $
+# $Id: gb_bisonware_bisonftp_server_dir_trav_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # BisonWare BisonFTP Server Directory Traversal Vulnerability
 #
@@ -29,10 +29,10 @@ CPE = "cpe:/a:bisonware:bison_ftp_server";
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805753");
-  script_version("$Revision: 6486 $");
+  script_version("$Revision: 11872 $");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-29 11:59:06 +0200 (Thu, 29 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-09-29 12:41:58 +0530 (Tue, 29 Sep 2015)");
   script_name("BisonWare BisonFTP Server Directory Traversal Vulnerability");
 
@@ -47,23 +47,19 @@ if (description)
   sequences that are received from an FTP server.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow attackers
-  to read arbitrary files on the affected application.
-
-  Impact Level: Application.");
+  to read arbitrary files on the affected application.");
 
   script_tag(name:"affected", value:"BisonWare BisonFTP Server version 3.5.");
 
-  script_tag(name:"solution", value:"No solution or patch was made available
-  for at least one year since disclosure of this vulnerability. Likely none will
-  be provided anymore. General solution options are to upgrade to a newer release,
-  disable respective features, remove the product or replace the product by another
-  one.");
+  script_tag(name:"solution", value:"No known solution was made available for at least one year since the disclosure of this vulnerability.
+Likely none will be provided anymore.
+General solution options are to upgrade to a newer release, disable respective features, remove the product or replace the product by another one.");
 
   script_tag(name:"solution_type", value:"WillNotFix");
 
   script_tag(name:"qod_type", value:"remote_vul");
 
-  script_xref(name : "URL" , value : "http://www.exploit-db.com/exploits/38341");
+  script_xref(name:"URL", value:"http://www.exploit-db.com/exploits/38341");
 
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
@@ -71,22 +67,13 @@ if (description)
   script_dependencies("secpod_ftp_anonymous.nasl", "gb_bisonware_bisonftp_server_detect.nasl");
   script_mandatory_keys("BisonWare/Ftp/Installed");
   script_require_ports("Services/ftp", 21);
- exit(0);
+  exit(0);
 }
 
 
 include("ftp_func.inc");
 include("host_details.inc");
 
-## Variable initialization
-login_details = "";
-ftpPort = "";
-banner = "";
-soc = "";
-user = "";
-password = "";
-
-## Get FTP Port
 ftpPort = get_app_port(cpe:CPE);
 if(!ftpPort){
   exit(0);
@@ -98,7 +85,6 @@ if(!soc){
   exit(0);
 }
 
-## Get the FTP user name and password
 user = get_kb_item("ftp/login");
 password = get_kb_item("ftp/password");
 
@@ -139,14 +125,12 @@ if(!soc2)
 files = make_list("windows/win.ini", "boot.ini", "winnt/win.ini");
 foreach file (files)
 {
-  ## Construct the attack request
   file = "../../../" + file;
   attackreq = string("RETR ", file);
   send(socket:soc, data:string(attackreq, "\r\n"));
 
   result = ftp_recv_data(socket:soc2);
 
-  ## confirm the exploit
   if("\WINDOWS" >< result || "; for 16-bit app support" >< result
                                      || "[boot loader]" >< result)
   {

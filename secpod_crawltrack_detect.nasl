@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_crawltrack_detect.nasl 6065 2017-05-04 09:03:08Z teissa $
+# $Id: secpod_crawltrack_detect.nasl 11224 2018-09-04 12:57:17Z cfischer $
 #
 # CrawlTrack Version Detection
 #
@@ -28,8 +28,8 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.901178");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 6065 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-04 11:03:08 +0200 (Thu, 04 May 2017) $");
+  script_version("$Revision: 11224 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-04 14:57:17 +0200 (Tue, 04 Sep 2018) $");
   script_tag(name:"creation_date", value:"2011-02-05 04:12:38 +0100 (Sat, 05 Feb 2011)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("CrawlTrack Version Detection");
@@ -54,7 +54,6 @@ include("http_keepalive.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Get http port
 port = get_http_port( default:80 );
 
 foreach dir( make_list_unique( "/crawltrack", "/crawler", "/", cgi_dirs( port:port ) ) ) {
@@ -62,29 +61,23 @@ foreach dir( make_list_unique( "/crawltrack", "/crawler", "/", cgi_dirs( port:po
   install = dir;
   if( dir == "/" ) dir = "";
 
-  ## Send and Receive the response
   sndReq = http_get( item: dir + "/html/infoen.htm", port:port);
   rcvRes = http_keepalive_send_recv( port:port, data:sndReq, bodyonly:TRUE );
 
-  ## Confirm the application
   if( ">CrawlTrack informations<" >< rcvRes ) {
 
     version = "unknown";
 
-    ## Get CrawlTrack Version
     ver = eregmatch( pattern:'>CrawlTrack ([0-9.]+)<', string:rcvRes );
     if( ver[1] ) version = ver[1];
 
-    ## Set the KB value
     tmp_version = version +" under "+ install;
     set_kb_item( name:"www/" + port + "/CrawlTrack", value:tmp_version );
 
-    ## build cpe and store it as host_detail
     cpe = build_cpe( value:version, exp:"^([0-9.]+)", base:"cpe:/a:crawltrack:crawltrack:" );
     if( isnull( cpe ) )
       cpe = 'cpe:/a:crawltrack:crawltrack';
 
-    ## Register Product and Build Report
     register_product( cpe:cpe, location:install, port:port );
 
     log_message( data:build_detection_report( app:"CrawlTrack",

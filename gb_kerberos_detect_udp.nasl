@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_kerberos_detect_udp.nasl 7287 2017-09-27 06:56:51Z cfischer $
+# $Id: gb_kerberos_detect_udp.nasl 11089 2018-08-23 08:25:21Z jschulte $
 #
 # Kerberos Detection (UDP)
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108027");
-  script_version("$Revision: 7287 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-27 08:56:51 +0200 (Wed, 27 Sep 2017) $");
+  script_version("$Revision: 11089 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-23 10:25:21 +0200 (Thu, 23 Aug 2018) $");
   script_tag(name:"creation_date", value:"2013-12-12 11:31:47 +0100 (Thu, 12 Dec 2013)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -39,9 +39,7 @@ if(description)
   script_dependencies("gb_kerberos_detect.nasl");
   script_require_udp_ports(88);
 
-  tag_summary = "The script sends a connection request to detect a running kerberos server.";
-
-  script_tag(name:"summary", value:tag_summary);
+  script_tag(name:"summary", value:"The script sends a connection request to detect a running kerberos server.");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
@@ -120,6 +118,7 @@ report = 'A Kerberos Server is running at this port.\n';
 
 if( stime ) report += '\nServer time: ' + mkd_date_str( rdate:stime ) + '\n';
 
+replace_kb_item( name:"kerberos/detected", value:TRUE );
 log_message( port:port, proto:"udp", data:report );
 
 exit( 0 );

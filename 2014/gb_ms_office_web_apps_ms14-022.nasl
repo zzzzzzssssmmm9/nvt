@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_office_web_apps_ms14-022.nasl 9319 2018-04-05 08:03:12Z cfischer $
+# $Id: gb_ms_office_web_apps_ms14-022.nasl 11878 2018-10-12 12:40:08Z cfischer $
 #
 # Microsoft Office Web Apps Multiple Vulnerabilities (2952166)
 #
@@ -29,52 +29,38 @@ CPE = "cpe:/a:microsoft:office_web_apps";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804582");
-  script_version("$Revision: 9319 $");
+  script_version("$Revision: 11878 $");
   script_cve_id("CVE-2014-0251", "CVE-2014-1754", "CVE-2014-1813");
   script_bugtraq_id(67283, 67288, 67290);
   script_tag(name:"cvss_base", value:"9.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:S/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-05 10:03:12 +0200 (Thu, 05 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 14:40:08 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-05-14 13:45:31 +0530 (Wed, 14 May 2014)");
   script_name("Microsoft Office Web Apps Multiple Vulnerabilities (2952166)");
 
-  tag_summary = "This host is missing an critical security update according to Microsoft
-Bulletin MS14-022.";
+  script_tag(name:"summary", value:"This host is missing an critical security update according to Microsoft
+Bulletin MS14-022.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"insight", value:"Flaws is due to multiple unspecified components when handling page content.");
+  script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to execute the arbitrary
+code and compromise a vulnerable system.");
+  script_tag(name:"affected", value:"Microsoft Web Applications 2010 Service Pack 2 and prior,
 
-  tag_vuldetect = "Get the vulnerable file version and check appropriate patch is applied
-or not.";
-
-  tag_insight = "Flaws is due to multiple unspecified components when handling page content.";
-
-  tag_impact = "Successful exploitation will allow remote attackers to execute the arbitrary
-code and compromise a vulnerable system.
-
-Impact Level: System/Application ";
-
-  tag_affected = "Microsoft Web Applications 2010 Service Pack 2 and prior,
-
-Microsoft Web Applications 2013 Service Pack 1 and prior.";
-
-  tag_solution = "Run Windows Update and update the listed hotfixes or download and
-update mentioned hotfixes in the advisory from the below link,
-http://technet.microsoft.com/en-us/security/bulletin/ms14-022";
-
-  script_tag(name : "summary" , value : tag_summary);
-  script_tag(name : "vuldetect" , value : tag_vuldetect);
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "impact" , value : tag_impact);
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "solution" , value : tag_solution);
+Microsoft Web Applications 2013 Service Pack 1 and prior.");
+  script_tag(name:"solution", value:"Run Windows Update and update the listed hotfixes or download and
+install the hotfixes from the referenced advisory.");
   script_tag(name:"qod_type", value:"registry");
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/57834");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/library/security/ms14-022");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/57834");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/library/security/ms14-022");
   script_category(ACT_GATHER_INFO);
   script_family("Windows : Microsoft Bulletins");
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
   script_dependencies("gb_ms_office_web_apps_detect.nasl");
+  script_require_ports(139, 445);
   script_mandatory_keys("MS/Office/Web/Apps/Ver");
+  script_xref(name:"URL", value:"http://technet.microsoft.com/en-us/security/bulletin/ms14-022");
   exit(0);
 }
 
@@ -99,7 +85,7 @@ if(webappVer =~ "^14\..*")
   {
     if(version_in_range(version:dllVer, test_version:"14.0", test_version2:"14.0.7123.5000"))
     {
-      security_message(0);
+      security_message( port: 0, data: "The target host was found to be vulnerable" );
       exit(0);
     }
   }
@@ -115,7 +101,7 @@ if(webappVer =~ "^15\..*")
   {
     if(version_in_range(version:dllVer, test_version:"15.0", test_version2:"15.0.4615.999"))
     {
-      security_message(0);
+      security_message( port: 0, data: "The target host was found to be vulnerable" );
       exit(0);
     }
   }

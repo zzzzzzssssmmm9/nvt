@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_glpi_lfi_06_13.nasl 7577 2017-10-26 10:41:56Z cfischer $
+# $Id: gb_glpi_lfi_06_13.nasl 11219 2018-09-04 11:52:00Z cfischer $
 #
 # GLPI Local File Include Vulnerability
 #
@@ -25,40 +25,42 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "GLPI is prone to a local file include vulnerability because it fails
-to adequately validate user-supplied input.
-
-An attacker can exploit this vulnerability to obtain potentially
-sensitive information and execute arbitrary local scripts. This could
-allow the attacker to compromise the application and the computer;
-other attacks are also possible.
-
-GLPI 0.83.7 is vulnerable. Other versions may also be vulnerable.";
-
 CPE = "cpe:/a:glpi-project:glpi";
 
-if (description)
+if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.103743");
- script_version ("$Revision: 7577 $");
- script_tag(name:"cvss_base", value:"7.5");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_oid("1.3.6.1.4.1.25623.1.0.103743");
+  script_version("$Revision: 11219 $");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
 
- script_name("GLPI Local File Include Vulnerability");
+  script_name("GLPI Local File Include Vulnerability");
 
- script_xref(name:"URL", value:"http://www.zeroscience.mk/en/vulnerabilities/ZSL-2013-5145.php");
- 
- script_tag(name:"last_modification", value:"$Date: 2017-10-26 12:41:56 +0200 (Thu, 26 Oct 2017) $");
- script_tag(name:"creation_date", value:"2013-06-20 11:59:55 +0200 (Thu, 20 Jun 2013)");
- script_category(ACT_ATTACK);
- script_tag(name:"qod_type", value:"remote_vul");
- script_family("Web application abuses");
- script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
- script_dependencies("gb_glpi_detect.nasl", "os_detection.nasl");
- script_require_ports("Services/www", 80);
- script_mandatory_keys("glpi/installed");
- script_tag(name : "summary" , value : tag_summary);
- exit(0);
+  script_xref(name:"URL", value:"http://www.zeroscience.mk/en/vulnerabilities/ZSL-2013-5145.php");
+
+  script_tag(name:"last_modification", value:"$Date: 2018-09-04 13:52:00 +0200 (Tue, 04 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2013-06-20 11:59:55 +0200 (Thu, 20 Jun 2013)");
+  script_category(ACT_ATTACK);
+  script_tag(name:"qod_type", value:"remote_vul");
+  script_family("Web application abuses");
+  script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
+  script_dependencies("gb_glpi_detect.nasl", "os_detection.nasl");
+  script_require_ports("Services/www", 80);
+  script_mandatory_keys("glpi/installed");
+  script_tag(name:"solution", value:"Vendor updates are available.");
+  script_tag(name:"solution_type", value:"VendorFix");
+
+  script_tag(name:"summary", value:"GLPI is prone to a local file include vulnerability because it fails
+  to adequately validate user-supplied input.");
+
+  script_tag(name:"impact", value:"An attacker can exploit this vulnerability to obtain potentially
+  sensitive information and execute arbitrary local scripts. This could
+  allow the attacker to compromise the application and the computer.
+  Other attacks are also possible.");
+
+  script_tag(name:"affected", value:"GLPI 0.83.7 is vulnerable. Other versions may also be vulnerable.");
+
+  exit(0);
 }
 
 include("misc_func.inc");
@@ -70,6 +72,7 @@ if(!port = get_app_port(cpe:CPE))exit(0);
 if(!dir = get_app_location(cpe:CPE, port:port))exit(0);
 
 url = dir + '/ajax/common.tabs.php';
+useragent = get_http_user_agent();
 host = http_host_name(port:port);
 
 files = traversal_files();
@@ -82,7 +85,7 @@ foreach file (keys(files)) {
   req = string("POST ", url," HTTP/1.1\r\n",
              "Host: ", host,"\r\n",
              "Content-Length: ", len,"\r\n",
-             "User-Agent: ", OPENVAS_HTTP_USER_AGENT,"\r\n",
+             "User-Agent: ", useragent, "\r\n",
              "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n",
              "Accept-Language: en-US,en;q=0.5\r\n",
              "Accept-Encoding: Identity\r\n",
@@ -93,12 +96,9 @@ foreach file (keys(files)) {
   result = http_keepalive_send_recv(port:port, data:req, bodyonly:FALSE);
 
   if(eregmatch(pattern:file, string:result)) {
-
     security_message(port:port);
     exit(0);
-
   }
+}
 
-} 
-
-exit(99); 
+exit(99);

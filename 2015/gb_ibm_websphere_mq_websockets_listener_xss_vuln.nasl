@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ibm_websphere_mq_websockets_listener_xss_vuln.nasl 6357 2017-06-16 10:00:29Z teissa $
+# $Id: gb_ibm_websphere_mq_websockets_listener_xss_vuln.nasl 11424 2018-09-17 08:03:52Z mmartin $
 #
 # IBM WebSphere MQ XR WebSockets listener Cross-Site Scripting Vulnerability
 #
@@ -29,28 +29,25 @@ CPE = "cpe:/a:ibm:websphere_mq";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805547");
-  script_version("$Revision: 6357 $");
+  script_version("$Revision: 11424 $");
   script_cve_id("CVE-2015-0176");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-16 12:00:29 +0200 (Fri, 16 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 10:03:52 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-05-06 12:12:34 +0530 (Wed, 06 May 2015)");
   script_name("IBM WebSphere MQ XR WebSockets listener Cross-Site Scripting Vulnerability");
 
   script_tag(name:"summary", value:"This host is installed with IBM WebSphere MQ
   and is prone to cross-site scripting vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw exists due to improper validation
   of user-supplied input.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow a remote
   attacker to execute arbitrary script code in a user's browser session within
-  the trust relationship between their browser and the server.
-
-  Impact Level: Application");
+  the trust relationship between their browser and the server.");
 
   script_tag(name:"affected", value:"IBM WebSphere MQ version 8.x before 8.0.0.2");
 
@@ -61,7 +58,7 @@ if(description)
 
   script_tag(name:"qod_type", value:"registry");
 
-  script_xref(name : "URL" , value : "http://www-01.ibm.com/support/docview.wss?uid=swg21699549");
+  script_xref(name:"URL", value:"http://www-01.ibm.com/support/docview.wss?uid=swg21699549");
 
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_category(ACT_GATHER_INFO);
@@ -75,15 +72,10 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-mqVer = "";
-
-## Get version
 if(!mqVer = get_app_version(cpe:CPE)){
   exit(0);
 }
 
-## Grep for vulnerable version,  8.x before 8.0.0.2
 if(version_in_range(version:mqVer, test_version:"8.0", test_version2:"8.0.0.1"))
 {
   report = 'Installed version: ' + mqVer + '\n' +

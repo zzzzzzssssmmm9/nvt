@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cisco_pis_web_detect.nasl 7591 2017-10-27 09:24:32Z cfischer $
+# $Id: gb_cisco_pis_web_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Cisco Prime Infrastructure Web Interface Detection
 #
@@ -27,25 +27,25 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105613");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 7591 $");
- script_tag(name:"last_modification", value:"$Date: 2017-10-27 11:24:32 +0200 (Fri, 27 Oct 2017) $");
- script_tag(name:"creation_date", value:"2016-04-20 16:20:47 +0200 (Wed, 20 Apr 2016)");
- script_name("Cisco Prime Infrastructure Web Interface Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105613");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-04-20 16:20:47 +0200 (Wed, 20 Apr 2016)");
+  script_name("Cisco Prime Infrastructure Web Interface Detection");
 
- script_tag(name: "summary" , value: "This Script detects the Webinterface of Cisco Prime Infrastructure");
+  script_tag(name:"summary", value:"This Script detects the Webinterface of Cisco Prime Infrastructure");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80, 443);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80, 443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  exit(0);
 }
 
 
@@ -93,7 +93,7 @@ if( buf =~ "^HTTP/1\.[01] 200" && "Prime Infrastructure" >< buf )
         {
           if( "TECH PACK" >< id ) continue;
           _p = eregmatch( pattern:'"name":"PI ([0-9]+\\.[^"]+)"', string:id );
-          if( ! isnull( _p[1] ) ) 
+          if( ! isnull( _p[1] ) )
           {
             installed_patches += _p[1] + '\n';
           }

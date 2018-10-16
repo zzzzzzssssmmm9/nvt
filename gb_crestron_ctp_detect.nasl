@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_crestron_ctp_detect.nasl 10168 2018-06-13 03:27:59Z ckuersteiner $
+# $Id: gb_crestron_ctp_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Crestron Device Detection (CTP)
 #
@@ -27,40 +27,39 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.141174");
- script_version ("$Revision: 10168 $");
- script_tag(name: "last_modification", value: "$Date: 2018-06-13 05:27:59 +0200 (Wed, 13 Jun 2018) $");
- script_tag(name: "creation_date", value: "2018-06-13 08:39:58 +0700 (Wed, 13 Jun 2018)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.141174");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2018-06-13 08:39:58 +0700 (Wed, 13 Jun 2018)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("Crestron Device Detection (CTP)");
+  script_name("Crestron Device Detection (CTP)");
 
- script_tag(name: "summary" , value: "Detection of Crestron devices.
+  script_tag(name:"summary", value:"Detection of Crestron devices.
 
 The script sends a Crestron Terminal Protocol (CTP) connection request to the server and attempts to detect
 Crestron devices and to extract its firmware version.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2018 Greenbone Networks GmbH");
- script_family("Product detection");
- script_require_ports(41795);
+  script_copyright("This script is Copyright (C) 2018 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("telnet.nasl");
+  script_require_ports("Services/telnet", 41795);
 
- script_xref(name: "URL", value: "https://www.crestron.com/");
+  script_xref(name:"URL", value:"https://www.crestron.com/");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");
 include("host_details.inc");
+include("telnet_func.inc");
 
-port = 41795;
-
-if (!get_port_state(port))
-  exit(0);
+port = get_telnet_port(default: 41795);
 
 soc = open_sock_tcp(port);
 if (!soc)
@@ -68,7 +67,7 @@ if (!soc)
 
 send(socket: soc, data: raw_string(0x0d));
 recv = recv(socket: soc, length: 100);
-if ("Control Console" >!< recv) {
+if (recv !~ "(Control|MC3|CP3) Console") {
   close(soc);
   exit(0);
 }

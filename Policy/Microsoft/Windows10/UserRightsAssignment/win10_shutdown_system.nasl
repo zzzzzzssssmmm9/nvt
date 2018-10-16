@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: win10_shutdown_system.nasl 9679 2018-04-30 14:05:59Z emoss $
+# $Id: win10_shutdown_system.nasl 11532 2018-09-21 19:07:30Z cfischer $
 #
 # Check value for Shut down the system (WMI)
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.109149");
-  script_version("$Revision: 9679 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-30 16:05:59 +0200 (Mon, 30 Apr 2018) $");
+  script_version("$Revision: 11532 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 21:07:30 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-04-30 15:37:24 +0200 (Mon, 30 Apr 2018)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:H/Au:S/C:N/I:N/A:N");
@@ -38,19 +38,20 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH");
   script_family("Policy");
   script_dependencies("gb_wmi_access.nasl", "smb_reg_service_pack.nasl");
+  script_add_preference(name:"Value", type:"entry", value:"Administrators, Users");
   script_mandatory_keys("Compliance/Launch");
   script_require_keys("WMI/access_successful");
-  script_tag(name: "summary", value: "This security setting determines if a user 
+  script_tag(name:"summary", value:"This security setting determines if a user
 who is logged on locally to a device can shut down Windows.
 
-Shutting down domain controllers makes them unavailable to perform functions 
-such as processing logon requests, processing Group Policy settings, and 
-answering Lightweight Directory Access Protocol (LDAP) queries. Shutting down 
-domain controllers that have been assigned operations master roles (also known 
-as flexible single master operations or FSMO roles) can disable key domain 
+Shutting down domain controllers makes them unavailable to perform functions
+such as processing logon requests, processing Group Policy settings, and
+answering Lightweight Directory Access Protocol (LDAP) queries. Shutting down
+domain controllers that have been assigned operations master roles (also known
+as flexible single master operations or FSMO roles) can disable key domain
 functionality.
 
-The Shut down the system user right is required to enable hibernation support, 
+The Shut down the system user right is required to enable hibernation support,
 to set the power management settings, and to cancel a shutdown.");
   exit(0);
 }
@@ -67,20 +68,33 @@ to query the registry.');
 WindowsName = get_kb_item("SMB/WindowsName");
 if('windows 10' >!< tolower(WindowsName)){
   policy_logging(text:'Host is not a Microsoft Windows 10 System.');
-  exit(0); 
+  exit(0);
 }
 
-type = 'Shut down the system';
+title = 'Shut down the system';
 select = 'AccountList';
 keyname = 'SeShutdownPrivilege';
+fixtext = 'Set following UI path accordingly:
+Computer Configuration/Windows Settings/Security Settings/Local Policies/User Rights Assignment/' + title;
+default = script_get_preference('Value');
 
 value = rsop_userprivilegeright(select:select,keyname:keyname);
 if( value == ''){
-  policy_logging(text:'Unable to detect setting for: "' + type + '".');
-  policy_set_kb(val:'error');
-}else{
-  policy_logging(text:'"' + type + '" is set to: ' + value);
-  policy_set_kb(val:value);
+  value = 'None';
 }
+
+if(tolower(chomp(value)) == tolower(default)){
+  compliant = 'yes';
+}else{
+  compliant = 'no';
+}
+
+policy_logging(text:'"' + title + '" is set to: ' + value);
+policy_add_oid();
+policy_set_dval(dval:default);
+policy_fixtext(fixtext:fixtext);
+policy_control_name(title:title);
+policy_set_kb(val:value);
+policy_set_compliance(compliant:compliant);
 
 exit(0);

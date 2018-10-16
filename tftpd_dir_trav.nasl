@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: tftpd_dir_trav.nasl 10411 2018-07-05 10:15:10Z cfischer $
+# $Id: tftpd_dir_trav.nasl 10894 2018-08-10 13:09:25Z cfischer $
 #
 # TFTP directory traversal
 #
@@ -29,15 +29,15 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.18262");
-  script_version("$Revision: 10411 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-05 12:15:10 +0200 (Thu, 05 Jul 2018) $");
+  script_version("$Revision: 10894 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-10 15:09:25 +0200 (Fri, 10 Aug 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
   script_cve_id("CVE-1999-0498", "CVE-1999-0183");
   script_bugtraq_id(6198, 11584, 11582);
   script_name("TFTP directory traversal");
-  script_category(ACT_GATHER_INFO);
+  script_category(ACT_ATTACK);
   script_copyright("This script is Copyright (C) 2005 Michel Arboi");
   script_family("Remote file access");
   script_dependencies("tftpd_detect.nasl", "global_settings.nasl");
@@ -89,8 +89,10 @@ function tftp_grab( port, file ) {
       if( data[0] == '\0' && data[1] == '\x03' ) {
         local_var c;
         c = substr( data, 4 );
-        set_kb_item( name:'tftp/' + port + '/filename/'+ nb, value:file );
-        set_kb_item( name:'tftp/' + port + '/filecontent/'+ nb, value:c );
+        set_kb_item( name:"tftp/" + port + "/filename/" + nb, value:file );
+        set_kb_item( name:"tftp/filename_available", value:TRUE );
+        set_kb_item( name:"tftp/" + port + "/filecontent/" + nb, value:c );
+        set_kb_item( name:"tftp/filcontent_available", value:TRUE );
         nb++;
         return c;
       } else {

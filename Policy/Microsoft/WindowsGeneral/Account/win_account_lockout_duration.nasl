@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: win_account_lockout_duration.nasl 9961 2018-05-25 13:02:30Z emoss $
+# $Id: win_account_lockout_duration.nasl 11532 2018-09-21 19:07:30Z cfischer $
 #
 # Check value for Account lockout duration (WMI)
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.109109");
-  script_version("$Revision: 9961 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-25 15:02:30 +0200 (Fri, 25 May 2018) $");
+  script_version("$Revision: 11532 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 21:07:30 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-04-25 12:49:31 +0200 (Wed, 25 Apr 2018)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:H/Au:S/C:N/I:N/A:N");
@@ -38,14 +38,15 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH");
   script_family("Policy");
   script_dependencies("gb_wmi_access.nasl", "smb_reg_service_pack.nasl");
+  script_add_preference(name:"Minimum", type:"entry", value:"15");
   script_mandatory_keys("Compliance/Launch");
   script_require_keys("WMI/access_successful");
-  script_tag(name: "summary", value: "This test checks the setting for policy 
+  script_tag(name:"summary", value:"This test checks the setting for policy
 'Account lockout duration' on Windows hosts (at least Windows 7).
 
-The policy setting determines the number of minutes that a locked-out account 
-remains locked out before automatically becoming unlocked. The available range 
-is from 1 through 99,999 minutes. A value of 0 specifies that the account will 
+The policy setting determines the number of minutes that a locked-out account
+remains locked out before automatically becoming unlocked. The available range
+is from 1 to 99, 999 minutes. A value of 0 specifies that the account will
 be locked out until an administrator explicitly unlocks it.");
   exit(0);
 }
@@ -60,23 +61,36 @@ to query the registry.');
 }
 
 if(get_kb_item("SMB/WindowsVersion") < "6.1"){
-  policy_logging(text:'Host is not at least a Microsoft Windows 7 system. 
-Older versions of Windows are not supported any more. Please update the 
+  policy_logging(text:'Host is not at least a Microsoft Windows 7 system.
+Older versions of Windows are not supported any more. Please update the
 Operating System.');
   exit(0);
 }
 
-type = 'Account lockout duration';
+title = 'Account lockout duration';
 select = 'Setting';
 keyname = 'LockoutDuration';
+fixtext = 'Set following UI path accordingly:
+Computer Configuration/Windows Settings/Security Settings/Account Policies/Password Policy/' + title;
+default = script_get_preference("Minimum");
 
 value = rsop_securitysettingsnumeric(select:select,keyname:keyname);
 if( value == ''){
-  policy_logging(text:'Unable to detect setting for: "' + type + '".');
-  policy_set_kb(val:'error');
-}else{
-  policy_logging(text:'"' + type + '" is set to: ' + value);
-  policy_set_kb(val:value);
+  value = '0';
 }
+
+if(int(value) >= int(default)){
+  compliant = "yes";
+}else{
+  compliant = "no";
+}
+
+policy_logging(text:'"' + title + '" is set to: ' + value);
+policy_add_oid();
+policy_set_dval(dval:default);
+policy_fixtext(fixtext:fixtext);
+policy_control_name(title:title);
+policy_set_kb(val:value);
+policy_set_compliance(compliant:compliant);
 
 exit(0);

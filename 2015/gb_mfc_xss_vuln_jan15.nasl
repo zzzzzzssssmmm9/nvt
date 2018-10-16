@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mfc_xss_vuln_jan15.nasl 9978 2018-05-28 08:52:24Z cfischer $
+# $Id: gb_mfc_xss_vuln_jan15.nasl 11422 2018-09-17 07:30:48Z mmartin $
 #
 # Brother MFC Administration Reflected Cross-Site Scripting Vulnerabilities - Jan15
 #
@@ -27,11 +27,11 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805320");
-  script_version("$Revision: 9978 $");
+  script_version("$Revision: 11422 $");
   script_cve_id("CVE-2015-1056");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-28 10:52:24 +0200 (Mon, 28 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 09:30:48 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-01-12 20:15:26 +0530 (Mon, 12 Jan 2015)");
   script_name("Brother MFC Administration Reflected Cross-Site Scripting Vulnerabilities - Jan15");
 
@@ -46,9 +46,7 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to execute arbitrary HTML and script code in a users browser
-  session in the context of an affected site.
-
-  Impact Level: Application");
+  session in the context of an affected site.");
 
   script_tag(name:"affected", value:"Brother MFC-J4410DW with F/W Versions J and K");
 
@@ -57,7 +55,7 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://seclists.org/bugtraq/2015/Jan/19");
+  script_xref(name:"URL", value:"http://seclists.org/bugtraq/2015/Jan/19");
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");

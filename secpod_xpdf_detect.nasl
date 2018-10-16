@@ -1,14 +1,11 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_xpdf_detect.nasl 9584 2018-04-24 10:34:07Z jschulte $
+# $Id: secpod_xpdf_detect.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # Xpdf Version Detection
 #
 # Authors:
 # Sujit Ghosal <sghosal@secpod.com>
-#
-# Updated by: <jan-oliver.wagner@greenbone.net> on 2011-11-22
-# Revised to comply with Change Request #57.
 #
 # Copyright:
 # Copyright (c) 2009 SecPod, http://www.secpod.com
@@ -31,20 +28,17 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.900466");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 9584 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-24 12:34:07 +0200 (Tue, 24 Apr 2018) $");
+  script_version("$Revision: 11279 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2009-05-06 08:04:28 +0200 (Wed, 06 May 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Xpdf Version Detection");
 
-  script_tag(name : "vuldetect" , value : "The script logs in via ssh, searches for executable 'xpdf' and
-    queries the found executables via command line option '-v'.");
-  script_tag(name : "summary" , value : "The PDF viewer Xpdf is installed and its version is detected.");
-  script_tag(name : "solution" , value : "N/A");
-  script_tag(name : "affected" , value : "Xpdf on Linux.");
-  script_tag(name : "insight" , value : "N/A");
-  script_tag(name : "impact" , value : "N/A");
+  script_tag(name:"vuldetect", value:"The script logs in via ssh, searches for executable 'xpdf' and
+  queries the found executables via command line option '-v'.");
+  script_tag(name:"summary", value:"The PDF viewer Xpdf is installed and its version is detected.");
+  script_tag(name:"affected", value:"Xpdf on Linux.");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2009 SecPod");
@@ -63,7 +57,7 @@ include("host_details.inc");
 
 sock = ssh_login_or_reuse_connection();
 if(!sock){
-  exit(-1);
+  exit(0);
 }
 
 xpdfPaths = find_file(file_name:"xpdf", file_path:"/", useregex:TRUE,

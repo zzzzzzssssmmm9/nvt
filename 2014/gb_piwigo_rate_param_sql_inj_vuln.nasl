@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_piwigo_rate_param_sql_inj_vuln.nasl 5226 2017-02-07 16:35:25Z cfi $
+# $Id: gb_piwigo_rate_param_sql_inj_vuln.nasl 11402 2018-09-15 09:13:36Z cfischer $
 #
 # Piwigo 'rate' Parameter SQL Injection Vulnerability
 #
@@ -29,11 +29,12 @@ CPE = 'cpe:/a:piwigo:piwigo';
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805102");
-  script_version("$Revision: 5226 $");
+  script_version("$Revision: 11402 $");
   script_bugtraq_id(71066);
+  script_cve_id("CVE-2014-9115");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-02-07 17:35:25 +0100 (Tue, 07 Feb 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:13:36 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2014-11-21 13:41:43 +0530 (Fri, 21 Nov 2014)");
   script_name("Piwigo 'rate' Parameter SQL Injection Vulnerability");
   script_category(ACT_ATTACK);
@@ -58,20 +59,18 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow attacker
   to manipulate SQL queries in the backend database, and disclose certain
-  sensitive information.
-
-  Impact Level: Application");
+  sensitive information.");
 
   script_tag(name:"affected", value:"Piwigo version 2.6.0, prior versions may
   also be affected.");
 
-  script_tag(name:"solution", value:"No solution or patch was made available
-  for at least one year since disclosure of this vulnerability. Likely none will
+  script_tag(name:"solution", value:"No known solution was made available
+  for at least one year since the disclosure of this vulnerability. Likely none will
   be provided anymore. General solution options are to upgrade to a newer release,
   disable respective features, remove the product or replace the product by another
   one.");
 
-  script_tag(name:"solution_type", value:"NoneAvailable");
+  script_tag(name:"solution_type", value:"WillNotFix");
   script_tag(name:"qod_type", value:"remote_analysis");
 
   exit(0);
@@ -85,7 +84,6 @@ if( ! port = get_app_port( cpe:CPE ) ) exit( 0 );
 if( ! dir = get_app_location( cpe:CPE, port:port ) ) exit( 0 );
 
 if( dir == "/" ) dir = "";
-
 url = dir + "/picture.php?/1/category/1&action=rate";
 
 host = http_host_name( port:port );

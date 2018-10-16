@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_hp_printer_66690.nasl 6692 2017-07-12 09:57:43Z teissa $
+# $Id: gb_hp_printer_66690.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # HP Officejet Pro X Printers, Certain Officejet Pro Printers, Remote Disclosure of Information
 #
@@ -25,10 +25,41 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_impact = "An attacker can exploit these issues to gain access to sensitive
-information that may aid in further attacks.";
+if (description)
+{
+  script_oid("1.3.6.1.4.1.25623.1.0.105040");
+  script_bugtraq_id(66690);
+  script_cve_id("CVE-2014-0160");
+  script_tag(name:"cvss_base", value:"5.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
+  script_version("$Revision: 11867 $");
 
-tag_affected = "HP Officejet Pro X451dn < BNP1CN1409BR
+  script_name("HP Officejet Pro X Printers, Certain Officejet Pro Printers, Remote Disclosure of Information");
+
+
+  script_xref(name:"URL", value:"http://www.securityfocus.com/archive/1/531993");
+
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2014-06-03 16:01:41 +0200 (Tue, 03 Jun 2014)");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("General");
+  script_copyright("This script is Copyright (C) 2014 Greenbone Networks GmbH");
+  script_dependencies("gb_hp_printer_detect.nasl");
+  script_require_ports("Services/www", 80);
+  script_mandatory_keys("hp_fw_ver", "hp_model");
+
+  script_tag(name:"impact", value:"An attacker can exploit these issues to gain access to sensitive
+information that may aid in further attacks.");
+  script_tag(name:"vuldetect", value:"Check the firmware version.");
+  script_tag(name:"solution", value:"Updates are available. Please see the references or vendor advisory
+for more information.");
+  script_tag(name:"solution_type", value:"VendorFix");
+  script_tag(name:"summary", value:"A potential security vulnerability has been identified in HP Officejet
+Pro X printers and in certain Officejet Pro printers running OpenSSL. This is the OpenSSL
+vulnerability known as 'Heartbleed' (CVE-2014-0160) which could be exploited remotely
+resulting in disclosure of information. ");
+  script_tag(name:"affected", value:"HP Officejet Pro X451dn < BNP1CN1409BR
 HP Officejet Pro X451dw  < BWP1CN1409BR
 HP Officejet Pro X551dw  < BZP1CN1409BR
 HP Officejet Pro X476dn  < LNP1CN1409BR
@@ -42,49 +73,9 @@ HP Officejet Pro 8620    < FDP1CN1416AR
 HP Officejet Pro 8625    < FDP1CN1416AR
 HP Officejet Pro 8630    < FDP1CN1416AR
 HP Officejet Pro 8640    < FDP1CN1416AR
-HP Officejet Pro 8660    < FDP1CN1416AR";
+HP Officejet Pro 8660    < FDP1CN1416AR");
 
-tag_summary = "A potential security vulnerability has been identified in HP Officejet
-Pro X printers and in certain Officejet Pro printers running OpenSSL. This is the OpenSSL
-vulnerability known as 'Heartbleed' (CVE-2014-0160) which could be exploited remotely
-resulting in disclosure of information. ";
-
-tag_solution = "Updates are available. Please see the references or vendor advisory
-for more information.";
-
-tag_vuldetect = "Check the firmware version.";
-
-if (description)
-{
- script_oid("1.3.6.1.4.1.25623.1.0.105040");
- script_bugtraq_id(66690);
- script_cve_id("CVE-2014-0160");
- script_tag(name:"cvss_base", value:"5.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
- script_version ("$Revision: 6692 $");
-
- script_name("HP Officejet Pro X Printers, Certain Officejet Pro Printers, Remote Disclosure of Information");
-
-
- script_xref(name:"URL", value:"http://www.securityfocus.com/archive/1/531993");
- 
- script_tag(name:"last_modification", value:"$Date: 2017-07-12 11:57:43 +0200 (Wed, 12 Jul 2017) $");
- script_tag(name:"creation_date", value:"2014-06-03 16:01:41 +0200 (Tue, 03 Jun 2014)");
- script_category(ACT_GATHER_INFO);
-  script_tag(name:"qod_type", value:"remote_banner");
- script_family("General");
- script_copyright("This script is Copyright (C) 2014 Greenbone Networks GmbH");
- script_dependencies("gb_hp_printer_detect.nasl");
- script_require_ports("Services/www", 80);
- script_mandatory_keys("hp_fw_ver","hp_model");
-
- script_tag(name : "impact" , value : tag_impact);
- script_tag(name : "vuldetect" , value : tag_vuldetect);
- script_tag(name : "solution" , value : tag_solution);
- script_tag(name : "summary" , value : tag_summary);
- script_tag(name : "affected" , value : tag_affected);
-
- exit(0);
+  exit(0);
 }
 
 include("host_details.inc");
@@ -125,7 +116,7 @@ if( fw_build < fixed_build )
   report = 'Detected Firmware: ' + fw_ver + '\nFixed Firmware:    ' + fixed_ver + '\n';
   security_message(port:port, data:report );
   exit( 0 );
-} 
+}
 
 exit( 99 );
 

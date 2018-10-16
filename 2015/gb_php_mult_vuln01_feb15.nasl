@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_php_mult_vuln01_feb15.nasl 10456 2018-07-09 06:10:17Z cfischer $
+# $Id: gb_php_mult_vuln01_feb15.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # PHP Multiple Vulnerabilities - 01 - Feb15
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805446");
-  script_version("$Revision: 10456 $");
-  script_cve_id("CVE-2015-0232","CVE-2015-0231", "CVE-2014-9652", "CVE-2014-9653");
+  script_version("$Revision: 11872 $");
+  script_cve_id("CVE-2015-0232", "CVE-2015-0231", "CVE-2014-9652", "CVE-2014-9653");
   script_bugtraq_id(72505, 72516, 72541, 72539);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 08:10:17 +0200 (Mon, 09 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-02-06 11:43:37 +0530 (Fri, 06 Feb 2015)");
   script_name("PHP Multiple Vulnerabilities - 01 - Feb15");
 
@@ -57,15 +57,13 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to cause a denial of service or possibly execute arbitrary code
-  via different crafted dimensions.
-
-  Impact Level: Application");
+  via different crafted dimensions.");
 
   script_tag(name:"affected", value:"PHP versions 5.4.x before 5.4.37, 5.5.x
   before 5.5.21, and 5.6.x before 5.6.5");
 
   script_tag(name:"solution", value:"Upgrade to PHP version 5.4.37 or 5.5.21
-  or 5.6.5 or later");
+  or 5.6.5 or later.");
 
   script_tag(name:"qod_type", value:"remote_banner_unreliable");
   script_tag(name:"solution_type", value:"VendorFix");

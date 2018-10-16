@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wanscam_admin_credentials_disclosure.nasl 10382 2018-07-03 11:22:45Z jschulte $
+# $Id: gb_wanscam_admin_credentials_disclosure.nasl 11408 2018-09-15 11:35:21Z cfischer $
 #
 # Wanscam HW0021 Administrator Credentials Disclosure
 #
@@ -25,11 +25,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if( description )
+if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.113147");
-  script_version("$Revision: 10382 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-03 13:22:45 +0200 (Tue, 03 Jul 2018) $");
+  script_version("$Revision: 11408 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 13:35:21 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-04-03 12:20:00 +0200 (Tue, 03 Apr 2018)");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
@@ -54,26 +54,27 @@ if( description )
   script_tag(name:"vuldetect", value:"The script tries to acquire the admin credentials.");
 
   script_tag(name:"insight", value:"The URL returned from a GetSnapshotUri request against the ONVIF SOAP Service
-running on the HW0021 camera includes an administrative username and password as cleartext in the GET-parameter.");
+  running on the HW0021 camera includes an administrative username and password as cleartext in the GET-parameter.");
 
   script_tag(name:"impact", value:"Successful exploitation would allow an attacker to acquire administrative
-access to the target device.");
+  access to the target device.");
 
   script_tag(name:"affected", value:"Wanscam HW0021.");
 
   script_tag(name:"solution", value:"No known solution is available as of 04th June, 2018. Information regarding
-this issue will be updated once solution details are available.");
+  this issue will be updated once solution details are available.");
 
   script_xref(name:"URL", value:"https://www.tenable.com/security/research/tra-2017-33");
 
-  exit( 0 );
+  exit(0);
 }
 
-include( "host_details.inc" );
-include( "http_func.inc" );
-include( "http_keepalive.inc" );
+include("host_details.inc");
+include("http_func.inc");
+include("http_keepalive.inc");
+include("misc_func.inc");
 
-if( ! port = get_http_port( default: 8080 ) ) exit( 0 );
+port = get_http_port( default: 8080 );
 
 res = http_get_cache( port: port, item: "/" );
 if( res !~ "http://www.onvif.org/ver10/media/wsdl" ) exit( 0 );

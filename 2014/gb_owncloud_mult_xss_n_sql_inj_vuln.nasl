@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_owncloud_mult_xss_n_sql_inj_vuln.nasl 9982 2018-05-28 12:00:03Z cfischer $
+# $Id: gb_owncloud_mult_xss_n_sql_inj_vuln.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # ownCloud Multiple XSS and SQL Injection Vulnerabilities
 #
@@ -29,38 +29,35 @@ CPE = "cpe:/a:owncloud:owncloud";
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804412");
-  script_version("$Revision: 9982 $");
+  script_version("$Revision: 11867 $");
   script_cve_id("CVE-2013-1893", "CVE-2013-1890");
   script_bugtraq_id(58855, 58852);
   script_tag(name:"cvss_base", value:"6.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:S/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-28 14:00:03 +0200 (Mon, 28 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-03-14 13:43:56 +0530 (Fri, 14 Mar 2014)");
   script_name("ownCloud Multiple XSS and SQL Injection Vulnerabilities");
 
-  script_tag(name : "summary" , value : "This host is installed with ownCloud and is prone to multiple XSS and SQL
+  script_tag(name:"summary", value:"This host is installed with ownCloud and is prone to multiple XSS and SQL
 injection vulnerabilities.");
-  script_tag(name : "vuldetect" , value : "Checks if a vulnerable version is present on the target host.");
-  script_tag(name : "insight" , value : "- Input passed via the 'new_name' POST parameter to
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"insight", value:"- Input passed via the 'new_name' POST parameter to
    /apps/bookmarks/ajax/renameTag.php is not properly sanitised before
    being used.
 
- - Certain unspecified input passed to some files in apps/contacts/ajax/ is not
+  - Certain unspecified input passed to some files in apps/contacts/ajax/ is not
    properly sanitised before being used.
 
- - Certain unspecified input passed to addressbookprovider.php is not properly
+  - Certain unspecified input passed to addressbookprovider.php is not properly
    sanitised before being used in a SQL query.");
-  script_tag(name : "impact" , value : "Successful exploitation will allow remote attacker to inject or manipulate
-SQL queries in the back-end database or conduct script insertion.
+  script_tag(name:"impact", value:"Successful exploitation will allow remote attacker to inject or manipulate
+SQL queries in the back-end database or conduct script insertion.");
+  script_tag(name:"affected", value:"ownCloud Server before version 5.0.1");
+  script_tag(name:"solution", value:"Upgrade to ownCloud version 5.0.1 or later.");
 
-Impact Level: Application");
-  script_tag(name : "affected" , value : "ownCloud Server before version 5.0.1");
-  script_tag(name : "solution" , value : "Upgrade to ownCloud version 5.0.1 or later,
-For updates refer to http://owncloud.org");
-
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/52833");
-  script_xref(name : "URL" , value : "http://xforce.iss.net/xforce/xfdb/83253");
-  script_xref(name : "URL" , value : "http://owncloud.org/about/security/advisories/oC-SA-2013-012");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/52833");
+  script_xref(name:"URL", value:"http://xforce.iss.net/xforce/xfdb/83253");
+  script_xref(name:"URL", value:"http://owncloud.org/about/security/advisories/oC-SA-2013-012");
   script_category(ACT_GATHER_INFO);
   script_tag(name:"qod_type", value:"remote_banner");
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");

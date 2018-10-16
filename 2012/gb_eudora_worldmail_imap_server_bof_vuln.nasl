@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_eudora_worldmail_imap_server_bof_vuln.nasl 10288 2018-06-21 13:26:05Z cfischer $
+# $Id: gb_eudora_worldmail_imap_server_bof_vuln.nasl 11818 2018-10-10 11:35:42Z asteins $
 #
 # Eudora WorldMail IMAP Server Buffer Overflow Vulnerability
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802294");
-  script_version("$Revision: 10288 $");
+  script_version("$Revision: 11818 $");
   script_bugtraq_id(15980);
   script_cve_id("CVE-2005-4267");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-21 15:26:05 +0200 (Thu, 21 Jun 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-10 13:35:42 +0200 (Wed, 10 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-01-18 14:14:14 +0530 (Wed, 18 Jan 2012)");
   script_name("Eudora WorldMail IMAP Server Buffer Overflow Vulnerability");
   script_category(ACT_DENIAL);
@@ -47,9 +47,7 @@ if(description)
   script_xref(name:"URL", value:"http://www.idefense.com/intelligence/vulnerabilities/display.php?id=359");
 
   script_tag(name:"impact", value:"Successful exploitation may allow remote attackers to execute
-  arbitrary code within the context of the application or cause a denial of service condition.
-
-  Impact Level: System/Application");
+  arbitrary code within the context of the application or cause a denial of service condition.");
 
   script_tag(name:"affected", value:"Eudora WorldMail Server 3.0");
 
@@ -57,8 +55,7 @@ if(description)
   supplied IMAP commands. This can be exploited to cause a stack-based overflow
   via a long string containing a '}' character.");
 
-  script_tag(name:"solution", value:"Upgrade to Eudora WorldMail Server version 4.0 or later.
-  For updates refer to http://www.eudora.com/worldmail/");
+  script_tag(name:"solution", value:"Upgrade to Eudora WorldMail Server version 4.0 or later.");
 
   script_tag(name:"summary", value:"This host is running WorldMail IMAP Server and prone to buffer
   overflow vulnerability.");
@@ -66,6 +63,7 @@ if(description)
   script_tag(name:"qod_type", value:"remote_vul");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://www.eudora.com/worldmail/");
   exit(0);
 }
 

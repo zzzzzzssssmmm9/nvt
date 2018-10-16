@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: ePo_detect.nasl 9678 2018-04-30 10:01:10Z ckuersteiner $
+# $Id: ePo_detect.nasl 11407 2018-09-15 11:02:05Z cfischer $
 #
 # ePo Agent Detection
 #
@@ -24,29 +24,30 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if (description)
+if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100329");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9678 $");
- script_tag(name:"last_modification", value:"$Date: 2018-04-30 12:01:10 +0200 (Mon, 30 Apr 2018) $");
- script_tag(name:"creation_date", value:"2009-10-30 14:42:19 +0100 (Fri, 30 Oct 2009)");
- script_tag(name:"cvss_base", value:"0.0");
+  script_oid("1.3.6.1.4.1.25623.1.0.100329");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11407 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 13:02:05 +0200 (Sat, 15 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2009-10-30 14:42:19 +0100 (Fri, 30 Oct 2009)");
+  script_tag(name:"cvss_base", value:"0.0");
 
- script_name("ePo Agent Detection");
+  script_name("ePo Agent Detection");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
   script_tag(name:"qod_type", value:"remote_banner");
- script_family("Service detection");
- script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl","http_version.nasl","netbios_name_get.nasl");
- script_require_ports("Services/www", 8081);
+  script_family("Service detection");
+  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl", "netbios_name_get.nasl");
+  script_require_ports("Services/www", 8081);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_tag(name: "summary", value: "Detection of ePo Agent
-                    
-The script sends a connection request to the server and attempts to extract some information from the reply.");
+  script_tag(name:"summary", value:"Detection of ePo Agent
 
- exit(0);
+  The script sends a connection request to the server and attempts to extract some information from the reply.");
+
+  exit(0);
 }
 
 include("http_func.inc");
@@ -79,7 +80,7 @@ if ("Agent-ListenServer" >< buf && "displayResult()" >< buf) {
     req = http_get(item:url, port:port);
     buf = http_keepalive_send_recv(port:port, data:req, bodyonly:FALSE);
   }
-} 
+}
 
 if (egrep(pattern:"Agent-ListenServer", string: buf, icase: TRUE) ||
     (egrep(pattern:"naLog>", string: buf, icase: FALSE) &&
@@ -89,12 +90,12 @@ if (egrep(pattern:"Agent-ListenServer", string: buf, icase: TRUE) ||
 
   if ("403 Forbidden" >< buf)
     info += "Could not read remote log. Error: 403 Forbidden\n";
-  else {  
+  else {
     if (lines = split(buf, sep:'><', keep: TRUE)) {
       foreach line (lines) {
         if (computer_name = eregmatch(string: line, pattern: 'ComputerName>([^<]+)</ComputerName>', icase: TRUE))
           if (!isnull(computer_name[1]))
-            cn = computer_name[1];	 
+            cn = computer_name[1];
 
         if (version = eregmatch(string: line, pattern: "version>([^<]+)</version>", icase: TRUE))
           if (!isnull(version[1])) {
@@ -109,7 +110,7 @@ if (egrep(pattern:"Agent-ListenServer", string: buf, icase: TRUE) ||
         if (repServer = eregmatch(string: line, pattern: 'Log component=[^>]+>Checking update packages from repository ([a-zA-Z0-9_-]+).</Log',icase: FALSE))
 	  if (!isnull(repServer[1]))
             rserver = repServer[1];
-	
+
         if (isnull(rserver))
           if (repServer = eregmatch(string:line, pattern: "ePOServerName>([^<]+)</ePOServerName>"))
            if (!isnull(repServer[1]))

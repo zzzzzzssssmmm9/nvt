@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_tandberg_devices_default_password.nasl 6065 2017-05-04 09:03:08Z teissa $
+# $Id: gb_tandberg_devices_default_password.nasl 11865 2018-10-12 10:03:43Z cfischer $
 #
 # Tandberg Devices Default Password
 #
@@ -25,34 +25,28 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "The remote Tandberg device has the default password 'TANDBERG'.";
-
-
-tag_solution = "Change the password.";
-
-SCRIPT_OID  = "1.3.6.1.4.1.25623.1.0.103695";
-
 if (description)
 {
- script_oid(SCRIPT_OID);
- script_version ("$Revision: 6065 $");
- script_tag(name:"cvss_base", value:"10.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_oid("1.3.6.1.4.1.25623.1.0.103695");
+  script_version("$Revision: 11865 $");
+  script_tag(name:"cvss_base", value:"10.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
 
- script_name("Tandberg Devices Default Password");
+  script_name("Tandberg Devices Default Password");
 
- script_tag(name:"last_modification", value:"$Date: 2017-05-04 11:03:08 +0200 (Thu, 04 May 2017) $");
- script_tag(name:"creation_date", value:"2013-04-10 12:01:48 +0100 (Wed, 10 Apr 2013)");
- script_category(ACT_ATTACK);
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:03:43 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2013-04-10 12:01:48 +0100 (Wed, 10 Apr 2013)");
+  script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
- script_family("Default Accounts");
- script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
- script_dependencies("gb_tandberg_devices_detect.nasl");
- script_require_ports(23);
- script_mandatory_keys("host_is_tandberg_device");
- script_tag(name : "solution" , value : tag_solution);
- script_tag(name : "summary" , value : tag_summary);
- exit(0);
+  script_family("Default Accounts");
+  script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
+  script_dependencies("gb_tandberg_devices_detect.nasl");
+  script_require_ports(23);
+  script_mandatory_keys("host_is_tandberg_device");
+  script_tag(name:"solution", value:"Change the password.");
+  script_tag(name:"solution_type", value:"Mitigation");
+  script_tag(name:"summary", value:"The remote Tandberg device has the default password 'TANDBERG'.");
+  exit(0);
 }
 
 include("telnet_func.inc");
@@ -82,7 +76,7 @@ if("HWaddr" >< recv && "Inet addr" >< recv) {
   security_message(port:port);
   exit(0);
 
-}  
+}
 
 exit(99);
 

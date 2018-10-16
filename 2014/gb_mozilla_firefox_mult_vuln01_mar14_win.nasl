@@ -29,7 +29,7 @@ CPE = "cpe:/a:mozilla:firefox";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804522");
-  script_version("$Revision: 9910 $");
+  script_version("$Revision: 11867 $");
   script_cve_id("CVE-2014-1493", "CVE-2014-1494", "CVE-2014-1496", "CVE-2014-1497",
                 "CVE-2014-1498", "CVE-2014-1499", "CVE-2014-1500", "CVE-2014-1502",
                 "CVE-2014-1504", "CVE-2014-1505", "CVE-2014-1508", "CVE-2014-1509",
@@ -39,49 +39,57 @@ if(description)
                     66418, 66426, 66425, 66206, 66207, 66209, 66203, 66240);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-18 15:37:53 +0200 (Fri, 18 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-03-26 12:29:17 +0530 (Wed, 26 Mar 2014)");
   script_name("Mozilla Firefox Multiple Vulnerabilities-01 Mar14 (Windows)");
 
 
-  script_tag(name : "summary" , value : "This host is installed with Mozilla Firefox and is prone to multiple
+  script_tag(name:"summary", value:"This host is installed with Mozilla Firefox and is prone to multiple
 vulnerabilities.");
-  script_tag(name : "vuldetect" , value : "Checks if a vulnerable version is present on the target host.");
-  script_tag(name : "insight" , value : "Multiple flaws are due to,
-- Local users can gain privileges by modifying the extracted Mar contents
-  during an update.
-- A boundary error when decoding WAV audio files.
-- The crypto.generateCRMFRequest method does not properly validate a certain
-  key type.
-- An error related to certain WebIDL-implemented APIs.
-- An error when performing polygon rendering in MathML.
-- The session-restore feature does not consider the Content Security Policy of
-  a data URL.
-- A timing error when processing SVG format images with filters and
-  displacements.
-- A use-after-free error when handling garbage collection of TypeObjects under
-  memory pressure.
-- An error within the TypedArrayObject implementation when handling neutered
-  ArrayBuffer objects.
-- And some unspecified errors exist.");
-  script_tag(name : "impact" , value : "Successful exploitation will allow attackers to conduct spoofing attacks,
-disclose potentially sensitive information, bypass certain security
-restrictions, and compromise a user's system.
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"insight", value:"Multiple flaws are due to,
 
-Impact Level: System/Application");
-  script_tag(name : "affected" , value : "Mozilla Firefox version before 28.0 on Windows");
-  script_tag(name : "solution" , value : "Upgrade to Mozilla Firefox version 28.0 or later,
-For updates refer to http://www.mozilla.com/en-US/firefox/all.html");
+  - Local users can gain privileges by modifying the extracted Mar contents
+  during an update.
+
+  - A boundary error when decoding WAV audio files.
+
+  - The crypto.generateCRMFRequest method does not properly validate a certain
+  key type.
+
+  - An error related to certain WebIDL-implemented APIs.
+
+  - An error when performing polygon rendering in MathML.
+
+  - The session-restore feature does not consider the Content Security Policy of
+  a data URL.
+
+  - A timing error when processing SVG format images with filters and
+  displacements.
+
+  - A use-after-free error when handling garbage collection of TypeObjects under
+  memory pressure.
+
+  - An error within the TypedArrayObject implementation when handling neutered
+  ArrayBuffer objects.
+
+  - And some unspecified errors exist.");
+  script_tag(name:"impact", value:"Successful exploitation will allow attackers to conduct spoofing attacks,
+disclose potentially sensitive information, bypass certain security
+restrictions, and compromise a user's system.");
+  script_tag(name:"affected", value:"Mozilla Firefox version before 28.0 on Windows");
+  script_tag(name:"solution", value:"Upgrade to Mozilla Firefox version 28.0 or later.");
   script_tag(name:"qod_type", value:"registry");
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/57500");
-  script_xref(name : "URL" , value : "http://www.mozilla.org/security/announce/2014/mfsa2014-15.html");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/57500");
+  script_xref(name:"URL", value:"http://www.mozilla.org/security/announce/2014/mfsa2014-15.html");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
   script_family("General");
   script_dependencies("gb_firefox_detect_portable_win.nasl");
   script_mandatory_keys("Firefox/Win/Ver");
+  script_xref(name:"URL", value:"http://www.mozilla.com/en-US/firefox/all.html");
   exit(0);
 }
 
@@ -95,6 +103,6 @@ if(!ffVer = get_app_version(cpe:CPE)){
 
 if(version_is_less(version:ffVer, test_version:"28.0"))
 {
-  security_message(0);
+  security_message( port: 0, data: "The target host was found to be vulnerable" );
   exit(0);
 }

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_novell_open_enterprise_server_remote_detect.nasl 4717 2016-12-08 13:00:43Z cfi $
+# $Id: gb_novell_open_enterprise_server_remote_detect.nasl 11408 2018-09-15 11:35:21Z cfischer $
 #
 # Novell Open Enterprise Server Remote Version Detection
 #
@@ -27,17 +27,17 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.809479");
-  script_version("$Revision: 4717 $");
+  script_version("$Revision: 11408 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2016-12-08 14:00:43 +0100 (Thu, 08 Dec 2016) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 13:35:21 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2016-11-21 13:12:56 +0530 (Mon, 21 Nov 2016)");
   script_name("Novell Open Enterprise Server Remote Version Detection");
 
-  script_tag(name : "summary" , value : "Detection of installed version
+  script_tag(name:"summary", value:"Detection of installed version
   of Novell Open Enterprise Server.
 
-  This script sends HTTP GET request and try to get the version from the
+  This script sends an HTTP GET request and tries to get the version from the
   response.");
 
   script_tag(name:"qod_type", value:"remote_banner");
@@ -55,31 +55,16 @@ include("http_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Variable Initialization
-dir = "";
-cpe = "";
-version = "";
-sndReq = "";
-rcvRes = "";
-novellPort = "";
-novellVer = "";
+novellPort = get_http_port(default:80);
 
-##Get HTTP Port
-if(!novellPort = get_http_port(default:80)){
-  exit(0);
-}
-
-##Iterate over possible paths
 foreach dir (make_list_unique("/", "/novell", cgi_dirs(port:novellPort)))
 {
   install = dir;
   if( dir == "/" ) dir = "";
 
-  ## Send and receive response
   sndReq = http_get(item:string(dir, "/welcome/index.html"), port:novellPort);
   rcvRes = http_send_recv(port:novellPort, data:sndReq);
 
-  ## Confirm the application
   if('Novell Open Enterprise Server' >< rcvRes)
   {
     version = eregmatch( pattern:"Novell Open Enterprise Server ([0-9A-Z .]+)", string:rcvRes );
@@ -92,10 +77,8 @@ foreach dir (make_list_unique("/", "/novell", cgi_dirs(port:novellPort)))
       novellVer = "Unknown";
     }
 
-    ## Set the KB 
     set_kb_item(name:"Novell/Open/Enterprise/Server/Installed", value:TRUE);
 
-    ## build cpe and store it as host_detail
     cpe = build_cpe(value:novellVer, exp:"^([0-9A-Z.]+)", base:"cpe:/a:novell:open_enterprise_server:");
     if(!cpe)
       cpe= "cpe:/a:novell:open_enterprise_server:";

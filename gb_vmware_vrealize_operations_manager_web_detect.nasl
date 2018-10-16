@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_vmware_vrealize_operations_manager_web_detect.nasl 6065 2017-05-04 09:03:08Z teissa $
+# $Id: gb_vmware_vrealize_operations_manager_web_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # VMware vRealize Operations Manager Detection
 #
@@ -27,25 +27,25 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105862");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 6065 $");
- script_tag(name:"last_modification", value:"$Date: 2017-05-04 11:03:08 +0200 (Thu, 04 May 2017) $");
- script_tag(name:"creation_date", value:"2016-08-11 15:53:38 +0200 (Thu, 11 Aug 2016)");
- script_name("VMware vRealize Operations Manager Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105862");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-08-11 15:53:38 +0200 (Thu, 11 Aug 2016)");
+  script_name("VMware vRealize Operations Manager Detection");
 
- script_tag(name: "summary" , value: "This Script performs HTTP based detection of VMware vRealize Operations Manager");
+  script_tag(name:"summary", value:"This Script performs HTTP based detection of VMware vRealize Operations Manager");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 443);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  exit(0);
 }
 
 

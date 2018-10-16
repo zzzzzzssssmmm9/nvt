@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_cybozu_products_detect.nasl 10371 2018-06-29 13:27:39Z santu $
+# $Id: secpod_cybozu_products_detect.nasl 11224 2018-09-04 12:57:17Z cfischer $
 #
 # Cybozu Products Version Detection
 #
@@ -28,8 +28,8 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902533");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 10371 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-29 15:27:39 +0200 (Fri, 29 Jun 2018) $");
+  script_version("$Revision: 11224 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-04 14:57:17 +0200 (Tue, 04 Sep 2018) $");
   script_tag(name:"creation_date", value:"2011-07-05 13:15:06 +0200 (Tue, 05 Jul 2011)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("Cybozu Products Version Detection");
@@ -54,7 +54,6 @@ include("http_keepalive.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Get http port
 port = get_http_port( default:80 );
 foreach dir( make_list_unique( "/scripts", cgi_dirs( port:port ) ) ) {
 
@@ -65,29 +64,23 @@ foreach dir( make_list_unique( "/scripts", cgi_dirs( port:port ) ) ) {
 
     install = dir + path;
 
-    ## Send and Receive the response
     req = http_get( item: install + "/grn.exe", port:port );
     res = http_keepalive_send_recv( port:port, data:req );
 
-    ## Confirm the application
     if( res =~ "HTTP/1.. 200" && "Cybozu" >< res && "Garoon" >< res ) {
 
       version = "unknown";
 
-      ## Try to get the version
       ver = eregmatch( pattern:"Version ([0-9.]+)", string:res );
       if( ver[1] ) version = ver[1];
 
-      ## Set the KB value
       tmp_version = version + " under " + install;
       set_kb_item( name:"www/" + port + "/CybozuGaroon", value:tmp_version );
       set_kb_item(name:"CybozuGaroon/Installed", value:TRUE);
-      ## build cpe and store it as host_detail
       cpe = build_cpe( value:version, exp:"^([0-9.]+)", base:"cpe:/a:cybozu:garoon:" );
       if( isnull( cpe ) )
         cpe = 'cpe:/a:cybozu:garoon';
 
-      ## Register Product and Build Report
       register_product( cpe:cpe, location:install, port:port );
 
       log_message( data:build_detection_report( app:"Cybozu Garoon",
@@ -98,38 +91,32 @@ foreach dir( make_list_unique( "/scripts", cgi_dirs( port:port ) ) ) {
                                                 port:port );
     }
   }
- 
+
   ## Cybozu Office
-  foreach path( make_list( "", "/cbag", "/office", "/cgi-bin/cbag" )) 
+  foreach path( make_list( "", "/cbag", "/office", "/cgi-bin/cbag" ))
   {
     foreach file(make_list("/ag.exe", "/ag.cgi"))
     {
       install = dir + path;
 
-      ## Send and Receive the response
       req = http_get( item: install + file, port:port );
       res = http_keepalive_send_recv( port:port, data:req );
 
-      ## Confirm the application
-      if( res =~ "HTTP/1.. 200" && "Cybozu" >< res && "Office" >< res ) 
+      if( res =~ "HTTP/1.. 200" && "Cybozu" >< res && "Office" >< res )
       {
         version = "unknown";
 
-        ## Try to get the version
         ver = eregmatch( pattern:"Office Version ([0-9.]+)", string:res );
         if( ver[1] ) version = ver[1];
 
-        ## Set the KB value
         tmp_version = version + " under " + install;
-        set_kb_item(name:"CybozuOffice/Installed", value:TRUE); 
+        set_kb_item(name:"CybozuOffice/Installed", value:TRUE);
         set_kb_item( name:"www/" + port + "/CybozuOffice", value:tmp_version );
 
-        ## build cpe and store it as host_detail
         cpe = build_cpe( value:version, exp:"^([0-9.]+)", base:"cpe:/a:cybozu:office:" );
         if( isnull( cpe ) )
           cpe = 'cpe:/a:cybozu:office';
 
-        ## Register Product and Build Report
         register_product( cpe:cpe, location:install, port:port );
 
         log_message( data:build_detection_report( app:"Cybozu Office",
@@ -146,30 +133,24 @@ foreach dir( make_list_unique( "/scripts", cgi_dirs( port:port ) ) ) {
 
     install = dir + path;
 
-    ## Send and Receive the response
     req = http_get( item: install + "/db.exe", port:port );
     res = http_keepalive_send_recv( port:port, data:req );
 
-    ## Confirm the application
     if( res =~ "HTTP/1.. 200" && "Cybozu" >< res && "Dezie" >< res ) {
 
       version = "unknown";
 
-      ## Try to get the version
       ver = eregmatch( pattern:"Version ([0-9.]+)", string:res );
       if( ver[1] ) version = ver[1];
 
-      ## Set the KB value
       tmp_version = version + " under " + install;
-      set_kb_item(name:"CybozuDezie/Installed", value:TRUE); 
+      set_kb_item(name:"CybozuDezie/Installed", value:TRUE);
       set_kb_item( name:"www/" + port + "/CybozuDezie", value:tmp_version );
 
-      ## build cpe and store it as host_detail
       cpe = build_cpe( value:version, exp:"^([0-9.]+)", base:"cpe:/a:cybozu:dezie:" );
       if( isnull( cpe ) )
         cpe = 'cpe:/a:cybozu:dezie';
 
-      ## Register Product and Build Report
       register_product( cpe:cpe, location:install, port:port );
 
       log_message( data:build_detection_report( app:"Cybozu Dezie",
@@ -186,30 +167,24 @@ foreach dir( make_list_unique( "/scripts", cgi_dirs( port:port ) ) ) {
 
     install = dir + path;
 
-    ## Send and Receive the response
     req = http_get(item: install + "/mw.exe", port:port );
     res = http_keepalive_send_recv( port:port, data:req );
 
-    ## Confirm the application
     if( res =~ "HTTP/1.. 200" && "Cybozu" >< res && "mailwise" >< res ) {
 
       version = "unknown";
 
-      ## Try to get the version
       ver = eregmatch( pattern:"Version ([0-9.]+)", string:res );
       if( ver[1] ) version = ver[1];
 
-      ## Set the KB value
       tmp_version = version + " under " + install;
       set_kb_item(name:"CybozuMailWise/Installed", value:TRUE);
       set_kb_item( name:"www/" + port + "/CybozuMailWise", value:tmp_version );
 
-      ## build cpe and store it as host_detail
       cpe = build_cpe( value:version, exp:"^([0-9.]+)", base:"cpe:/a:cybozu:mailwise:" );
       if( isnull( cpe ) )
         cpe = 'cpe:/a:cybozu:mailwise';
 
-      ## Register Product and Build Report
       register_product( cpe:cpe, location:install, port:port );
 
       log_message( data:build_detection_report( app:"Cybozu MailWise",

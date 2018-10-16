@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_tenable_nessus_tns_2016_17.nasl 5496 2017-03-06 10:21:31Z teissa $
+# $Id: gb_tenable_nessus_tns_2016_17.nasl 11903 2018-10-15 10:26:16Z asteins $
 #
 # Tenable Nessus < 6.9.1 Stored Cross-Site Scripting Vulnerability
 #
@@ -29,11 +29,11 @@ CPE = 'cpe:/a:tenable:nessus';
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108019");
-  script_version("$Revision: 5496 $");
+  script_version("$Revision: 11903 $");
   script_cve_id("CVE-2016-9259");
   script_tag(name:"cvss_base", value:"3.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:S/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-03-06 11:21:31 +0100 (Mon, 06 Mar 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-15 12:26:16 +0200 (Mon, 15 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-11-11 13:00:00 +0100 (Fri, 11 Nov 2016)");
   script_name("Tenable Nessus < 6.9.1 Stored Cross-Site Scripting Vulnerability");
   script_category(ACT_GATHER_INFO);
@@ -49,20 +49,18 @@ if(description)
   script_tag(name:"vuldetect", value:"Check the version whether it is vulnerable or not.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to inject arbitrary web script or HTML.
-
-  Impact Level: Application");
+  attackers to inject arbitrary web script or HTML.");
 
   script_tag(name:"affected", value:"Tenable Nessus versions 6.8.0, 6.8.1, 6.8.2 and 6.9.0");
 
-  script_tag(name:"solution", value:"Upgrade Tenable Nessus to 6.9.1. For updates refer to
-  http://www.tenable.com/products/nessus");
+  script_tag(name:"solution", value:"Upgrade Tenable Nessus to 6.9.1.");
 
   script_xref(name:"URL", value:"https://www.tenable.com/security/tns-2016-17");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_banner");
 
+  script_xref(name:"URL", value:"http://www.tenable.com/products/nessus");
   exit(0);
 }
 

@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_ftpshell_client_detect.nasl 7140 2017-09-15 09:41:22Z cfischer $
+# $Id: secpod_ftpshell_client_detect.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # FTPShell Client Version Detection
 #
@@ -28,17 +28,17 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.900961");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 7140 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-15 11:41:22 +0200 (Fri, 15 Sep 2017) $");
+  script_version("$Revision: 11279 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2009-10-01 12:15:29 +0200 (Thu, 01 Oct 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("FTPShell Client Version Detection");
-  script_tag(name:"summary", value : "Detection of installed version of FTPShell Client");
+  script_tag(name:"summary", value:"Detects the installed version of FTPShell Client");
   script_category(ACT_GATHER_INFO);
   script_tag(name:"qod_type", value:"executable_version");
   script_copyright("Copyright (C) 2009 SecPod");
-  script_family("Service detection");
-  script_dependencies("secpod_reg_enum.nasl");
+  script_family("Product detection");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
@@ -49,23 +49,14 @@ include("secpod_smb_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-os_arch = "";
-key_list = "";
-key = "";
-fcPath = "";
-fcVer = "";
-fcName = "";
-
-
 os_arch = get_kb_item("SMB/Windows/Arch");
 if(!os_arch){
-  exit(-1);
+  exit(0);
 }
 if("x86" >< os_arch){
   key_list = make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\");
 }
 
-#check for 64 bit platform
 else if("x64" >< os_arch)
 {
   key_list =  make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\",
@@ -85,7 +76,6 @@ foreach key (key_list)
 
       if("FTPShell Client" >< fcName)
       {
-       #try to get version for older versions of windows: 
        fcPath = registry_get_sz(key:key + item, item:"UninstallString");
        fcPath = ereg_replace(pattern:'\"(.*)\"',replace:"\1",string:fcPath);
        fcPath = fcPath - 'unins000.exe' + 'readme.txt';
@@ -111,7 +101,6 @@ foreach key (key_list)
               }
            }
         }
-        # Get version for other versions of windows  
         if (isnull(fcVer))
         {
                fcVer = registry_get_sz(key:key + item, item:"DisplayVersion");

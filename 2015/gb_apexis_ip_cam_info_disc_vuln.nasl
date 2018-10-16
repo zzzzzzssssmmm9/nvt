@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apexis_ip_cam_info_disc_vuln.nasl 9381 2018-04-06 11:21:01Z cfischer $
+# $Id: gb_apexis_ip_cam_info_disc_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Apexis IP CAM Information Disclosure Vulnerability
 #
@@ -27,30 +27,27 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805070");
-  script_version("$Revision: 9381 $");
+  script_version("$Revision: 11872 $");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 13:21:01 +0200 (Fri, 06 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-06-17 11:22:32 +0530 (Wed, 17 Jun 2015)");
   script_tag(name:"qod_type", value:"exploit");
   script_name("Apexis IP CAM Information Disclosure Vulnerability");
 
-  script_tag(name: "summary" , value:"This host has Apexis IP Camera and is
+  script_tag(name:"summary", value:"This host has Apexis IP Camera and is
   prone to information disclosure vulnerability.");
 
-  script_tag(name: "vuldetect" , value:"Send a crafted HTTP GET request and
+  script_tag(name:"vuldetect", value:"Send a crafted HTTP GET request and
   check whether it is able read the sensitive information");
 
-  script_tag(name: "insight" , value:"The flaw is due to the camera is not
+  script_tag(name:"insight", value:"The flaw is due to the camera is not
   restricting some files which are containing sensitive information.");
 
-  script_tag(name: "impact" , value:"Successful exploitation will allow attacker
-  to gain access to potentially sensitive information.
+  script_tag(name:"impact", value:"Successful exploitation will allow attacker
+  to gain access to potentially sensitive information.");
 
-  Impact Level: Application");
-
-  script_tag(name: "affected" , value:"
-  Apexis IP CAM models,
+  script_tag(name:"affected", value:"Apexis IP CAM models,
   APM-H602-MPC
   APM-H803-MPC
   APM-H901-MPC
@@ -58,11 +55,11 @@ if(description)
   APM-H403-MPC
   APM-H804");
 
-  script_tag(name: "solution" , value:"As a workaround apply appropriate
-  firewall rules. For updates refer to http://www.apexis.com.cn");
+  script_tag(name:"solution", value:"As a workaround apply appropriate
+  firewall rules.");
 
-  script_xref(name : "URL" , value : "https://www.exploit-db.com/exploits/37298");
-  script_xref(name : "URL" , value : "https://packetstormsecurity.com/files/132213");
+  script_xref(name:"URL", value:"https://www.exploit-db.com/exploits/37298");
+  script_xref(name:"URL", value:"https://packetstormsecurity.com/files/132213");
 
   script_tag(name:"solution_type", value:"Workaround");
   script_category(ACT_ATTACK);
@@ -71,15 +68,13 @@ if(description)
   script_dependencies("find_service.nasl", "http_version.nasl");
   script_require_ports("Services/www", 8080);
   script_exclude_keys("Settings/disable_cgi_scanning");
+  script_xref(name:"URL", value:"http://www.apexis.com.cn");
   exit(0);
 }
 
 include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
-
-## Variable Initialization
-apexCamPort = "";
 
 apexCamPort = get_http_port(default:80);
 
@@ -88,11 +83,9 @@ foreach dir (make_list_unique("/", "/cgi-bin", cgi_dirs(port:apexCamPort)))
 
   if( dir == "/" ) dir = "";
 
-  ##Send Request and Receive Response
   sndReq = http_get(item:string(dir,"/get_status.cgi"), port:apexCamPort);
   rcvRes = http_keepalive_send_recv(port:apexCamPort, data:sndReq);
 
-  # Confirm the Alpication
   if("ret_prot_mode='APM-H" >< rcvRes)
   {
     url = dir + "/get_tutk_account.cgi";

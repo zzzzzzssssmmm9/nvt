@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_3660_1.nasl 10015 2018-05-30 06:04:26Z cfischer $
+# $Id: gb_ubuntu_USN_3660_1.nasl 11044 2018-08-18 15:12:40Z cfischer $
 #
 # Ubuntu Update for thunderbird USN-3660-1
 #
@@ -27,14 +27,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.843537");
-  script_version("$Revision: 10015 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-30 08:04:26 +0200 (Wed, 30 May 2018) $");
+  script_version("$Revision: 11044 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-18 17:12:40 +0200 (Sat, 18 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-05-26 05:44:12 +0200 (Sat, 26 May 2018)");
   script_cve_id("CVE-2018-5150", "CVE-2018-5154", "CVE-2018-5155", "CVE-2018-5159",
                 "CVE-2018-5168", "CVE-2018-5178", "CVE-2018-5161", "CVE-2018-5162",
                 "CVE-2018-5170", "CVE-2018-5183", "CVE-2018-5184", "CVE-2018-5185");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
   script_tag(name:"qod_type", value:"package");
   script_name("Ubuntu Update for thunderbird USN-3660-1");
   script_tag(name:"summary", value:"Check the version of thunderbird");
@@ -72,14 +72,14 @@ potentially exploit this to obtain sensitive information. (CVE-2018-5184)
 It was discovered that plaintext of decrypted emails could leak by
 submitting an embedded form. An attacker could potentially exploit this to
 obtain sensitive information. (CVE-2018-5185)");
-  script_tag(name:"affected", value:"thunderbird on Ubuntu 18.04 LTS ,
-  Ubuntu 17.10 ,
-  Ubuntu 16.04 LTS ,
+  script_tag(name:"affected", value:"thunderbird on Ubuntu 18.04 LTS,
+  Ubuntu 17.10,
+  Ubuntu 16.04 LTS,
   Ubuntu 14.04 LTS");
   script_tag(name:"solution", value:"Please install the updated packages.");
 
   script_xref(name:"USN", value:"3660-1");
-  script_xref(name:"URL" , value:"https://usn.ubuntu.com/3660-1");
+  script_xref(name:"URL", value:"https://usn.ubuntu.com/3660-1");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -92,7 +92,7 @@ obtain sensitive information. (CVE-2018-5185)");
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 res = "";
 if(release == NULL){

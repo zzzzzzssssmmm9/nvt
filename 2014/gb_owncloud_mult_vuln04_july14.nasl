@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_owncloud_mult_vuln04_july14.nasl 9122 2018-03-17 14:01:04Z cfischer $
+# $Id: gb_owncloud_mult_vuln04_july14.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # ownCloud Multiple Vulnerabilities-04 July14
 #
@@ -29,52 +29,36 @@ CPE = "cpe:/a:owncloud:owncloud";
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804662");
-  script_version("$Revision: 9122 $");
+  script_version("$Revision: 11867 $");
   script_cve_id("CVE-2014-3833", "CVE-2014-3835", "CVE-2014-3838");
   script_bugtraq_id(67451, 68060, 68059);
   script_tag(name:"cvss_base", value:"5.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:S/C:N/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-03-17 15:01:04 +0100 (Sat, 17 Mar 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-07-03 16:47:48 +0530 (Thu, 03 Jul 2014)");
   script_name("ownCloud Multiple Vulnerabilities-04 July14");
 
-  tag_summary = "This host is installed with ownCloud and is prone to multiple
-vulnerabilities.";
+  script_tag(name:"summary", value:"This host is installed with ownCloud and is prone to multiple
+vulnerabilities.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"insight", value:"Multiple flaws are due to,
 
-  tag_vuldetect = "Get the installed version with the help of detect NVT and check the version
-is vulnerable or not.";
-
-  tag_insight = "Multiple flaws are due to,
-
-- Input passed on to 'print_unescaped' function in the Gallery component is not
+  - Input passed on to 'print_unescaped' function in the Gallery component is not
   sufficiently validated before returning it to users.
 
-- The program fails to verify whether a user has been granted access to add
+  - The program fails to verify whether a user has been granted access to add
   external storages or not.
 
-- The server fails to properly perform authorization checks in core when
-  handling user accounts.";
-
-  tag_impact = "Successful exploitation will allow remote attackers to mount an external
+  - The server fails to properly perform authorization checks in core when
+  handling user accounts.");
+  script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to mount an external
 storage without permission, access the file names of other users and execute
 arbitrary script code in a user's browser session within the trust relationship
-between their browser and the server.
+between their browser and the server.");
+  script_tag(name:"affected", value:"ownCloud Server 5.0.x before 5.0.16 and 6.0.x before 6.0.3");
+  script_tag(name:"solution", value:"Upgrade to ownCloud version 5.0.16 or 6.0.3 or later.");
 
-Impact Level: Application";
-
-  tag_affected = "ownCloud Server 5.0.x before 5.0.16 and 6.0.x before 6.0.3";
-
-  tag_solution = "Upgrade to ownCloud version 5.0.16 or 6.0.3 or later,
-For updates refer to http://owncloud.org";
-
-  script_tag(name : "summary" , value : tag_summary);
-  script_tag(name : "vuldetect" , value : tag_vuldetect);
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "impact" , value : tag_impact);
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "solution" , value : tag_solution);
-
-  script_xref(name : "URL" , value : "http://xforce.iss.net/xforce/xfdb/93687");
+  script_xref(name:"URL", value:"http://xforce.iss.net/xforce/xfdb/93687");
   script_category(ACT_GATHER_INFO);
   script_tag(name:"qod_type", value:"remote_banner");
   script_tag(name:"solution_type", value:"VendorFix");
@@ -83,6 +67,7 @@ For updates refer to http://owncloud.org";
   script_dependencies("gb_owncloud_detect.nasl");
   script_mandatory_keys("owncloud/installed");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"http://owncloud.org");
   exit(0);
 }
 

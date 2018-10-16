@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_3675_1.nasl 10215 2018-06-15 10:24:04Z cfischer $
+# $Id: gb_ubuntu_USN_3675_1.nasl 11037 2018-08-17 11:51:16Z cfischer $
 #
 # Ubuntu Update for gnupg2 USN-3675-1
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.843550");
-  script_version("$Revision: 10215 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-15 12:24:04 +0200 (Fri, 15 Jun 2018) $");
+  script_version("$Revision: 11037 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 13:51:16 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-06-12 05:54:57 +0200 (Tue, 12 Jun 2018)");
   script_cve_id("CVE-2018-12020", "CVE-2018-9234");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"5.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:P/A:N");
   script_tag(name:"qod_type", value:"package");
   script_name("Ubuntu Update for gnupg2 USN-3675-1");
   script_tag(name:"summary", value:"Check the version of gnupg2");
@@ -50,14 +50,14 @@ key certification required an offline master Certify key. An attacker
 with access to a signing subkey could generate certifications that
 appeared to be valid. This issue only affected Ubuntu 18.04 LTS.
 (CVE-2018-9234)");
-  script_tag(name:"affected", value:"gnupg2 on Ubuntu 18.04 LTS ,
-  Ubuntu 17.10 ,
-  Ubuntu 16.04 LTS ,
+  script_tag(name:"affected", value:"gnupg2 on Ubuntu 18.04 LTS,
+  Ubuntu 17.10,
+  Ubuntu 16.04 LTS,
   Ubuntu 14.04 LTS");
   script_tag(name:"solution", value:"Please install the updated packages.");
 
   script_xref(name:"USN", value:"3675-1");
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-3675-1/");
+  script_xref(name:"URL", value:"http://www.ubuntu.com/usn/usn-3675-1/");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -70,7 +70,7 @@ appeared to be valid. This issue only affected Ubuntu 18.04 LTS.
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 res = "";
 if(release == NULL){

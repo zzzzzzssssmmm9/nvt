@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_multiple_nas_57958.nasl 6079 2017-05-08 09:03:33Z teissa $
+# $Id: gb_multiple_nas_57958.nasl 11219 2018-09-04 11:52:00Z cfischer $
 #
 # RaidSonic IB-NAS5220 and IB-NAS4220-B Multiple Security Vulnerabilities
 #
@@ -29,11 +29,11 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.103793");
   script_bugtraq_id(57958);
-  script_version("$Revision: 6079 $");
+  script_version("$Revision: 11219 $");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
   script_name("RaidSonic IB-NAS5220 and IB-NAS4220-B Multiple Security Vulnerabilities");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-08 11:03:33 +0200 (Mon, 08 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-04 13:52:00 +0200 (Tue, 04 Sep 2018) $");
   script_tag(name:"creation_date", value:"2013-09-24 12:37:41 +0200 (Tue, 24 Sep 2013)");
   script_category(ACT_ATTACK);
   script_family("Web application abuses");
@@ -44,39 +44,30 @@ if(description)
 
   script_xref(name:"URL", value:"http://www.securityfocus.com/bid/57958");
 
-  tag_insight = "The remote NAS is prone to:
-  1. An authentication-bypass vulnerability
-  2. An HTML-injection vulnerability
-  3. A command-injection vulnerability";
-
-  tag_impact = "The attacker may leverage these issues to bypass certain security
+  script_tag(name:"impact", value:"The attacker may leverage these issues to bypass certain security
   restrictions and perform unauthorized actions or execute HTML and
   script code in the context of the affected browser, potentially
   allowing the attacker to steal cookie-based authentication
   credentials, control how the site is rendered to the user, or inject
-  and execute arbitrary commands.";
+  and execute arbitrary commands.");
+  script_tag(name:"vuldetect", value:"Try to execute the 'sleep' command on the device with a special crafted POST request.");
+  script_tag(name:"insight", value:"The remote NAS is prone to:
 
-  tag_affected = "It seems that not only RaidSonic IB-NAS5220 and IB-NAS422-B are prone to this
+  1. An authentication-bypass vulnerability
+
+  2. An HTML-injection vulnerability
+
+  3. A command-injection vulnerability");
+  script_tag(name:"solution", value:"Ask the Vendor for an update.");
+  script_tag(name:"summary", value:"RaidSonic IB-NAS5220 and IB-NAS422-B are prone to multiple security
+  vulnerabilities.");
+  script_tag(name:"affected", value:"It seems that not only RaidSonic IB-NAS5220 and IB-NAS422-B are prone to this
   vulnerabilities. We've seen devices from Toshiba, Sarotech, Verbatim and others where it also
   was possible to execute commands using the same exploit. Looks like these devices are using
-  the same firmware.";
-
-  tag_summary = "RaidSonic IB-NAS5220 and IB-NAS422-B are prone to multiple security
-  vulnerabilities.";
-
-  tag_solution = "Ask the Vendor for an update.";
-
-  tag_vuldetect = "Try to execute the 'sleep' command on the device with a special crafted POST request.";
-
-  script_tag(name:"impact", value:tag_impact);
-  script_tag(name:"vuldetect", value:tag_vuldetect);
-  script_tag(name:"insight", value:tag_insight);
-  script_tag(name:"solution", value:tag_solution);
-  script_tag(name:"summary", value:tag_summary);
-  script_tag(name:"affected", value:tag_affected);
+  the same firmware.");
 
   script_tag(name:"qod_type", value:"remote_analysis");
-  script_tag(name:"solution_type", value: "VendorFix");
+  script_tag(name:"solution_type", value:"VendorFix");
 
   exit(0);
 }
@@ -93,6 +84,7 @@ buf = http_keepalive_send_recv( port:port, data:req, bodyonly:FALSE );
 
 if( "/loginHandler.cgi" >!< buf && "focusLogin()" >!< buf ) exit( 0 );
 
+useragent = get_http_user_agent();
 host = http_host_name( port:port );
 
 sleep = make_list( 3, 5, 8 );
@@ -106,7 +98,7 @@ foreach i( sleep ) {
 
   req = 'POST ' + url + ' HTTP/1.1\r\n' +
         'Host: ' + host + '\r\n' +
-        'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+        'User-Agent: ' + useragent + '\r\n' +
         'Accept-Encoding: identity\r\n' +
         'Proxy-Connection: keep-alive\r\n' +
         'Referer: http://' + host + '/cgi/time/time.cgi\r\n' +
@@ -115,13 +107,11 @@ foreach i( sleep ) {
         '\r\n' +
         ex;
 
-
   start = unixtime();
   buf = http_send_recv( port:port, data:req, bodyonly:FALSE );
   stop = unixtime();
 
   if( "200 OK" >!< buf ) exit( 0 );
-
   if( stop - start < i || stop - start > ( i + 5 ) ) exit( 99 );
 }
 

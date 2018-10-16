@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wp_super_functions_pack_xss_vuln.nasl 6141 2017-05-17 09:03:37Z teissa $
+# $Id: gb_wp_super_functions_pack_xss_vuln.nasl 11424 2018-09-17 08:03:52Z mmartin $
 #
 # WordPress April's Super Functions Pack Plugin Cross Site Scripting Vulnerability
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805268");
-  script_version("$Revision: 6141 $");
+  script_version("$Revision: 11424 $");
   script_cve_id("CVE-2014-100026");
   script_bugtraq_id(64699);
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-17 11:03:37 +0200 (Wed, 17 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 10:03:52 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-02-04 12:02:20 +0530 (Wed, 04 Feb 2015)");
   script_name("WordPress April's Super Functions Pack Plugin Cross Site Scripting Vulnerability");
 
@@ -51,9 +51,7 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow attacker to
   execute arbitrary HTML and script code in a user's browser session in the context
-  of an affected site.
-
-  Impact Level: Application");
+  of an affected site.");
 
   script_tag(name:"affected", value:"Wordpress April's Super Functions Pack Plugin
   prior to version 1.4.8");
@@ -63,9 +61,9 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/55576");
-  script_xref(name : "URL" , value : "http://xforce.iss.net/xforce/xfdb/90172");
-  script_xref(name : "URL" , value : "https://wordpress.org/plugins/aprils-super-functions-pack/changelog");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/55576");
+  script_xref(name:"URL", value:"http://xforce.iss.net/xforce/xfdb/90172");
+  script_xref(name:"URL", value:"https://wordpress.org/plugins/aprils-super-functions-pack/changelog");
 
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
@@ -82,26 +80,17 @@ include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
 
-## Variable Initialization
-http_port = 0;
-dir = "";
-url = "";
-
-## Get HTTP Port
 if(!http_port = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get WordPress Location
 if(!dir = get_app_location(cpe:CPE, port:http_port)){
   exit(0);
 }
 
-## Vulnerable URL
 url = dir + "/wp-content/plugins/aprils-super-functions-pack/readme.php?pa"
           + 'ge="><script>alert(document.cookie);</script>';
 
-## Try attack and check the response to confirm vulnerability
 if(http_vuln_check(port:http_port, url:url, check_header:TRUE,
          pattern:"<script>alert\(document.cookie\);</script>",
          extra_check:">April's Super Functions Pack<"))

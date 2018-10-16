@@ -29,20 +29,19 @@ CPE = "cpe:/a:apache:tomcat";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.807404");
-  script_version("$Revision: 7545 $");
+  script_version("$Revision: 11811 $");
   script_cve_id("CVE-2015-5174");
   script_bugtraq_id(83329);
   script_tag(name:"cvss_base", value:"4.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:S/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-24 13:45:30 +0200 (Tue, 24 Oct 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-10 11:55:00 +0200 (Wed, 10 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-02-25 11:25:47 +0530 (Thu, 25 Feb 2016)");
   script_name("Apache Tomcat Limited Directory Traversal Vulnerability - Feb16 (Windows)");
 
   script_tag(name:"summary", value:"This host is installed with Apache Tomcat
   and is prone to Limited Directory Traversal Vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with
-  the help of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw is due to an improper validation of
   path while accessing resources via the ServletContext methods getResource(),
@@ -51,16 +50,13 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   authenticated users to bypass intended SecurityManager restrictions and
-  list a parent directory.
+  list a parent directory.");
 
-  Impact Level: Application");
-  
   script_tag(name:"affected", value:"Apache Tomcat 6.x before 6.0.45,
   7.x before 7.0.65, and 8.0.0.RC1 before 8.0.27 on Windows.");
 
   script_tag(name:"solution", value:"Upgrade to version 6.0.45 or 7.0.65 or
-  8.0.27 or later.
-  For updates refer to http://tomcat.apache.org");
+  8.0.27 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_banner");
@@ -73,31 +69,25 @@ if(description)
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Web Servers");
   script_dependencies("gb_apache_tomcat_detect.nasl", "os_detection.nasl");
-  script_mandatory_keys("ApacheTomcat/installed","Host/runs_windows");
+  script_mandatory_keys("ApacheTomcat/installed", "Host/runs_windows");
   script_require_ports("Services/www", 8080);
+  script_xref(name:"URL", value:"http://tomcat.apache.org");
   exit(0);
 }
 
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-appPort = "";
-appVer = "";
-
-## get the port
 if(!appPort = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get the version
 if(!appVer = get_app_version(cpe:CPE, port:appPort)){
   exit(0);
 }
 
 if(appVer =~ "^(6|8|7)")
 {
-  ## Grep for vulnerable version
   if(version_in_range(version:appVer, test_version:"6.0.0", test_version2:"6.0.44"))
   {
     fix = "6.0.45";
@@ -115,7 +105,7 @@ if(appVer =~ "^(6|8|7)")
     fix = "8.0.27";
     VULN = TRUE;
   }
-  
+
   if(VULN)
   {
     report = report_fixed_ver(installed_version:appVer, fixed_version:fix);

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_codesys_detect.nasl 9996 2018-05-29 07:18:44Z cfischer $
+# $Id: gb_codesys_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # CODESYS Detection
 #
@@ -27,32 +27,32 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.140500");
- script_version ("$Revision: 9996 $");
- script_tag(name: "last_modification", value: "$Date: 2018-05-29 09:18:44 +0200 (Tue, 29 May 2018) $");
- script_tag(name: "creation_date", value: "2017-11-16 08:54:19 +0700 (Thu, 16 Nov 2017)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.140500");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2017-11-16 08:54:19 +0700 (Thu, 16 Nov 2017)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("CODESYS Detection");
+  script_name("CODESYS Detection");
 
- script_tag(name: "summary" , value: "A CODESYS Service is running at this host.
+  script_tag(name:"summary", value:"A CODESYS Service is running at this host.
 
 Over 250 device manufacturers from different industrial sectors offer intelligent automation devices with a
 CODESYS programming interface.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
- script_family("Service detection");
- script_dependencies("find_service.nasl");
- script_require_ports("Services/unknown", 1200, 2455, 4840);
+  script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
+  script_family("Service detection");
+  script_dependencies("find_service.nasl");
+  script_require_ports("Services/unknown", 1200, 2455, 4840);
 
- script_xref(name: "URL", value: "https://www.codesys.com");
+  script_xref(name:"URL", value:"https://www.codesys.com");
 
- exit(0);
+  exit(0);
 }
 
 include("dump.inc");

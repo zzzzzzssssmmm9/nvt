@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_dotnet_framework_ms15-128.nasl 7174 2017-09-18 11:48:08Z asteins $
+# $Id: gb_dotnet_framework_ms15-128.nasl 11876 2018-10-12 12:20:01Z cfischer $
 #
 # Microsoft .NET Framework Remote Code Execution Vulnerabilities (3104503)
 #
@@ -27,32 +27,28 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806647");
-  script_version("$Revision: 7174 $");
+  script_version("$Revision: 11876 $");
   script_cve_id("CVE-2015-6108");
   script_bugtraq_id(78499);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-18 13:48:08 +0200 (Mon, 18 Sep 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 14:20:01 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-12-09 13:05:49 +0530 (Wed, 09 Dec 2015)");
   script_name("Microsoft .NET Framework Remote Code Execution Vulnerabilities (3104503)");
 
   script_tag(name:"summary", value:"This host is missing a critical security
   update according to Microsoft Bulletin MS15-128.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and
-  check appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaws exist due to an error in
   Windows font library which improperly handles specially crafted embedded
   fonts.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow an
-  attacker to execute arbitrary code on the affected system.
+  attacker to execute arbitrary code on the affected system.");
 
-  Impact Level: System/Application");
-
-  script_tag(name:"affected", value:"
-  Microsoft .NET Framework 3.0 Service Pack 2
+  script_tag(name:"affected", value:"Microsoft .NET Framework 3.0 Service Pack 2
   Microsoft .NET Framework 3.5
   Microsoft .NET Framework 3.5.1
   Microsoft .NET Framework 4
@@ -60,28 +56,26 @@ if(description)
   Microsoft .NET Framework 4.6");
 
   script_tag(name:"solution", value:"Run Windows Update and update the
-  listed hotfixes or download and update mentioned hotfixes in the advisory
-  from the below link,
-  https://technet.microsoft.com/library/security/MS15-128");
+  listed hotfixes or download and install the hotfixes from the referenced advisory.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
   script_tag(name:"qod_type", value:"executable_version");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3104503");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3099874");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3099869");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3099866");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3099862");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3099864");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3099863");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3099860");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/library/security/MS15-128");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3104503");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3099874");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3099869");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3099866");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3099862");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3099864");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3099863");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3099860");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/library/security/MS15-128");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
-  script_dependencies("secpod_reg_enum.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion");
   script_require_ports(139, 445);
   exit(0);
@@ -93,26 +87,17 @@ include("secpod_reg.inc");
 include("version_func.inc");
 include("secpod_smb_func.inc");
 
-## Variables Initialization
-key = "";
-item = "";
-path = "";
-dllVer = "";
-sysVer = "";
-
-## Check for OS and Service Pack
 if(hotfix_check_sp(winVista:3, win7:2, win7x64:2, win2008:3,
    win2008r2:2, win8:1, win8x64:1, win8_1:1, win8_1x64:1, win2012:1, win2012R2:1) <= 0){
   exit(0);
 }
 
-## Confirm .NET
 key = "SOFTWARE\Microsoft\ASP.NET\";
 if(!registry_key_exists(key:key)){
   exit(0);
 }
 
-##.NET Framework 3.5 
+##.NET Framework 3.5
 key = "SOFTWARE\Microsoft\.NETFramework\AssemblyFolders\v3.0";
 if(registry_key_exists(key:key))
 {
@@ -120,11 +105,9 @@ if(registry_key_exists(key:key))
   if(pathPrint){
     dllVer = fetch_file_version(sysPath:pathPrint, file_name:"System.printing.dll");
   }
-  ## Get version from System.printing.dll file
   ## on Windows 8 and Windows Server 2012
   if(dllVer)
   {
-    ## Get .NET Framework 3.5
     if(hotfix_check_sp(win8:1, win2012:1) > 0)
     {
       if(version_in_range(version:dllVer, test_version:"3.0.6920.6400", test_version2:"3.0.6920.6421"))
@@ -141,14 +124,13 @@ if(registry_key_exists(key:key))
     }
 
     ## Description of the security update for the .NET Framework 3.5.1 on
-    ## Windows 7 Service Pack 1 and Windows Server 2008 R2 Service Pack 1
     else if(hotfix_check_sp(win7:2, win7x64:2, win2008r2:2) > 0)
     {
       if(version_in_range(version:dllVer, test_version:"3.0.6920.5400", test_version2:"3.0.6920.5469"))
       {
         VULN1 = TRUE ;
         vulnerable_range1 = "3.0.6920.5400 - 3.0.6920.5469";
-      } 
+      }
       else if(version_in_range(version:dllVer, test_version:"3.0.6920.8600", test_version2:"3.0.6920.8692"))
       {
         VULN1 = TRUE ;
@@ -158,7 +140,6 @@ if(registry_key_exists(key:key))
   }
 }
 
-## Get System Path
 ##Description of the security update for the .NET Framework 3.0
 ##Service Pack 2 on Windows Vista Service Pack 2 and Windows Server 2008
 ## Service Pack 2
@@ -170,8 +151,7 @@ if(sysPath)
   key = "SOFTWARE\Microsoft\.NETFramework\AssemblyFolders\v3.0";
   if(registry_key_exists(key:key))
   {
-    ## Get Version from XPSViewer.exe
-    exeVer = fetch_file_version(sysPath, file_name:"system32\XPSViewer\XPSViewer.exe");
+    exeVer = fetch_file_version(sysPath:sysPath, file_name:"system32\XPSViewer\XPSViewer.exe");
     if(exeVer)
     {
       ## .NET Framework 3.0 Service Pack 2 on Windows Vista and Windows Server 2008
@@ -192,7 +172,6 @@ if(sysPath)
   }
 }
 
-## Get .NET Framework 4.0 Version
 ## Description of the security update for the .NET Framework 4
 ## on Windows Vista and Windows Server 2008
 key = "SOFTWARE\Microsoft\ASP.NET\4.0.30319.0";
@@ -222,7 +201,6 @@ if(registry_key_exists(key:key))
   }
 }
 
-## Get .NET Framework 4.5/4.5.1/4.5.2 Version on Windows Vista
 ## Service Pack 2 and Windows Server 2008 Service Pack 2
 key = "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client\";
 if(registry_key_exists(key:key))
@@ -268,7 +246,6 @@ if(registry_key_exists(key:key))
     dllPres2 = fetch_file_version(sysPath:pathAss, file_name:"presentationcore.dll");
     if(dllPres2)
     {
-      ## Get .NET Framework 3.5 on Windows 8.1 and Windows Server 2012 R2
       if(hotfix_check_sp(win8_1:1, win8_1x64:1, win2012R2:1) > 0)
       {
         if(version_in_range(version:dllPres2, test_version:"3.0.6920.7000", test_version2:"3.0.6920.8008"))
@@ -277,7 +254,7 @@ if(registry_key_exists(key:key))
           vulnerable_range5 = "3.0.6920.7000 - 3.0.6920.8008";
         }
         else if(version_in_range(version:dllVer, test_version:"3.0.6920.8600", test_version2:"3.0.6920.8692"))
-        { 
+        {
           VULN5 = TRUE ;
           vulnerable_range5 = "3.0.6920.8600 - 3.0.6920.8692";
         }

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_php_magic_quotes_gpc_sec_bypass_vuln_win.nasl 10458 2018-07-09 06:47:36Z cfischer $
+# $Id: gb_php_magic_quotes_gpc_sec_bypass_vuln_win.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # PHP 'magic_quotes_gpc' Directive Security Bypass Vulnerability (Windows)
 #
@@ -29,8 +29,8 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802591");
-  script_version("$Revision: 10458 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 08:47:36 +0200 (Mon, 09 Jul 2018) $");
+  script_version("$Revision: 11857 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 10:25:16 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-02-10 11:24:19 +0530 (Fri, 10 Feb 2012)");
   script_cve_id("CVE-2012-0831");
   script_bugtraq_id(51954);
@@ -44,9 +44,7 @@ if(description)
   script_mandatory_keys("php/installed", "Host/runs_windows");
 
   script_tag(name:"impact", value:"Successful exploitation could allow remote attackers to gain sensitive
-  information via a crafted request.
-
-  Impact Level: Application");
+  information via a crafted request.");
 
   script_tag(name:"affected", value:"PHP Version 5.3.9 and prior on Windows.");
 
@@ -54,8 +52,7 @@ if(description)
   it not properly performing a temporary change to the 'magic_quotes_gpc'
   directive during the importing of environment variables.");
 
-  script_tag(name:"solution", value:"Upgrade to PHP Version 5.3.10 or later,
-  For updates refer to http://php.net/downloads.php");
+  script_tag(name:"solution", value:"Upgrade to PHP Version 5.3.10 or later.");
 
   script_tag(name:"summary", value:"This host is installed with PHP and is prone to security bypass
   vulnerability.");
@@ -66,6 +63,7 @@ if(description)
   script_xref(name:"URL", value:"http://www.securityfocus.com/bid/51954/info");
   script_xref(name:"URL", value:"http://svn.php.net/viewvc?view=revision&revision=323016");
 
+  script_xref(name:"URL", value:"http://php.net/downloads.php");
   exit(0);
 }
 

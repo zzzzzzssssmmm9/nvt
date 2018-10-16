@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_php_dos_n_code_exec_vuln_dec13.nasl 10458 2018-07-09 06:47:36Z cfischer $
+# $Id: gb_php_dos_n_code_exec_vuln_dec13.nasl 11865 2018-10-12 10:03:43Z cfischer $
 #
 # PHP Remote Code Execution and Denial of Service Vulnerabilities - Dec13
 #
@@ -29,22 +29,20 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804174");
-  script_version("$Revision: 10458 $");
+  script_version("$Revision: 11865 $");
   script_cve_id("CVE-2013-6420");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 08:47:36 +0200 (Mon, 09 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:03:43 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2013-12-19 18:09:47 +0530 (Thu, 19 Dec 2013)");
   script_name("PHP Remote Code Execution and Denial of Service Vulnerabilities - Dec13");
 
   script_tag(name:"summary", value:"This host is installed with PHP and is prone to remote code execution
   vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version of PHP with the help of detect NVT and check
-  the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name:"solution", value:"Update to PHP version 5.3.28 or 5.4.23 or 5.5.7 or later.
-  For updates refer to http://www.php.net");
+  script_tag(name:"solution", value:"Update to PHP version 5.3.28 or 5.4.23 or 5.5.7 or later.");
 
   script_tag(name:"insight", value:"The flaw is due to a boundary error within the 'asn1_time_to_time_t' function
   in 'ext/openssl/openssl.c' when parsing X.509 certificates.");
@@ -52,9 +50,7 @@ if(description)
   script_tag(name:"affected", value:"PHP versions before 5.3.28, 5.4.x before 5.4.23, and 5.5.x before 5.5.7.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to execute arbitrary code
-  or cause a denial of service (memory corruption).
-
-  Impact Level: Application");
+  or cause a denial of service (memory corruption).");
 
   script_xref(name:"URL", value:"http://secunia.com/advisories/56055");
   script_xref(name:"URL", value:"http://packetstormsecurity.com/files/124436/PHP-openssl_x509_parse-Memory-Corruption.html");
@@ -68,6 +64,7 @@ if(description)
   script_tag(name:"qod_type", value:"remote_banner_unreliable");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://www.php.net");
   exit(0);
 }
 

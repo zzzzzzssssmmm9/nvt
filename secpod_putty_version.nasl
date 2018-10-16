@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_putty_version.nasl 10082 2018-06-05 12:51:08Z tpassfeld $
+# $Id: secpod_putty_version.nasl 11356 2018-09-12 10:46:43Z tpassfeld $
 #
 # PuTTY Version Detection
 #
@@ -33,14 +33,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.900618");
-  script_version("$Revision: 10082 $");
+  script_version("$Revision: 11356 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-05 14:51:08 +0200 (Tue, 05 Jun 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-12 12:46:43 +0200 (Wed, 12 Sep 2018) $");
   script_tag(name:"creation_date", value:"2009-06-02 12:54:52 +0200 (Tue, 02 Jun 2009)");
   script_tag(name:"qod_type", value:"registry");
   script_name("PuTTY Version Detection");
-  script_tag(name: "summary" , value:"Detection of installed version of PuTTY.
+  script_tag(name:"summary", value:"Detects the installed version of PuTTY.
 
   The script logs in via smb, searches for PuTTy in the registry, gets
   version from the 'DisplayName' string and set it in the KB item.");
@@ -48,12 +48,11 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_family("Product detection");
   script_copyright("Copyright (C) 2009 SecPod.");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
 }
-
 
 include("smb_nt.inc");
 include("version_func.inc");
@@ -63,7 +62,7 @@ include("host_details.inc");
 
 os_arch = get_kb_item("SMB/Windows/Arch");
 if(!os_arch){
-  exit(-1);
+  exit(0);
 }
 
 if("x86" >< os_arch){
@@ -99,7 +98,7 @@ foreach key (key_list)
       }
       if(appVer)
       {
-        set_kb_item(name:"PuTTY/Version", value:appVer);
+        set_kb_item(name:"putty/version", value:appVer);
 
         cpe = build_cpe(value:appVer, exp:"^([0-9.]+)", base:"cpe:/a:putty:putty:");
         if(isnull(cpe))
@@ -107,7 +106,7 @@ foreach key (key_list)
 
 	tmp_location = tolower(insloc);
 	tmp_location = ereg_replace(pattern:"\\$", string:tmp_location, replace:'');
-        set_kb_item(name:"PuTTY/Win/InstallLocations", value:tmp_location);
+        set_kb_item(name:"putty/win/install_locations", value:tmp_location);
 
 	register_product(cpe:cpe, location:insloc);
 

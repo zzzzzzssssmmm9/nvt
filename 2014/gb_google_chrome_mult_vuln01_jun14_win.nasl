@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_google_chrome_mult_vuln01_jun14_win.nasl 10133 2018-06-08 11:13:34Z asteins $
+# $Id: gb_google_chrome_mult_vuln01_jun14_win.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # Google Chrome Multiple Vulnerabilities - 01 June14 (Windows)
 #
@@ -29,53 +29,60 @@ CPE = "cpe:/a:google:chrome";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804616");
-  script_version("$Revision: 10133 $");
+  script_version("$Revision: 11867 $");
   script_cve_id("CVE-2014-1743", "CVE-2014-1744", "CVE-2014-1745", "CVE-2014-1746",
                 "CVE-2014-1747", "CVE-2014-1748", "CVE-2014-1749", "CVE-2014-3152",
                 "CVE-2014-3803");
   script_bugtraq_id(67790, 67517, 67582);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-08 13:13:34 +0200 (Fri, 08 Jun 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-06-04 09:39:42 +0530 (Wed, 04 Jun 2014)");
   script_name("Google Chrome Multiple Vulnerabilities - 01 June14 (Windows)");
 
 
-  script_tag(name : "summary" , value : "The host is installed with Google Chrome and is prone to multiple
+  script_tag(name:"summary", value:"The host is installed with Google Chrome and is prone to multiple
 vulnerabilities.");
-  script_tag(name : "vuldetect" , value : "Checks if a vulnerable version is present on the target host.");
-  script_tag(name : "insight" , value : "The flaws are due to,
-- A use-after-free error exists in 'StyleElement::removedFromDocument' function
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"insight", value:"The flaws are due to,
+
+  - A use-after-free error exists in 'StyleElement::removedFromDocument' function
 within core/dom/StyleElement.cpp.
-- An integer overflow error exists in 'AudioInputRendererHost::OnCreateStream'
+
+  - An integer overflow error exists in 'AudioInputRendererHost::OnCreateStream'
 function in media/audio_input_renderer_host.cc.
-- A use-after-free error exists within SVG.
-- An error within media filters  in 'InMemoryUrlProtocol::Read'.
-- An error in 'DocumentLoader::maybeCreateArchive' function related to a local
+
+  - A use-after-free error exists within SVG.
+
+  - An error within media filters  in 'InMemoryUrlProtocol::Read'.
+
+  - An error in 'DocumentLoader::maybeCreateArchive' function related to a local
 MHTML file.
-- An error in 'ScrollView::paint' function related to scroll bars.
-- Multiple unspecified errors exist.
-- An integer overflow error in 'LCodeGen::PrepareKeyedOperand' function in
+
+  - An error in 'ScrollView::paint' function related to scroll bars.
+
+  - Multiple unspecified errors exist.
+
+  - An integer overflow error in 'LCodeGen::PrepareKeyedOperand' function in
 arm/lithium-codegen-arm.cc within v8.
-- Some error in speech API within Blink.");
-  script_tag(name : "impact" , value : "Successful exploitation will allow remote attackers to conduct a denial of
+
+  - Some error in speech API within Blink.");
+  script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to conduct a denial of
 service, inject arbitrary web script or HTML, spoof the UI, enable microphone
 access and obtain speech-recognition text and possibly have other unspecified
-impact.
-
-Impact Level: System/Application");
-  script_tag(name : "affected" , value : "Google Chrome version prior to 35.0.1916.114 on Windows.");
-  script_tag(name : "solution" , value : "Upgrade to Google Chrome 35.0.1916.114 or later,
-For updates refer to http://www.google.com/chrome");
+impact.");
+  script_tag(name:"affected", value:"Google Chrome version prior to 35.0.1916.114 on Windows.");
+  script_tag(name:"solution", value:"Upgrade to Google Chrome 35.0.1916.114 or later.");
   script_tag(name:"qod_type", value:"registry");
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://googlechromereleases.blogspot.in/2014/05/stable-channel-update_20.html");
+  script_xref(name:"URL", value:"http://googlechromereleases.blogspot.in/2014/05/stable-channel-update_20.html");
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
   script_category(ACT_GATHER_INFO);
   script_family("General");
   script_dependencies("gb_google_chrome_detect_portable_win.nasl");
   script_mandatory_keys("GoogleChrome/Win/Ver");
+  script_xref(name:"URL", value:"http://www.google.com/chrome");
   exit(0);
 }
 

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ibm_spss_sample_power_detect_win.nasl 8194 2017-12-20 11:29:51Z cfischer $
+# $Id: gb_ibm_spss_sample_power_detect_win.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # IBM SPSS SamplePower Version Detection (Windows)
 #
@@ -8,7 +8,7 @@
 # Sooraj KS <kssooraj@secpod.com>
 #
 # Copyright:
-# Copyright (c) 2012 Greenbone Networks GmbH, http://www.greenbone.net
+# Copyright (c) 2011 Greenbone Networks GmbH, http://www.greenbone.net
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -27,25 +27,23 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802299");
-  script_version("$Revision: 8194 $");
+  script_version("$Revision: 11279 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-20 12:29:51 +0100 (Wed, 20 Dec 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2011-04-11 14:40:00 +0200 (Mon, 11 Apr 2011)");
   script_tag(name:"qod_type", value:"registry");
   script_name("IBM SPSS SamplePower Version Detection (Windows)");
 
- tag_summary = "Detection of installed version of IBM SPSS SamplePower on Windows.
+  script_tag(name:"summary", value:"Detects the installed version of IBM SPSS SamplePower on Windows.
 
 The script logs in via smb, searches for IBM SPSS SamplePower in the registry,
-gets the from registry.";
-
-  script_tag(name : "summary" , value : tag_summary);
+gets the from registry.");
 
   script_category(ACT_GATHER_INFO);
-  script_copyright("Copyright (C) 2012 Greenbone Networks GmbH");
+  script_copyright("Copyright (C) 2011 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
@@ -56,16 +54,9 @@ include("secpod_smb_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-osArch = "";
-key_list = "";
-gsName = "";
-gsVer = "";
-path = "";
-
 osArch = get_kb_item("SMB/Windows/Arch");
-if(!osArch)
-{
-  exit(-1);
+if(!osArch){
+  exit(0);
 }
 
 ## if os is 32 bit iterate over comman path
@@ -73,7 +64,6 @@ if("x86" >< osArch){
   key_list = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\";
 }
 
-## Check for 64 bit platform
 else if("x64" >< osArch){
  key_list = make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\",
                       "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\");

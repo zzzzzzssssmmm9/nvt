@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sharepoint_server_was_ms16-107.nasl 9316 2018-04-05 07:06:02Z cfischer $
+# $Id: gb_sharepoint_server_was_ms16-107.nasl 11614 2018-09-26 07:39:28Z asteins $
 #
 # Microsoft SharePoint Server WAS Remote Code Execution Vulnerability (3115466)
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:microsoft:sharepoint_server";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.809044");
-  script_version("$Revision: 9316 $");
+  script_version("$Revision: 11614 $");
   script_cve_id("CVE-2016-3357");
   script_bugtraq_id(92786);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-05 09:06:02 +0200 (Thu, 05 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-26 09:39:28 +0200 (Wed, 26 Sep 2018) $");
   script_tag(name:"creation_date", value:"2016-09-14 10:24:16 +0530 (Wed, 14 Sep 2016)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Microsoft SharePoint Server WAS Remote Code Execution Vulnerability (3115466)");
@@ -42,17 +42,14 @@ if(description)
   script_tag(name:"summary", value:"This host is missing a critical security
   update according to Microsoft Bulletin MS16-107.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Multiple flaws exist due to,
 
   - Office software fails to properly handle objects in memory.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow an
-  attacker to run arbitrary code in the context of the current user.
-
-  Impact Level: System/Application");
+  attacker to run arbitrary code in the context of the current user.");
 
   script_tag(name:"affected", value:"Microsoft SharePoint Server 2010 Service Pack 2 Word Automation Services,
 
@@ -64,14 +61,15 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3115443");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3115466");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/library/security/MS16-107");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3115443");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3115466");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/library/security/MS16-107");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
   script_dependencies("gb_ms_sharepoint_sever_n_foundation_detect.nasl");
+  script_require_ports(139, 445);
   script_mandatory_keys("MS/SharePoint/Server/Ver");
   exit(0);
 }

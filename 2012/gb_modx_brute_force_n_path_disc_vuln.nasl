@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_modx_brute_force_n_path_disc_vuln.nasl 5889 2017-04-07 09:14:58Z cfi $
+# $Id: gb_modx_brute_force_n_path_disc_vuln.nasl 11374 2018-09-13 12:45:05Z asteins $
 #
 # MODX Brute Force and Path Disclosure Vulnerabilities
 #
@@ -27,10 +27,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802495");
-  script_version("$Revision: 5889 $");
+  script_version("$Revision: 11374 $");
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-04-07 11:14:58 +0200 (Fri, 07 Apr 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-13 14:45:05 +0200 (Thu, 13 Sep 2018) $");
   script_tag(name:"creation_date", value:"2012-11-21 10:48:20 +0530 (Wed, 21 Nov 2012)");
   script_name("MODX Brute Force and Path Disclosure Vulnerabilities");
   script_category(ACT_ATTACK);
@@ -44,23 +44,21 @@ if(description)
   script_xref(name:"URL", value:"http://packetstormsecurity.org/files/118240/modx-brutedisclose.txt");
 
   script_tag(name:"impact", value:"Successful exploitation will allow the attacker to obtain
-  sensitive information that could aid in further attacks.
-
-  Impact Level: Application");
+  sensitive information that could aid in further attacks.");
 
   script_tag(name:"affected", value:"MODX CMF version 2.x (Revolution)
   MODX CMS version 1.x (Evolution)");
 
   script_tag(name:"insight", value:"- In login form (manager/index.php) there is no reliable
   protection from brute force attacks.
+
   - Insufficient error checking, allows remote attackers to obtain sensitive
   information via a direct request to a .php file, which reveals the
   installation path in an error message.");
 
-  script_tag(name:"solution", value:"No solution or patch was made available for at least one year
-  since disclosure of this vulnerability. Likely none will be provided anymore.
-  General solution options are to upgrade to a newer release, disable respective
-  features, remove the product or replace the product by another one.");
+  script_tag(name:"solution", value:"No known solution was made available for at least one year since the disclosure of this vulnerability.
+Likely none will be provided anymore.
+General solution options are to upgrade to a newer release, disable respective features, remove the product or replace the product by another one.");
 
   script_tag(name:"summary", value:"This host is installed with MODX and is prone to brute force and
   path disclosure vulnerabilities.");

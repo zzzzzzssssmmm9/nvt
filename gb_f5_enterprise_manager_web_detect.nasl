@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_f5_enterprise_manager_web_detect.nasl 6032 2017-04-26 09:02:50Z teissa $
+# $Id: gb_f5_enterprise_manager_web_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # F5 Enterprise Manager Configuration Utility Detection
 #
@@ -27,26 +27,26 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105305");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 6032 $");
- script_tag(name:"last_modification", value:"$Date: 2017-04-26 11:02:50 +0200 (Wed, 26 Apr 2017) $");
- script_tag(name:"creation_date", value:"2015-06-24 14:01:02 +0200 (Wed, 24 Jun 2015)");
- script_name("F5 Enterprise Manager Configuration Utility Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105305");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-06-24 14:01:02 +0200 (Wed, 24 Jun 2015)");
+  script_name("F5 Enterprise Manager Configuration Utility Detection");
 
- script_tag(name: "summary" , value: "The script sends a connection request to the server and attempts to detect the
+  script_tag(name:"summary", value:"The script sends a connection request to the server and attempts to detect the
 F5 Enterprise Manager Configuration Utility");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 443);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  exit(0);
 }
 
 

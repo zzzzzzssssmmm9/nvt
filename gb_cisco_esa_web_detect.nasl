@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cisco_esa_web_detect.nasl 8138 2017-12-15 11:42:07Z cfischer $
+# $Id: gb_cisco_esa_web_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Cisco Email Security Appliance Detection
 #
@@ -27,25 +27,25 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105314");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 8138 $");
- script_tag(name:"last_modification", value:"$Date: 2017-12-15 12:42:07 +0100 (Fri, 15 Dec 2017) $");
- script_tag(name:"creation_date", value:"2015-07-06 11:43:00 +0200 (Mon, 06 Jul 2015)");
- script_name("Cisco Email Security Appliance Web Interface Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105314");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-07-06 11:43:00 +0200 (Mon, 06 Jul 2015)");
+  script_name("Cisco Email Security Appliance Web Interface Detection");
 
- script_tag(name: "summary" , value: "This script performs HTTP based detection of Cisco Email Security Appliance");
+  script_tag(name:"summary", value:"This script performs HTTP based detection of Cisco Email Security Appliance");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 443);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  exit(0);
 }
 
 include("http_func.inc");
@@ -91,7 +91,7 @@ if( ! isnull( m[1] ) )
   rep_model = ' (' + model + ')';
 }
 
-# register_product( cpe:cpe ); TODO: Might cause forking issues as gb_cisco_eam_version.nasl is also registering this product
+# TODO: Using register_product( cpe:cpe ); Might cause forking issues as gb_cisco_eam_version.nasl is also registering this product.
 
 log_message( data: build_detection_report( app:"Cisco Email Security Appliance" + rep_model + ' Web Interface',
                                            version:vers,

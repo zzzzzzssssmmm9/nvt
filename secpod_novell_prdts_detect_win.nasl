@@ -1,28 +1,11 @@
 ####################################G###########################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_novell_prdts_detect_win.nasl 8201 2017-12-20 14:28:50Z cfischer $
+# $Id: secpod_novell_prdts_detect_win.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # Novell Multiple Products Version Detection
 #
 # Authors:
 # Sharath S <sharaths@secpod.com>
-#
-# Modified by: Nikita MR (rnikita@secpod.com)
-# Date: 24th July 2009
-# Changes: Modified the kb name to indicate windows version.
-#
-# Modified by: Nikita MR (rnikita@secpod.com)
-# Date: 09th Nov 2009
-# Changes: Added check for Novell Groupwise client.
-#
-# Updated by: Madhuri D  <dmadhuri@secpod.com> on 2010-08-13
-#  Modified to detect recent versions.
-#
-# Update By: Antu Sanadi <santu@secpod.com> on 2011-04-12
-# Updated to detect Novell File Reporter.
-#
-# Updated By: Shakeel <bshakeel@secpod.com> on 2014-09-17
-# To support 32 and 64 bit.
 #
 # Copyright:
 # Copyright (c) 2009 SecPod, http://www.secpod.com
@@ -44,23 +27,21 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.900340");
-  script_version("$Revision: 8201 $");
+  script_version("$Revision: 11279 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-20 15:28:50 +0100 (Wed, 20 Dec 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2009-04-24 16:23:28 +0200 (Fri, 24 Apr 2009)");
   script_tag(name:"qod_type", value:"registry");
   script_name("Novell Multiple Products Version Detection");
 
-  tag_summary = "This script detects the installed version of Novell Products and sets the
-  result in KB.";
-
-  script_tag(name : "summary" , value : tag_summary);
+  script_tag(name:"summary", value:"This script detects the installed version of Novell Products and sets the
+  result in KB.");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2009 SecPod");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
@@ -72,27 +53,6 @@ include("cpe.inc");
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialisation
-os_arch = "";
-key = "";
-cpe = "";
-install = "";
-eDirName = "";
-eDirVer = "";
-eDirPath = "";
-clientVer = "";
-clientPath = "";
-netidName = "";
-netidPath = "";
-nfrName = "";
-nfrPath = "";
-nfrVer = "";
-gcPath = "";
-gcVer = "";
-iprintName = "";
-iprintVer = "";
-
-##Confirm Applications
 if(!registry_key_exists(key:"SOFTWARE\Novell"))
 {
   if(!registry_key_exists(key:"SOFTWARE\Novell-iPrint"))
@@ -103,19 +63,16 @@ if(!registry_key_exists(key:"SOFTWARE\Novell"))
   }
 }
 
-## Get OS Architecture
 os_arch = get_kb_item("SMB/Windows/Arch");
 if(!os_arch){
-  exit(-1);
+  exit(0);
 }
 
-# Check for 32 bit platform
 if("x86" >< os_arch){
   key_novell = make_list("SOFTWARE\Novell");
   key_iprint = "SOFTWARE\Novell-iPrint";
 }
 
-## Check for 64 bit platform
 else if("x64" >< os_arch){
   key_novell = make_list("SOFTWARE\Novell", "SOFTWARE\Wow6432Node\Novell");
   key_iprint = "SOFTWARE\Novell-iPrint";
@@ -123,7 +80,6 @@ else if("x64" >< os_arch){
 
 foreach key(key_novell)
 {
-  # Set KB for Novell eDirectory (NDSD), 32-bit app not installing on 64-bit Architecture
   if(registry_key_exists(key:key + "\NDS"))
   {
     eDirName = registry_get_sz(key:"SOFTWARE\Microsoft\Windows\CurrentVersion" +
@@ -155,7 +111,6 @@ foreach key(key_novell)
   }
 
   ##32-bit install not possible on 64-bit Architecture
-  # Set KB for Novell Client
   if(registry_key_exists(key:key))
   {
     clientVer = registry_get_sz(key:key + "\NetWareWorkstation\CurrentVersion",
@@ -200,7 +155,6 @@ foreach key(key_novell)
     }
   }
 
-  # Set KB for Novell NetIdentity, only 32-bit application available
   if(registry_key_exists(key: key + "\NetIdentity"))
   {
     unins_key = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\";
@@ -236,7 +190,6 @@ foreach key(key_novell)
     }
   }
 
-  # Set kb for Novell Groupwise Client, only 32-bit version is available
   if(registry_key_exists(key: key + "\GroupWise"))
   {
     gcPath = registry_get_sz(key:"SOFTWARE\Microsoft\Windows\CurrentVersion"+
@@ -253,7 +206,6 @@ foreach key(key_novell)
     }
   }
 
-  # Set KB for Novell File Reporter, 32-bit application cannot be installed on 64-bit architecture
   if(registry_key_exists(key: key + "\File Reporter"))
   {
     unins_key = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\";
@@ -285,8 +237,6 @@ foreach key(key_novell)
 }
 
 ##Novell-iPrint Client 32-bit app cannot be installed on 64-bit Architecture
-## Set KB for Novell iPrint Client
-## Check application is installed
 if(registry_key_exists(key:key_iprint))
 {
   ver = registry_get_sz(key:key_iprint, item:"Current Version");

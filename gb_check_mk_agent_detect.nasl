@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_check_mk_agent_detect.nasl 8137 2017-12-15 11:26:42Z cfischer $
+# $Id: gb_check_mk_agent_detect.nasl 11399 2018-09-15 07:45:12Z cfischer $
 #
 # Check_MK Agent Detection
 #
@@ -30,8 +30,8 @@ if(description)
   script_oid("1.3.6.1.4.1.25623.1.0.140096");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 8137 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 12:26:42 +0100 (Fri, 15 Dec 2017) $");
+  script_version("$Revision: 11399 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 09:45:12 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2016-12-12 12:33:00 +0100 (Mon, 12 Dec 2016)");
   script_name("Check_MK Agent Detection");
   script_category(ACT_GATHER_INFO);
@@ -85,11 +85,11 @@ extra = 'Gathered info (truncated):\n\n' + substr( buf, 0, 2000 ) + '\n[...]\n\n
 os = eregmatch( pattern:'AgentOS: ([a-zA-Z]+[^ \r\n]+)', string:buf );
 if( os[1] ) {
   if( os[1] == "windows" ) {
-    register_and_report_os( os:"Windows", cpe:"cpe:/o:microsoft:windows", banner_type:banner_type, banner:os[0], port:port, desc:SCRIPT_DESC, runs_key:"windows" );
+    register_and_report_os( os:"Microsoft Windows", cpe:"cpe:/o:microsoft:windows", banner_type:banner_type, banner:os[0], port:port, desc:SCRIPT_DESC, runs_key:"windows" );
   } else if( os[1] == "linux" ) {
     register_and_report_os( os:"Linux", cpe:"cpe:/o:linux:kernel", banner_type:banner_type, banner:os[0], port:port, desc:SCRIPT_DESC, runs_key:"unixoide" );
   } else {
-    # Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
+    # nb: Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
     register_and_report_os( os:os[1], banner_type:banner_type, banner:os[0], port:port, desc:SCRIPT_DESC, runs_key:"unixoide" );
     register_unknown_os_banner( banner:os[0], banner_type_name:banner_type, banner_type_short:"check_mk_agent_banner", port:port );
   }

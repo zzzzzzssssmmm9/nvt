@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_php_mult_vuln_mar13_win.nasl 10459 2018-07-09 07:41:24Z cfischer $
+# $Id: gb_php_mult_vuln_mar13_win.nasl 11865 2018-10-12 10:03:43Z cfischer $
 #
 # PHP Multiple Vulnerabilities - Mar13 (Windows)
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.803337");
-  script_version("$Revision: 10459 $");
-  script_cve_id("CVE-2013-1635","CVE-2013-1643");
+  script_version("$Revision: 11865 $");
+  script_cve_id("CVE-2013-1635", "CVE-2013-1643");
   script_bugtraq_id(58224);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 09:41:24 +0200 (Mon, 09 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:03:43 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2013-03-14 18:10:04 +0530 (Thu, 14 Mar 2013)");
   script_name("PHP Multiple Vulnerabilities - Mar13 (Windows)");
   script_category(ACT_GATHER_INFO);
@@ -50,8 +50,7 @@ if(description)
   script_xref(name:"URL", value:"http://bugs.gentoo.org/show_bug.cgi?id=459904");
 
   script_tag(name:"summary", value:"This host is running PHP and is prone to multiple vulnerabilities.");
-  script_tag(name:"vuldetect", value:"Get the installed version of PHP with the help of detect NVT and check
-  the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Multiple flaws are due to,
 
@@ -62,18 +61,16 @@ if(description)
   in 'soap_xmlParseFile' and 'soap_xmlParseMemory' functions.");
 
   script_tag(name:"impact", value:"Successful exploitation allows attackers to read arbitrary files and write
-  wsdl files within the context of the affected application.
-
-  Impact Level: Application");
+  wsdl files within the context of the affected application.");
 
   script_tag(name:"affected", value:"PHP version before 5.3.23 and 5.4.x before 5.4.13");
 
-  script_tag(name:"solution", value:"Upgrade to PHP 5.4.13 or 5.3.23, which will be available soon.
-  For updates refer to http://www.php.net/downloads.php");
+  script_tag(name:"solution", value:"Upgrade to PHP 5.4.13 or 5.3.23, which will be available soon.");
 
   script_tag(name:"qod_type", value:"remote_banner");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://www.php.net/downloads.php");
   exit(0);
 }
 

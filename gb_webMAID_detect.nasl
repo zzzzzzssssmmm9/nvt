@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_webMAID_detect.nasl 9633 2018-04-26 14:07:08Z jschulte $
+# $Id: gb_webMAID_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # webMAID Detection
 #
@@ -26,24 +26,24 @@
 
 if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100558");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9633 $");
- script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
- script_tag(name:"creation_date", value:"2010-03-29 12:55:36 +0200 (Mon, 29 Mar 2010)");
- script_tag(name:"cvss_base", value:"0.0");
- script_name("webMAID Detection");
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Service detection");
- script_copyright("This script is Copyright (C) 2010 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
- script_tag(name : "summary" , value : "This host is running webMAID CMS. webMAID CMS is a flatfile CMS system
+  script_oid("1.3.6.1.4.1.25623.1.0.100558");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2010-03-29 12:55:36 +0200 (Mon, 29 Mar 2010)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_name("webMAID Detection");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Service detection");
+  script_copyright("This script is Copyright (C) 2010 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  script_tag(name:"summary", value:"This host is running webMAID CMS. webMAID CMS is a flatfile CMS system
 based on PHP and XML.");
- script_xref(name : "URL" , value : "http://code.google.com/p/webmaidcms/");
- exit(0);
+  script_xref(name:"URL", value:"http://code.google.com/p/webmaidcms/");
+  exit(0);
 }
 
 include("http_func.inc");

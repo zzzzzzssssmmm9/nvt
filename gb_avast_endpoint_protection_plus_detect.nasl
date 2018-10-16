@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_avast_endpoint_protection_plus_detect.nasl 9633 2018-04-26 14:07:08Z jschulte $
+# $Id: gb_avast_endpoint_protection_plus_detect.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # Avast Endpoint Protection Plus Version Detection
 #
@@ -27,14 +27,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.810213");
-  script_version("$Revision: 9633 $");
+  script_version("$Revision: 11279 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2016-11-24 12:04:38 +0530 (Thu, 24 Nov 2016)");
   script_name("Avast Endpoint Protection Plus Version Detection");
 
-  script_tag(name: "summary" , value: "Detection of installed version of
+  script_tag(name:"summary", value:"Detects the installed version of
   Avast Endpoint Protection Plus.
   The script logs in via smb, searches for string 'Avast Endpoint Protection Plus' in the
   registry and reads the version information from registry.");
@@ -43,7 +43,7 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
@@ -62,7 +62,7 @@ if(!registry_key_exists(key:"SOFTWARE\AVAST Software\Avast") &&
 
 os_arch = get_kb_item("SMB/Windows/Arch");
 if(!os_arch){
-  exit(-1);
+  exit(0);
 }
 
 ## Only 32-bit version is available
@@ -74,7 +74,6 @@ else if("x64" >< os_arch){
   key = "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\";
 }
 
-##Iterate
 foreach item (registry_enum_keys(key:key))
 {
   avastName = registry_get_sz(key:key + item, item:"DisplayName");

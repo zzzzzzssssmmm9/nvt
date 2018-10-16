@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_climatix_bacnet_mult_vuln.nasl 6141 2017-05-17 09:03:37Z teissa $
+# $Id: gb_climatix_bacnet_mult_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Climatix BACnet/IP Communication Module Multiple Vulnerabilities
 #
@@ -27,11 +27,11 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805713");
-  script_version("$Revision: 6141 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-4174");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-17 11:03:37 +0200 (Wed, 17 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-07-03 16:04:22 +0530 (Fri, 03 Jul 2015)");
   script_name("Climatix BACnet/IP Communication Module Multiple Vulnerabilities");
 
@@ -42,34 +42,34 @@ if(description)
   check whether it is able to read cookie or not.");
 
   script_tag(name:"insight", value:"Multiple flaws are due to,
+
   - The application does not validate input to the 'dumpfile.dll' before
     returning it to users.
+
   - The application allow unrestricted upload of files");
 
   script_tag(name:"impact", value:"Successful exploitation will allow attacker
-  to execute arbitrary HTML and script code in the context of an affected site.
-
-  Impact Level: Application");
+  to execute arbitrary HTML and script code in the context of an affected site.");
 
   script_tag(name:"affected", value:"Climatix BACnet/IP communication module
   before v10.34.");
 
   script_tag(name:"solution", value:"Upgrade to version 10.34 or above.
-  details are available.
-  For updates refer to http://www.climatix-group.com");
+  details are available.");
 
   script_tag(name:"qod_type", value:"remote_vul");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://packetstormsecurity.com/files/132514/climatixbacnet-xss.txt");
-  script_xref(name : "URL" , value : "http://www.siemens.com/innovation/pool/de/forschungsfelder/siemens_security_advisory_ssa-142512.pdf");
+  script_xref(name:"URL", value:"https://packetstormsecurity.com/files/132514/climatixbacnet-xss.txt");
+  script_xref(name:"URL", value:"http://www.siemens.com/innovation/pool/de/forschungsfelder/siemens_security_advisory_ssa-142512.pdf");
 
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Web application abuses");
   script_dependencies("find_service.nasl");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"http://www.climatix-group.com");
   exit(0);
 }
 
@@ -77,24 +77,14 @@ if(description)
 include("http_func.inc");
 include("http_keepalive.inc");
 
-## Variable Initialization
-http_port = "";
-sndReq = "";
-rcvRes = "";
-
-## Get HTTP Port
 http_port = get_http_port(default:80);
 
-# Construct GET Request
 rcvRes = http_get_cache(item:"/",  port:http_port);
 
-## Confirm Application
 if('>Climatix<' >< rcvRes || '>deviceWEB<' >< rcvRes || 'RMS_Banner.html' >< rcvRes)
 {
-  ## Construct Attack Request
   url = '/bgi/dumpfile.dll?";)</b><script>alert(document.cookie);</script>';
 
-  ## Try attack and check the response to confirm vulnerability
   if(http_vuln_check(port:http_port, url:url, check_header:TRUE,
      pattern:"<script>alert\(document.cookie\)"))
   {

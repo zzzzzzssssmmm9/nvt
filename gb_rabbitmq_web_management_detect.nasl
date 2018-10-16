@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_rabbitmq_web_management_detect.nasl 9443 2018-04-11 12:28:11Z cfischer $
+# $Id: gb_rabbitmq_web_management_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # RabbitMQ Web Management Detection
 #
@@ -27,25 +27,25 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105178");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_tag(name:"qod_type", value:"remote_banner");
- script_version ("$Revision: 9443 $");
- script_tag(name:"last_modification", value:"$Date: 2018-04-11 14:28:11 +0200 (Wed, 11 Apr 2018) $");
- script_tag(name:"creation_date", value:"2015-01-22 17:22:26 +0100 (Thu, 22 Jan 2015)");
- script_name("RabbitMQ Web Management Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105178");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-01-22 17:22:26 +0100 (Thu, 22 Jan 2015)");
+  script_name("RabbitMQ Web Management Detection");
 
- script_tag(name: "summary" , value: "The script sends a connection
+  script_tag(name:"summary", value:"The script sends a connection
 request to the server and attempts to detect the RabbitMQ webmanagement interface from the reply.");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 15672);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 15672);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  exit(0);
 }
 
 include("http_func.inc");

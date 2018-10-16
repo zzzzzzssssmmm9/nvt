@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_dell_omsa_remote_detect.nasl 9608 2018-04-25 13:33:05Z jschulte $
+# $Id: gb_dell_omsa_remote_detect.nasl 11407 2018-09-15 11:02:05Z cfischer $
 #
 # Dell OpenManage Server Administrator Remote Detection
 #
@@ -27,14 +27,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.807563");
-  script_version("$Revision: 9608 $");
+  script_version("$Revision: 11407 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-25 15:33:05 +0200 (Wed, 25 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 13:02:05 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2016-04-27 10:47:16 +0530 (Wed, 27 Apr 2016)");
   script_name("Dell OpenManage Server Administrator Remote Detection");
 
-  script_tag(name : "summary" , value : "Detection of installed version
+  script_tag(name:"summary", value:"Detection of installed version
   of Dell OpenManage Server Administrator.
 
   This script sends HTTP GET request and try to get the version from the
@@ -44,14 +44,12 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("find_service.nasl");
+  script_dependencies("find_service.nasl", "http_version.nasl");
   script_require_ports("Services/www", 1311);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+
   exit(0);
 }
-
-##
-### Code Starts Here
-##
 
 include("cpe.inc");
 include("http_func.inc");
@@ -60,20 +58,17 @@ include("http_keepalive.inc");
 
 omsaPort = get_http_port(default:1311);
 
-## Taking care of root installation and servlet installation
 foreach dir (make_list("/", "/servlet"))
 {
   install = dir;
   if( dir == "/" ) dir = "";
 
-  ## Send and Receive the response
   omsaReq = http_get(item: string(dir, "/Login?omacmd=getlogin&page=Login&managedws=true"), port:omsaPort);
   omsaRes = http_keepalive_send_recv(port:omsaPort, data:omsaReq);
 
   if('application">Server Administrator' >< omsaRes && '>Login' >< omsaRes &&
      'dell' >< omsaRes)
   {
-    ## Send and Receive the response
     url =  dir + "/UDataArea?plugin=com.dell.oma.webplugins.AboutWebPlugin";
     omsaReq = http_get(item: url, port:omsaPort);
     omsaRes = http_keepalive_send_recv(port:omsaPort, data:omsaReq);

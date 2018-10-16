@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mozilla_firefox_sec_bypass_vuln_aug15_macosx.nasl 6551 2017-07-06 09:58:21Z teissa $
+# $Id: gb_mozilla_firefox_sec_bypass_vuln_aug15_macosx.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Mozilla Firefox Security Bypass Vulnerability - Aug15 (Mac OS X)
 #
@@ -29,34 +29,31 @@ CPE = "cpe:/a:mozilla:firefox";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806008");
-  script_version("$Revision: 6551 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-4495");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 11:58:21 +0200 (Thu, 06 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-08-10 16:09:05 +0530 (Mon, 10 Aug 2015)");
   script_name("Mozilla Firefox Security Bypass Vulnerability - Aug15 (Mac OS X)");
 
-  script_tag(name: "summary" , value:"This host is installed with Mozilla
+  script_tag(name:"summary", value:"This host is installed with Mozilla
   Firefox and is prone to security bypass vulnerability.");
 
-  script_tag(name: "vuldetect" , value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"The flaw exists due to an error in the
+  script_tag(name:"insight", value:"The flaw exists due to an error in the
   interaction of the mechanism that enforces JavaScript context separation
   and Firefox PDF Viewer.");
 
-  script_tag(name: "impact" , value:"Successful exploitation will allow remote
-  attackers to read and steal sensitive local files on the victim's computer.
+  script_tag(name:"impact", value:"Successful exploitation will allow remote
+  attackers to read and steal sensitive local files on the victim's computer.");
 
-  Impact Level: System/Application");
-
-  script_tag(name: "affected" , value:"Mozilla Firefox version before 39.0.3 on
+  script_tag(name:"affected", value:"Mozilla Firefox version before 39.0.3 on
   Mac OS X");
 
-  script_tag(name: "solution" , value:"Upgrade to Mozilla Firefox version 39.0.3
-  or later, For updates refer to http://www.mozilla.com/en-US/firefox/all.html");
+  script_tag(name:"solution", value:"Upgrade to Mozilla Firefox version 39.0.3
+  or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
@@ -70,6 +67,7 @@ if(description)
   script_family("General");
   script_dependencies("gb_mozilla_prdts_detect_macosx.nasl");
   script_mandatory_keys("Mozilla/Firefox/MacOSX/Version");
+  script_xref(name:"URL", value:"http://www.mozilla.com/en-US/firefox/all.html");
   exit(0);
 }
 
@@ -77,15 +75,10 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-ffVer = "";
-
-## Get version
 if(!ffVer = get_app_version(cpe:CPE)){
    exit(0);
 }
 
-# Check for vulnerable version
 if(version_is_less(version:ffVer, test_version:"39.0.3"))
 {
   report = 'Installed version: ' + ffVer + '\n' +

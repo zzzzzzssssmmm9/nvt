@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mozilla_firefox_esr_mult_vuln01_dec14_macosx.nasl 6769 2017-07-20 09:56:33Z teissa $
+# $Id: gb_mozilla_firefox_esr_mult_vuln01_dec14_macosx.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # Mozilla Firefox ESR Multiple Vulnerabilities-01 Dec14 (Mac OS X)
 #
@@ -29,45 +29,48 @@ CPE = "cpe:/a:mozilla:firefox_esr";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805220");
-  script_version("$Revision: 6769 $");
+  script_version("$Revision: 11867 $");
   script_cve_id("CVE-2014-1594", "CVE-2014-1593", "CVE-2014-1592", "CVE-2014-1590",
                 "CVE-2014-1587", "CVE-2014-1595");
   script_bugtraq_id(71396, 71395, 71398, 71397, 71391, 71394);
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-20 11:56:33 +0200 (Thu, 20 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-12-16 10:57:44 +0530 (Tue, 16 Dec 2014)");
   script_name("Mozilla Firefox ESR Multiple Vulnerabilities-01 Dec14 (Mac OS X)");
 
-  script_tag(name: "summary" , value:"This host is installed with Mozilla Firefox ESR
+  script_tag(name:"summary", value:"This host is installed with Mozilla Firefox ESR
   and is prone to multiple vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Get the installed version with the help of
-  detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"Multiple flaws exist due to,
+  script_tag(name:"insight", value:"Multiple flaws exist due to,
+
   - A bad cast issue from the BasicThebesLayer to BasicContainerLayer.
+
   - An error when parsing media content within the 'mozilla::FileBlockCache::Read'
   function.
+
   - A use-after-free error when parsing certain HTML within the
   'nsHtml5TreeOperation' class.
+
   - An error that is triggered when handling JavaScript objects that are passed
   to XMLHttpRequest that mimics an input stream.
+
   - Multiple unspecified errors.
+
   - The CoreGraphics framework logging potentially sensitive input data
   to the /tmp directory.");
 
-  script_tag(name: "impact" , value:"Successful exploitation will allow attackers
+  script_tag(name:"impact", value:"Successful exploitation will allow attackers
   disclose potentially sensitive information, compromise a user's system and
-  have other unknown impacts.
+  have other unknown impacts.");
 
-  Impact Level: System/Application");
-
-  script_tag(name: "affected" , value:"Mozilla Firefox ESR 31.x before 31.3 on
+  script_tag(name:"affected", value:"Mozilla Firefox ESR 31.x before 31.3 on
   Mac OS X");
 
-  script_tag(name: "solution" , value:"Upgrade to Mozilla Firefox ESR version 31.3
-  or later, For updates refer to https://www.mozilla.org/en-US/firefox/organizations");
+  script_tag(name:"solution", value:"Upgrade to Mozilla Firefox ESR version 31.3
+  or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"package");
@@ -81,6 +84,7 @@ if(description)
   script_family("General");
   script_dependencies("gb_mozilla_prdts_detect_macosx.nasl");
   script_mandatory_keys("Mozilla/Firefox-ESR/MacOSX/Version");
+  script_xref(name:"URL", value:"https://www.mozilla.org/en-US/firefox/organizations");
   exit(0);
 }
 
@@ -88,20 +92,15 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-ffVer = "";
-
-## Get version
 if(!ffVer = get_app_version(cpe:CPE)){
   exit(0);
 }
 
-# Check for vulnerable version
-if(ffVer =~ "^(31)\.")
+if(ffVer =~ "^31\.")
 {
   if((version_in_range(version:ffVer, test_version:"31.0", test_version2:"31.2")))
   {
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }

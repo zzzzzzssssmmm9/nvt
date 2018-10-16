@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: find_service1.nasl 10434 2018-07-06 09:33:22Z cfischer $
+# $Id: find_service1.nasl 11526 2018-09-21 15:24:10Z cfischer $
 #
 # Service Detection with 'GET' Request
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.17975");
-  script_version("$Revision: 10434 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-06 11:33:22 +0200 (Fri, 06 Jul 2018) $");
+  script_version("$Revision: 11526 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 17:24:10 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -491,9 +491,7 @@ if( "IOR:010000002600000049444c3a536f70686f734d6573736167696e672f4d6573736167655
   exit( 0 );
 }
 
-# Check_MK Agent
 if( "<<<check_mk>>>" >< r || "<<<uptime>>>" >< r || "<<<services>>>" >< r || "<<<mem>>>" >< r ) {
-  # Check_MK Agents seems to not answer to repeated requests in a short amount of time so saving the response here for later processing.
   replace_kb_item( name:"check_mk_agent/banner/" + port, value:r );
   register_service( port:port, proto:"check_mk_agent", message:"A Check_MK Agent seems to be running on this port." );
   log_message( port:port, data:"A Check_MK Agent seems to be running on this port." );
@@ -506,7 +504,7 @@ if( r =~ "^\.NET" && ( "customErrors" >< r || "RemotingException" >< r ) ) {
   exit( 0 );
 }
 
-if( ( r =~ "^-ERR wrong number of arguments for 'get' command" && "-ERR unknown command 'Host:'" >< r ) ||
+if( r =~ "^-ERR wrong number of arguments for 'get' command" || egrep( string:r, pattern:"^-ERR unknown command 'Host:'" ) ||
     r =~ "^-DENIED Redis is running in protected mode" ) {
   register_service( port:port, proto:"redis", message:"A Redis server seems to be running on this port." );
   log_message( port:port, data:"A Redis server seems to be running on this port." );
@@ -556,7 +554,7 @@ if( "Connection from client using unsupported AMQP attempted" >< r || "amqp:deco
 # 0x0180:  6F 6E 09 00 06 35 2E 31 34 2E 35                   on...5.14.5
 
 if( "ActiveMQ" >< r && ( "PlatformDetails" >< r || "StackTraceEnable" >< r || "ProviderVersion" >< r || "TcpNoDelayEnabled" >< r ) ) {
-  # Set the response for later use in gb_apache_activemq_detect.nasl
+  # nb: Set the response for later use in gb_apache_activemq_detect.nasl
   set_kb_item( name:"ActiveMQ/JMS/banner/" + port, value:bin2string( ddata:r ) );
   register_service( port:port, proto:"activemq_jms", message:"A ActiveMQ JMS service seems to be running on this port." );
   log_message( port:port, data:"A ActiveMQ JMS service seems to be running on this port." );
@@ -871,8 +869,85 @@ if( port == 5441 &&
   exit( 0 );
 }
 
-#### Some spontaneous banners are coming slowly, so they are wrongly
-#### registered as answers to GET
+# OMAPI https://en.wikipedia.org/wiki/OMAPI
+# 0x00:  00 00 00 64 00 00 00 18                            ...d....
+if( rhexstr == "0000006400000018" ) {
+  register_service( port:port, proto:"omapi", message:"A service supporting the Object Management Application Programming Interface (OMAPI) protocol seems to be running on this port." );
+  log_message( port:port, data:"A service supporting the Object Management Application Programming Interface (OMAPI) protocol seems to be running on this port." );
+  exit( 0 );
+}
+
+# Comvault Complete Backup & Recovery v11 sp 9-12
+# https://www.commvault.com/complete-backup
+# 0x00:  00 00 10 03 09 00 01 03 09 00 00 00 00 00 FF E8    ................
+# 0x10:  00 00 00 0C 00 01 00 04 00 00 00 02 00 00 00 00    ................
+# 0x20:  00 00 00 02                                        ....
+if( rhexstr == "0000100309000103090000000000ffe80000000c00010004000000020000000000000002" ) {
+  register_service( port:port, proto:"comvault-complete-backup", message:"A Comvault Complete Backup & Recovery service seems to be running on this port." );
+  log_message( port:port, data:"A Comvault Complete Backup & Recovery service seems to be running on this port." );
+  exit( 0 );
+}
+
+# Digi AnywhereUSB/14
+# https://www.digi.com/products/usb-and-serial-connectivity/usb-over-ip-hubs/anywhereusb
+# 0x00:  FF 14 50 6F 72 74 20 69 73 20 6F 75 74 20 6F 66    ..Port is out of
+# 0x10:  20 72 61 6E 67 65 00 FF 14 50 6F 72 74 20 69 73     range...Port is
+# 0x20:  20 6F 75 74 20 6F 66 20 72 61 6E 67 65 00 FF 14     out of range...
+# 0x30:  50 6F 72 74 20 69 73 20 6F 75 74 20 6F 66 20 72    Port is out of r
+# 0x40:  61 6E 67 65 00 FF 14 50 6F 72 74 20 69 73 20 6F    ange...Port is o
+# 0x50:  75 74 20 6F 66 20 72 61 6E 67 65 00 FF 14 50 6F    ut of range...Po
+# 0x60:  72 74 20 69 73 20 6F 75 74 20 6F 66 20 72 61 6E    rt is out of ran
+# 0x70:  67 65 00                                           ge.
+if( rhexstr == "ff14506f7274206973206f7574206f662072616e676500ff14506f7274206973206f7574206f662072616e676500ff14506f7274206973206f7574206f662072616e676500ff14506f7274206973206f7574206f662072616e676500ff14506f7274206973206f7574206f662072616e676500" ) {
+  register_service( port:port, proto:"digi-usb", message:"A Digi AnywhereUSB/14 service seems to be running on this port." );
+  log_message( port:port, data:"A Digi AnywhereUSB/14 service seems to be running on this port." );
+  exit( 0 );
+}
+
+# mariadb - galera cluster port on e.g. 4567/tcp
+# 0x00:  24 00 00 02 43 9D 3A 7F 00 01 10 00 B3 B7 1E CD    $...C.:.........
+# 0x10:  A6 E7 11 E8 B9 33 E6 E4 2B A3 C7 AF 29 9F 98 AD    .....3..+...)...
+# 0x20:  A8 3B 11 E8 A6 2B 7F 47 06 68 BC B7                .;...+.G.h..
+if( rhexstr == "24000002439d3a7f00011000b3b71ecda6e711e8b933e6e42ba3c7af299f98ada83b11e8a62b7f470668bcb7 " ) {
+  register_service( port:port, proto:"digi-usb", message:"A MariaDB galera cluster service seems to be running on this port." );
+  log_message( port:port, data:"A MariaDB galera cluster service seems to be running on this port." );
+  exit( 0 );
+}
+
+# Various IRC servers, e.g.
+# nb: $hostname/$ip are placeholders for the hostname/ip of the target system, * are no placeholders and received as such...
+# :irc.$hostname NOTICE AUTH :*** Looking up your hostname...
+# ERROR :Your host is trying to (re)connect too fast -- throttled.
+# :unknown.host 451 GET :You have not registered
+# :$hostname NOTICE IP_LOOKUP :*** Looking up your hostname...
+# :irc.$hostname NOTICE * :*** Looking up your hostname...
+# ERROR :Trying to reconnect too fast.
+# ERROR :Closing Link: [$ip] (Throttled: Reconnecting too fast)
+if( r =~ "^:.* NOTICE AUTH :\*\*\* Looking up your hostname" ||
+    r =~ "^ERROR :Your host is trying to \(re\)connect too fast -- throttled\." ||
+    r =~ "^:.* 451 GET :You have not registered" ||
+    r =~ "^:.* NOTICE IP_LOOKUP :\*\*\* Looking up your hostname\.\.\." ||
+    r =~ "^:.* NOTICE \* :\*\*\* Looking up your hostname\.\.\." ||
+    r =~ "^ERROR :Trying to reconnect too fast." ||
+    ( r =~ "^ERROR :Closing Link:" && "(Throttled: Reconnecting too fast)" >< r ) ) {
+  register_service( port:port, proto:"irc", message:"An IRC server seems to be running on this port." );
+  log_message( port:port, data:"An IRC server seems to be running on this port." );
+  exit( 0 );
+}
+
+# rsh on 514/tcp if there is something wrong with the name resolution on the target host.
+# The "real" detection will happen in rsh.nasl as it won't response if working correctly...
+# 0x00:  01 67 65 74 6E 61 6D 65 69 6E 66 6F 3A 20 54 65    .getnameinfo: Te
+# 0x10:  6D 70 6F 72 61 72 79 20 66 61 69 6C 75 72 65 20    mporary failure # nb: Ending space...
+# 0x20:  69 6E 20 6E 61 6D 65 20 72 65 73 6F 6C 75 74 69    in name resoluti
+# 0x30:  6F 6E 0A                                           on.
+if( port == 514 && "getnameinfo: Temporary failure in name resolution" >< r ) {
+  register_service( port:port, proto:"rsh", message:"A rsh service seems to be running on this port." );
+  log_message( port:port, data:"A rsh service seems to be running on this port." );
+  exit( 0 );
+}
+
+# Some spontaneous banners are coming slowly, so they are wrongly registered as answers to GET
 if( r =~ '^(\\|/dev/[a-z0-9/-]+\\|[^|]*\\|[^|]*\\|[^|]\\|)+$' ) {
   report_service( port:port, svc:"hddtemp" );
   exit( 0 );
@@ -883,6 +958,7 @@ if( r =~ '^(\\|/dev/[a-z0-9/-]+\\|[^|]*\\|[^|]*\\|[^|]\\|)+$' ) {
 # or 0x00:  15 03 01                                           ...
 # See also "Alert Protocol format" in http://blog.fourthbit.com/2014/12/23/traffic-analysis-of-an-ssl-slash-tls-session/
 if( rhexstr =~ "^15030[0-3]00020[1-2]..$" ||
+    rhexstr =~ "^1500000732$" || # nb: e.g. Novell Zenworks prebootserver on 998/tcp
     rhexstr =~ "^150301$" ) {
   register_service( port:port, proto:"ssl", message:"A service responding with an unknown SSL/TLS alert seems to be running on this port." );
   log_message( port:port, data:"A service responding with an unknown SSL/TLS alert seems to be running on this port." );

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_smartermail_detect.nasl 6000 2017-04-21 11:07:29Z cfi $
+# $Id: secpod_smartermail_detect.nasl 11015 2018-08-17 06:31:19Z cfischer $
 #
 # SmarterMail Version Detection
 #
@@ -30,10 +30,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902258");
-  script_version("$Revision: 6000 $");
+  script_version("$Revision: 11015 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-04-21 13:07:29 +0200 (Fri, 21 Apr 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 08:31:19 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2010-10-01 08:36:34 +0200 (Fri, 01 Oct 2010)");
   script_name("SmarterMail Version Detection");
 
@@ -73,11 +73,9 @@ version = "unknown";
 ver = eregmatch(pattern:">SmarterMail [a-zA-Z]+ ([0-9.]+)<", string:SmRes);
 if(ver[1]) version = ver[1];
 
-## set the KB
 set_kb_item(name:"SmarterMail/Ver", value:version);
 set_kb_item(name:"SmarterMail/installed", value:TRUE);
 
-## build cpe and store it as host_detail
 cpe = build_cpe(value:version, exp:"^([0-9.]+)", base:"cpe:/a:smartertools:smartermail:");
 if(!cpe)
   cpe = 'cpe:/a:smartertools:smartermail';

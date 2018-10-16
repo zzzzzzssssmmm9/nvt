@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_fins_tcp_detect.nasl 7899 2017-11-24 09:30:33Z ckuersteiner $
+# $Id: gb_fins_tcp_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Factory Interface Network Service (FINS) Detection (TCP)
 #
@@ -27,32 +27,32 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.140512");
- script_version ("$Revision: 7899 $");
- script_tag(name: "last_modification", value: "$Date: 2017-11-24 10:30:33 +0100 (Fri, 24 Nov 2017) $");
- script_tag(name: "creation_date", value: "2017-11-20 16:46:39 +0700 (Mon, 20 Nov 2017)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.140512");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2017-11-20 16:46:39 +0700 (Mon, 20 Nov 2017)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("Factory Interface Network Service (FINS) Detection (TCP)");
+  script_name("Factory Interface Network Service (FINS) Detection (TCP)");
 
- script_tag(name: "summary" , value: "A Factory Interface Network Service (FINS) over TCP is running at this host.
+  script_tag(name:"summary", value:"A Factory Interface Network Service (FINS) over TCP is running at this host.
 
 Factory Interface Network Service, is a network protocol used by Omron PLCs. The FINS communications service was
 developed by Omron to provide a consistent way for PLCs and computers on various networks to communicate.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
- script_family("Service detection");
- script_dependencies("find_service.nasl");
- script_require_ports(9600);
+  script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
+  script_family("Service detection");
+  script_dependencies("find_service.nasl");
+  script_require_ports(9600);
 
- script_xref(name: "URL", value: "http://www.omron.com/");
+  script_xref(name:"URL", value:"http://www.omron.com/");
 
- exit(0);
+  exit(0);
 }
 
 include("dump.inc");

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ibm_websphere_detect_giop.nasl 9444 2018-04-11 12:34:23Z cfischer $
+# $Id: gb_ibm_websphere_detect_giop.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # IBM WebSphere Application Server Detection Detection (GIOP)
 #
@@ -27,24 +27,24 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105834");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 9444 $");
- script_tag(name:"last_modification", value:"$Date: 2018-04-11 14:34:23 +0200 (Wed, 11 Apr 2018) $");
- script_tag(name:"creation_date", value:"2016-07-29 15:04:09 +0200 (Fri, 29 Jul 2016)");
- script_name("IBM WebSphere Application Server Detection (GIOP)");
+  script_oid("1.3.6.1.4.1.25623.1.0.105834");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-07-29 15:04:09 +0200 (Fri, 29 Jul 2016)");
+  script_name("IBM WebSphere Application Server Detection (GIOP)");
 
- script_tag(name: "summary" , value: "The script sends a GIOP (General Inter-ORB Protocol) connection request to the server and attempts to extract the version number from the reply.");
+  script_tag(name:"summary", value:"The script sends a GIOP (General Inter-ORB Protocol) connection request to the server and attempts to extract the version number from the reply.");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("find_service2.nasl");
- script_require_ports("Services/giop", 9100, 9900 );
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("find_service2.nasl");
+  script_require_ports("Services/giop", 9100, 9900);
+  exit(0);
 }
 
 include("dump.inc");

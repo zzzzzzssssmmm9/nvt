@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: nmap.nasl 9277 2018-04-03 09:52:47Z cfischer $
+# $Id: nmap.nasl 11663 2018-09-28 06:18:46Z cfischer $
 #
 # Nmap (NASL wrapper)
 #
@@ -31,7 +31,7 @@
 # <http://nmap.org>
 
 # nb: Keep above the description part as it is used there
-include("gos_funcs.inc");
+include("misc_func.inc");
 include("version_func.inc");
 
 # nb: includes in the description phase won't work anymore from GOS 4.2.11 (OpenVAS TBD)
@@ -52,8 +52,8 @@ if( defined_func( "get_local_gos_version" ) &&
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.14259");
-  script_version("$Revision: 9277 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-03 11:52:47 +0200 (Tue, 03 Apr 2018) $");
+  script_version("$Revision: 11663 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-28 08:18:46 +0200 (Fri, 28 Sep 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -64,8 +64,7 @@ if(description)
   script_dependencies("toolcheck.nasl", "ping_host.nasl");
   script_mandatory_keys("Tools/Present/nmap");
 
-  script_add_preference(name:"TCP scanning technique :", type:"radio",
-  value:"connect();SYN scan;FIN scan;Xmas Tree scan;SYN FIN scan;FIN SYN scan;Null scan;No TCP scan");
+  script_add_preference(name:"TCP scanning technique :", type:"radio", value:"connect();SYN scan;FIN scan;Xmas Tree scan;SYN FIN scan;FIN SYN scan;Null scan;No TCP scan");
 
   script_add_preference(name:"Service scan", type:"checkbox", value:"no");
   script_add_preference(name:"RPC port scan", type:"checkbox", value:"no");
@@ -74,9 +73,9 @@ if(description)
   script_add_preference(name:"Source port :", type:"entry", value:"");
 
   if( use_new_timing ) {
-    script_add_preference(name:"Timing policy :", type:"radio", value:"Aggressive;Insane;Normal;Polite;Sneaky;Paranoid;Custom");
+  script_add_preference(name:"Timing policy :", type:"radio", value:"Aggressive;Insane;Normal;Polite;Sneaky;Paranoid;Custom");
   } else {
-    script_add_preference(name:"Timing policy :", type:"radio", value:"Normal;Insane;Aggressive;Polite;Sneaky;Paranoid;Custom");
+  script_add_preference(name:"Timing policy :", type:"radio", value:"Normal;Insane;Aggressive;Polite;Sneaky;Paranoid;Custom");
   }
 
   script_add_preference(name:"Max Retries :", type:"entry", value:"");
@@ -104,11 +103,9 @@ if(description)
 
 include("host_details.inc");
 include("network_func.inc");
-#nb: misc_func.inc is included down below only when needed
 
 if( get_kb_item( "Host/dead" ) ) exit( 0 );
 
-# Check if this scanner supports scan phases
 phase = 0;
 if( defined_func( "scan_phase" ) ) {
   phase = scan_phase();
@@ -383,7 +380,6 @@ if( ! res ) {
   }
 
   if( log_output ) {
-    include("misc_func.inc");
     log_message( port:0, data:"nmap command: " + join( list:argv ) + '\n\n' + res );
   }
 

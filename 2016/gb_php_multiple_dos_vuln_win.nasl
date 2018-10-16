@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_php_multiple_dos_vuln_win.nasl 10455 2018-07-09 05:52:14Z cfischer $
+# $Id: gb_php_multiple_dos_vuln_win.nasl 11903 2018-10-15 10:26:16Z asteins $
 #
 # PHP 'gdImageScaleTwoPass()' Multiple Denial of Service Vulnerabilities (Windows)
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.808610");
-  script_version("$Revision: 10455 $");
+  script_version("$Revision: 11903 $");
   script_cve_id("CVE-2015-8877", "CVE-2015-8879", "CVE-2015-8874");
   script_bugtraq_id(90866, 90842, 90714);
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 07:52:14 +0200 (Mon, 09 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-15 12:26:16 +0200 (Mon, 15 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-07-14 12:14:00 +0530 (Thu, 14 Jul 2016)");
   script_name("PHP 'gdImageScaleTwoPass()' Multiple Denial of Service Vulnerabilities (Windows)");
 
@@ -53,14 +53,12 @@ if(description)
 
   script_tag(name:"impact", value:"Successfully exploiting this issue allow
   remote attackers to cause a denial of service (application crash or
-  memory consuption).
-
-  Impact Level: Application");
+  memory consuption).");
 
   script_tag(name:"affected", value:"PHP versions prior to 5.6.12 on Windows");
 
   script_tag(name:"solution", value:"Upgrade to PHP version 5.6.12
-  or later. For updates refer to http://www.php.net");
+  or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_banner");

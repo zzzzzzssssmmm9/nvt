@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_citrix_netscaler_default_ssh_credentials.nasl 6243 2017-05-30 09:04:14Z teissa $
+# $Id: gb_citrix_netscaler_default_ssh_credentials.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Citrix NetScaler SSH Default Credentials
 #
@@ -27,32 +27,33 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105278");
- script_version("$Revision: 6243 $");
- script_tag(name:"cvss_base", value:"7.5");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
- script_name("Citrix NetScaler SSH Default Credentials");
- script_tag(name:"last_modification", value:"$Date: 2017-05-30 11:04:14 +0200 (Tue, 30 May 2017) $");
- script_tag(name:"creation_date", value:"2015-05-12 18:01:07 +0200 (Tue, 12 May 2015)");
- script_category(ACT_ATTACK);
- script_family("Default Accounts");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_require_ports("Services/ssh", 22);
+  script_oid("1.3.6.1.4.1.25623.1.0.105278");
+  script_version("$Revision: 11872 $");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_name("Citrix NetScaler SSH Default Credentials");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-05-12 18:01:07 +0200 (Tue, 12 May 2015)");
+  script_category(ACT_ATTACK);
+  script_family("Default Accounts");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_require_ports("Services/ssh", 22);
 
- script_tag(name: "summary" , value: 'The remote Citrix NetScaler is prone to a default account authentication
+  script_tag(name:"summary", value:'The remote Citrix NetScaler is prone to a default account authentication
 bypass vulnerability.');
 
- script_tag(name: "impact" , value:'This issue may be exploited by a remote attacker to gain
+  script_tag(name:"impact", value:'This issue may be exploited by a remote attacker to gain
 access to sensitive information or modify system configuration.');
 
- script_tag(name: "vuldetect" , value: 'Try to login with default credentials.');
- script_tag(name: "insight" , value: 'It was possible to login with default credentials: nsroot/nsroot');
- script_tag(name: "solution" , value: 'Change the password.');
- script_dependencies("find_service.nasl");
+  script_tag(name:"vuldetect", value:'Try to login with default credentials.');
+  script_tag(name:"insight", value:'It was possible to login with default credentials: nsroot/nsroot');
+  script_tag(name:"solution", value:'Change the password.');
+  script_tag(name:"solution_type", value:"Mitigation");
+  script_dependencies("find_service.nasl");
 
- script_tag(name:"qod_type", value:"exploit");
+  script_tag(name:"qod_type", value:"exploit");
 
- exit(0);
+  exit(0);
 }
 
 include("ssh_func.inc");

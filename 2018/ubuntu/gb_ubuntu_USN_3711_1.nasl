@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_3711_1.nasl 10556 2018-07-20 11:13:07Z cfischer $
+# $Id: gb_ubuntu_USN_3711_1.nasl 11171 2018-08-31 02:55:34Z ckuersteiner $
 #
 # Ubuntu Update for imagemagick USN-3711-1
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.843588");
-  script_version("$Revision: 10556 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-20 13:13:07 +0200 (Fri, 20 Jul 2018) $");
+  script_version("$Revision: 11171 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-31 04:55:34 +0200 (Fri, 31 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-07-12 05:57:23 +0200 (Thu, 12 Jul 2018)");
   script_cve_id("CVE-2018-12599", "CVE-2018-12600", "CVE-2018-13153");
-  script_tag(name:"cvss_base", value:"5.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
+  script_tag(name:"cvss_base", value:"6.8");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
   script_tag(name:"qod_type", value:"package");
   script_name("Ubuntu Update for imagemagick USN-3711-1");
   script_tag(name:"summary", value:"Check the version of imagemagick");
@@ -43,14 +43,14 @@ handled certain malformed image files. If a user or automated system using
 ImageMagick were tricked into opening a specially crafted image, an attacker could
 exploit this to cause a denial of service or possibly execute code with the
 privileges of the user invoking the program.");
-  script_tag(name:"affected", value:"imagemagick on Ubuntu 18.04 LTS ,
-  Ubuntu 17.10 ,
-  Ubuntu 16.04 LTS ,
+  script_tag(name:"affected", value:"imagemagick on Ubuntu 18.04 LTS,
+  Ubuntu 17.10,
+  Ubuntu 16.04 LTS,
   Ubuntu 14.04 LTS");
   script_tag(name:"solution", value:"Please install the updated packages.");
 
   script_xref(name:"USN", value:"3711-1");
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-3711-1/");
+  script_xref(name:"URL", value:"http://www.ubuntu.com/usn/usn-3711-1/");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -63,7 +63,7 @@ privileges of the user invoking the program.");
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 res = "";
 if(release == NULL){

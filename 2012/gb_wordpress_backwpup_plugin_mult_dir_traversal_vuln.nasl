@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wordpress_backwpup_plugin_mult_dir_traversal_vuln.nasl 10257 2018-06-19 14:04:53Z cfischer $
+# $Id: gb_wordpress_backwpup_plugin_mult_dir_traversal_vuln.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # WordPress BackWPup Plugin Multiple Directory Traversal Vulnerabilities
 #
@@ -29,7 +29,7 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802979");
-  script_version("$Revision: 10257 $");
+  script_version("$Revision: 11857 $");
   script_cve_id("CVE-2011-5208");
   script_tag(name:"last_modification", value:"$Date: 2017-10-26 12:41:56 +0200 (Do, 26 Okt 2017)$");
   script_tag(name:"creation_date", value:"2012-10-09 14:50:11 +0530 (Tue, 09 Oct 2012)");
@@ -47,9 +47,7 @@ if(description)
   script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2011/Feb/663");
 
   script_tag(name:"impact", value:"Successful exploitation could allow attackers to perform directory traversal
-  attacks and read arbitrary files on the affected application.
-
-  Impact Level: Application");
+  attacks and read arbitrary files on the affected application.");
 
   script_tag(name:"affected", value:"WordPress BackWPup Plugin Version prior to 1.4.1");
 
@@ -60,8 +58,7 @@ if(description)
   (when jobid is set to a numeric value) is not properly verified before being
   used to include files.");
 
-  script_tag(name:"solution", value:"Upgrade to WordPress BackWPup Plugin version 1.4.1 or later
-  For updates refer to http://wordpress.org/extend/plugins/backwpup/");
+  script_tag(name:"solution", value:"Upgrade to WordPress BackWPup Plugin version 1.4.1 or later.");
 
   script_tag(name:"summary", value:"This host is installed with WordPress BackWPup Plugin and is prone to
   multiple directory traversal vulnerabilities.");
@@ -69,6 +66,7 @@ if(description)
   script_tag(name:"qod_type", value:"remote_vul");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://wordpress.org/extend/plugins/backwpup/");
   exit(0);
 }
 

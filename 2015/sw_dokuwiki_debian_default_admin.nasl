@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: sw_dokuwiki_debian_default_admin.nasl 6505 2017-07-03 09:58:27Z teissa $
+# $Id: sw_dokuwiki_debian_default_admin.nasl 11492 2018-09-20 08:38:50Z mmartin $
 #
 # Dokuwiki default admin credentials on Debian
 #
@@ -29,8 +29,8 @@ CPE = 'cpe:/a:dokuwiki:dokuwiki';
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.111044");
-  script_version("$Revision: 6505 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-03 11:58:27 +0200 (Mon, 03 Jul 2017) $");
+  script_version("$Revision: 11492 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-20 10:38:50 +0200 (Thu, 20 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-10-30 09:00:00 +0100 (Fri, 30 Oct 2015)");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
@@ -44,14 +44,14 @@ if(description)
   script_require_ports("Services/www", 80);
   script_mandatory_keys("dokuwiki/installed");
 
-  script_tag(name : "summary" , value : "Detection of Dokuwiki default admin credentials on Debian.");
-  script_tag(name : "vuldetect" , value : "Check if it is possible to login with default admin credentials.");
-  script_tag(name : "impact" , value : "This issue may be exploited by a remote attacker to gain
+  script_tag(name:"summary", value:"Detection of Dokuwiki default admin credentials on Debian.");
+  script_tag(name:"vuldetect", value:"Check if it is possible to login with default admin credentials.");
+  script_tag(name:"impact", value:"This issue may be exploited by a remote attacker to gain
   access to sensitive information.");
-  script_tag(name: "insight" , value: "It was possible to login with default credentials: admin/fix-your-debconf-settings
+  script_tag(name:"insight", value:"It was possible to login with default credentials: admin/fix-your-debconf-settings
 
   This default credentials are created if Dokuwiki is installed on Debian with debconf configured to skip high priority questions.");
-  script_tag(name : "solution" , value : "Change the password of the 'admin' account.");
+  script_tag(name:"solution", value:"Change the password of the 'admin' account.");
 
   script_xref(name:"URL", value:"https://www.dokuwiki.org/");
 
@@ -84,13 +84,13 @@ if( isnull( sectok[1] ) ) exit( 0 );
 host = http_host_name( port:port );
 
 url = dir + "/doku.php?id=start&do=login&sectok=" + sectok[1];
-
+useragent = get_http_user_agent();
 data = "sectok=" + sectok[1] + "&id=start&do=login&u=admin&p=fix-your-debconf-settings";
 len = strlen( data );
 
 req = 'POST ' + url + ' HTTP/1.1\r\n' +
       'Host: ' + host + '\r\n' +
-      'User-Agent: ' + OPENVAS_HTTP_USER_AGENT +'\r\n' +
+      'User-Agent: ' + useragent + '\r\n' +
       'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
       'Accept-Language: en-US,en;q=0.5\r\n' +
       'Referer: http://' + host + url + '\r\n' +
@@ -107,7 +107,7 @@ if( isnull( cookie2[1] ) ) exit( 0 );
 
 req = 'GET ' + dir + '/doku.php?id=start HTTP/1.1\r\n' +
       'Host: ' + host + '\r\n' +
-      'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+      'User-Agent: ' + useragent + '\r\n' +
       'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
       'Accept-Language: en-US,en;q=0.5\r\n' +
       'Referer: http://' + host + url + '\r\n' +
@@ -121,6 +121,6 @@ if( "do=admin" >< res && "action admin" >< res ) {
   report = report_vuln_url( port:port, url:url );
   security_message( port:port, data:report );
   exit( 0 );
-}  
+}
 
 exit( 99 );

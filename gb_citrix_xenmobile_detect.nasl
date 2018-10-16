@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_citrix_xenmobile_detect.nasl 9633 2018-04-26 14:07:08Z jschulte $
+# $Id: gb_citrix_xenmobile_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Citrix XenMobile Server Detection
 #
@@ -27,35 +27,38 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105569");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 9633 $");
- script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
- script_tag(name:"creation_date", value:"2016-03-15 18:31:10 +0100 (Tue, 15 Mar 2016)");
- script_name("Citrix XenMobile Server Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105569");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-03-15 18:31:10 +0100 (Tue, 15 Mar 2016)");
+  script_name("Citrix XenMobile Server Detection");
 
- script_tag(name: "summary" , value: "The script sends a connection request to the server and attempts to extract the version number from the reply. When HTTP credentials are given, this script logis in into the XenMobile Server to get installed patch releases.");
+  script_tag(name:"summary", value:"The script sends a connection request to the server and attempts to extract
+  the version number from the reply. When HTTP credentials are given, this script logis in into the XenMobile
+  Server to get installed patch releases.");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80, 443, 8443 );
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80, 443, 8443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_add_preference(name:"XenMobile Username: ", value:"", type:"entry");
- script_add_preference(name:"XenMobile Password: ", type:"password", value:"");
+  script_add_preference(name:"XenMobile Username: ", value:"", type:"entry");
+  script_add_preference(name:"XenMobile Password: ", type:"password", value:"");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
 include("version_func.inc");
+include("misc_func.inc");
 
 port = get_http_port( default:4443 );
 

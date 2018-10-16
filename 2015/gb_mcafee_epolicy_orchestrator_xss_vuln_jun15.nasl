@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mcafee_epolicy_orchestrator_xss_vuln_jun15.nasl 6194 2017-05-23 09:04:00Z teissa $
+# $Id: gb_mcafee_epolicy_orchestrator_xss_vuln_jun15.nasl 11452 2018-09-18 11:24:16Z mmartin $
 #
 # McAfee ePolicy Orchestrator Cross Site Scripting Vulnerability - June15
 #
@@ -29,28 +29,25 @@ CPE = "cpe:/a:mcafee:epolicy_orchestrator";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805594");
-  script_version("$Revision: 6194 $");
+  script_version("$Revision: 11452 $");
   script_cve_id("CVE-2015-4559");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-23 11:04:00 +0200 (Tue, 23 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-18 13:24:16 +0200 (Tue, 18 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-06-24 11:25:11 +0530 (Wed, 24 Jun 2015)");
   script_name("McAfee ePolicy Orchestrator Cross Site Scripting Vulnerability - June15");
 
   script_tag(name:"summary", value:"This host is installed with McAfee ePolicy
   Orchestrator and is prone to cross site scripting vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help of
-  detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw exists due to error in the product
   deployment feature in the Java core web services.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attacker to execute arbitrary HTML and script code in the context of an
-  affected site.
-
-  Impact Level: Application");
+  affected site.");
 
   script_tag(name:"affected", value:"McAfee ePolicy Orchestrator version 5.x
   before 5.1.2");
@@ -78,21 +75,14 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-mcaVer = "";
-mcaPort = "";
-
-## get the port
 if(!mcaPort = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get the version
 if(!mcaVer = get_app_version(cpe:CPE, port:mcaPort)){
   exit(0);
 }
 
-##Check for version
 if(version_in_range(version:mcaVer, test_version:"5.0.0", test_version2:"5.1.1"))
 {
   report = 'Installed Version: ' + mcaVer + '\n' +

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_java_mult_unspecified_vuln03_apr15.nasl 10144 2018-06-08 14:06:26Z asteins $
+# $Id: gb_java_mult_unspecified_vuln03_apr15.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Oracle Java SE JRE Multiple Unspecified Vulnerabilities-03 Apr 2015 (Windows)
 #
@@ -29,39 +29,38 @@ CPE = "cpe:/a:oracle:jre";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805537");
-  script_version("$Revision: 10144 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-0470", "CVE-2015-0486");
   script_bugtraq_id(74149, 74145);
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-08 16:06:26 +0200 (Fri, 08 Jun 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-04-21 17:16:10 +0530 (Tue, 21 Apr 2015)");
   script_name("Oracle Java SE JRE Multiple Unspecified Vulnerabilities-03 Apr 2015 (Windows)");
 
-  script_tag(name: "summary" , value:"The host is installed with Oracle Java SE
+  script_tag(name:"summary", value:"The host is installed with Oracle Java SE
   JRE and is prone to multiple unspecified vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"Multiple flaws exist due to,
+  script_tag(name:"insight", value:"Multiple flaws exist due to,
+
   - An error in the Hotspot subcomponent related to private method resolution.
+
   - An unspecified error related to the Deployment subcomponent.");
 
-  script_tag(name: "impact" , value:"Successful exploitation will allow attackers
+  script_tag(name:"impact", value:"Successful exploitation will allow attackers
   to gain knowledge of potentially sensitive information and bypass certain
-  sandbox restrictions.
+  sandbox restrictions.");
 
-  Impact Level: System/Application");
-
-  script_tag(name: "affected" , value:"Oracle Java SE 8 update 40 and prior
+  script_tag(name:"affected", value:"Oracle Java SE 8 update 40 and prior
   on Windows.");
 
-  script_tag(name: "solution" , value:"Apply the patch from below link,
-  http://www.oracle.com/technetwork/topics/security/cpuapr2015-2365600.html");
+  script_tag(name:"solution", value:"Apply the patch from the referenced advisory.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"registry");
-  script_xref(name : "URL" , value : "http://www.oracle.com/technetwork/topics/security/cpuapr2015-2365600.html");
+  script_xref(name:"URL", value:"http://www.oracle.com/technetwork/topics/security/cpuapr2015-2365600.html");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("General");
@@ -82,7 +81,7 @@ if(jreVer =~ "^(1\.8)")
 {
   if(version_in_range(version:jreVer, test_version:"1.8.0", test_version2:"1.8.0.40"))
   {
-    report = report_fixed_ver(installed_version:jreVer, fixed_version: "Apply the patch");
+    report = report_fixed_ver(installed_version:jreVer, fixed_version: "Apply the patch from the referenced advisory.");
     security_message(data:report);
     exit(0);
   }

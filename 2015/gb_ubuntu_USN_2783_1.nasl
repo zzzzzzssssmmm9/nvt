@@ -26,21 +26,20 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.842504");
-  script_version("$Revision: 9652 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-27 11:09:48 +0200 (Fri, 27 Apr 2018) $");
+  script_version("$Revision: 11513 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 05:48:51 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-10-28 07:18:08 +0100 (Wed, 28 Oct 2015)");
-  script_cve_id("CVE-2015-5146", "CVE-2015-5194", "CVE-2015-5195", "CVE-2015-5196",
-                "CVE-2015-7703", "CVE-2015-5219", "CVE-2015-5300", "CVE-2015-7691",
-                "CVE-2015-7692", "CVE-2015-7702", "CVE-2015-7701", "CVE-2015-7704",
-                "CVE-2015-7705", "CVE-2015-7850", "CVE-2015-7852", "CVE-2015-7853",
+  script_cve_id("CVE-2015-5146", "CVE-2015-5194", "CVE-2015-5195", "CVE-2015-7703", "CVE-2015-5219",
+                "CVE-2015-5300", "CVE-2015-7691", "CVE-2015-7692", "CVE-2015-7702", "CVE-2015-7701",
+                "CVE-2015-7704", "CVE-2015-7705", "CVE-2015-7850", "CVE-2015-7852", "CVE-2015-7853",
                 "CVE-2015-7855", "CVE-2015-7871");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"7.8");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
   script_tag(name:"qod_type", value:"package");
   script_name("Ubuntu Update for ntp USN-2783-1");
-  script_tag(name: "summary", value: "Check the version of ntp");
-  script_tag(name: "vuldetect", value: "Checks if a vulnerable version is present on the target host.");
-script_tag(name: "insight", value: "Aleksis Kauppinen discovered that NTP
+  script_tag(name:"summary", value:"Check the version of ntp");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"insight", value:"Aleksis Kauppinen discovered that NTP
 incorrectly handled certain remote config packets. In a non-default configuration,
 a remote authenticated attacker could possibly use this issue to cause NTP to crash,
 resulting in a denial of service. (CVE-2015-5146)
@@ -58,7 +57,7 @@ of service. (CVE-2015-5195)
 Miroslav Lichvar discovered that NTP incorrectly handled certain file
 paths. In a non-default configuration, a remote authenticated attacker
 could possibly use this issue to cause NTP to crash, resulting in a denial
-of service, or overwrite certain files. (CVE-2015-5196, CVE-2015-7703)
+of service, or overwrite certain files. (CVE-2015-7703)
 
 Miroslav Lichvar discovered that NTP incorrectly handled certain packets.
 A remote attacker could possibly use this issue to cause NTP to hang,
@@ -93,13 +92,10 @@ Yves Younan and Aleksander Nikolich discovered that NTP incorrectly handled
 ascii conversion. A remote attacker could possibly  ...
 
   Description truncated, for more information please check the Reference URL");
-  script_tag(name: "affected", value: "ntp on Ubuntu 15.10 ,
-  Ubuntu 15.04 ,
-  Ubuntu 14.04 LTS ,
-  Ubuntu 12.04 LTS");
-  script_tag(name: "solution", value: "Please Install the Updated Packages.");
-  script_xref(name: "USN", value: "2783-1");
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-2783-1/");
+  script_tag(name:"affected", value:"ntp on Ubuntu 15.10, Ubuntu 15.04, Ubuntu 14.04 LTS, Ubuntu 12.04 LTS");
+  script_tag(name:"solution", value:"Please Install the Updated Packages.");
+  script_xref(name:"USN", value:"2783-1");
+  script_xref(name:"URL", value:"http://www.ubuntu.com/usn/usn-2783-1/");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
@@ -112,7 +108,7 @@ ascii conversion. A remote attacker could possibly  ...
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 res = "";
 if(release == NULL){

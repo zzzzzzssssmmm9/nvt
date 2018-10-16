@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wordpress_pretty_link_plugin_mult_vuln.nasl 10257 2018-06-19 14:04:53Z cfischer $
+# $Id: gb_wordpress_pretty_link_plugin_mult_vuln.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # WordPress Pretty Link Lite Plugin SQL Injection And XSS Vulnerabilities
 #
@@ -29,7 +29,7 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802857");
-  script_version("$Revision: 10257 $");
+  script_version("$Revision: 11857 $");
   script_bugtraq_id(53531);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
@@ -51,9 +51,7 @@ if(description)
   script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to cause SQL Injection
   attack and gain sensitive information or insert arbitrary HTML and script
   code, which will be executed in a user's browser session in the context of
-  an affected site.
-
-  Impact Level: Application");
+  an affected site.");
 
   script_tag(name:"affected", value:"WordPress Pretty Link Lite Plugin version 1.5.2 and prior");
 
@@ -65,8 +63,7 @@ if(description)
   - 'page' parameter to '/wp-admin/admin.php', which allows attacker to
     manipulate SQL queries by injecting arbitrary SQL code.");
 
-  script_tag(name:"solution", value:"Upgrade to Pretty Link Lite Plugin version 1.5.4 or later,
-  For updates refer to http://wordpress.org/extend/plugins/pretty-link/");
+  script_tag(name:"solution", value:"Upgrade to Pretty Link Lite Plugin version 1.5.4 or later.");
 
   script_tag(name:"summary", value:"This host is running WordPress with Pretty Link Lite plugin and is
   prone to sql injection and cross site scripting vulnerabilities.");
@@ -74,6 +71,7 @@ if(description)
   script_tag(name:"qod_type", value:"remote_vul");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://wordpress.org/extend/plugins/pretty-link/");
   exit(0);
 }
 

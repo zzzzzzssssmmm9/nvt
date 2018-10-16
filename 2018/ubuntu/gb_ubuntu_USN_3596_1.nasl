@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_3596_1.nasl 9655 2018-04-27 09:23:07Z cfischer $
+# $Id: gb_ubuntu_USN_3596_1.nasl 11044 2018-08-18 15:12:40Z cfischer $
 #
 # Ubuntu Update for firefox USN-3596-1
 #
@@ -27,21 +27,21 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.843475");
-  script_version("$Revision: 9655 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-27 11:23:07 +0200 (Fri, 27 Apr 2018) $");
+  script_version("$Revision: 11044 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-18 17:12:40 +0200 (Sat, 18 Aug 2018) $");
   script_tag(name:"creation_date", value:"2018-03-15 08:47:52 +0100 (Thu, 15 Mar 2018)");
   script_cve_id("CVE-2018-5125", "CVE-2018-5126", "CVE-2018-5127", "CVE-2018-5128",
                 "CVE-2018-5129", "CVE-2018-5130", "CVE-2018-5136", "CVE-2018-5137",
                 "CVE-2018-5140", "CVE-2018-5141", "CVE-2018-5142", "CVE-2018-5131",
                 "CVE-2018-5132", "CVE-2018-5134", "CVE-2018-5135", "CVE-2018-5133",
                 "CVE-2018-5143");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
   script_tag(name:"qod_type", value:"package");
   script_name("Ubuntu Update for firefox USN-3596-1");
-  script_tag(name: "summary", value: "Check the version of firefox");
-  script_tag(name: "vuldetect", value: "Checks if a vulnerable version is present on the target host.");
-  script_tag(name: "insight", value: "Multiple security issues were discovered in
+  script_tag(name:"summary", value:"Check the version of firefox");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
+  script_tag(name:"insight", value:"Multiple security issues were discovered in
   Firefox. If a user were tricked in to opening a specially crafted website, an
   attacker could potentially exploit these to cause a denial of service via
   application crash or opening new tabs, escape the sandbox, bypass same-origin
@@ -64,13 +64,13 @@ if(description)
   tricked in to copying a specially crafted URL in to the addressbar, an attacker
   could exploit this to conduct cross-site scripting (XSS) attacks.
   (CVE-2018-5143)");
-  script_tag(name: "affected", value: "firefox on Ubuntu 17.10 ,
-  Ubuntu 16.04 LTS ,
+  script_tag(name:"affected", value:"firefox on Ubuntu 17.10,
+  Ubuntu 16.04 LTS,
   Ubuntu 14.04 LTS");
-  script_tag(name: "solution", value: "Please Install the Updated Packages.");
+  script_tag(name:"solution", value:"Please Install the Updated Packages.");
 
-  script_xref(name: "USN", value: "3596-1");
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-3596-1/");
+  script_xref(name:"USN", value:"3596-1");
+  script_xref(name:"URL", value:"http://www.ubuntu.com/usn/usn-3596-1/");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -83,7 +83,7 @@ if(description)
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 res = "";
 if(release == NULL){

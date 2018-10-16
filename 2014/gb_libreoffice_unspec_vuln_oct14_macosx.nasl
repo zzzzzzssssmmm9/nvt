@@ -1,6 +1,6 @@
 #############################################################################/##
 # OpenVAS Vulnerability Test
-# $Id: gb_libreoffice_unspec_vuln_oct14_macosx.nasl 6759 2017-07-19 09:56:33Z teissa $
+# $Id: gb_libreoffice_unspec_vuln_oct14_macosx.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # LibreOffice Unspecified Vulnerability Oct14 (Mac OS X)
 #
@@ -29,36 +29,32 @@ CPE = "cpe:/a:libreoffice:libreoffice";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804929");
-  script_version("$Revision: 6759 $");
+  script_version("$Revision: 11867 $");
   script_cve_id("CVE-2014-0247");
   script_bugtraq_id(68151);
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-19 11:56:33 +0200 (Wed, 19 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-10-01 12:57:54 +0530 (Wed, 01 Oct 2014)");
 
   script_name("LibreOffice Unspecified Vulnerability Oct14 (Mac OS X)");
 
-  script_tag(name: "summary" , value:"This host is installed with LibreOffice
+  script_tag(name:"summary", value:"This host is installed with LibreOffice
   and is prone to unspecified vulnerability.");
 
-  script_tag(name: "vuldetect" , value:"Get the installed version with the help of
-  detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name: "insight" , value:"Flaw exists due to the application not
+  script_tag(name:"insight", value:"Flaw exists due to the application not
   properly restricting VBA macros in the VBAProject element.");
 
-  script_tag(name: "impact" , value:"Successful exploitation will allow attackers
+  script_tag(name:"impact", value:"Successful exploitation will allow attackers
   to bypass certain security restrictions and execute VBA script code without
-  user approval.
+  user approval.");
 
-  Impact Level: Application");
-
-  script_tag(name: "affected" , value:"LibreOffice version 4.1.4/4.2.0 prior
+  script_tag(name:"affected", value:"LibreOffice version 4.1.4/4.2.0 prior
   to 4.2.5 on Mac OS X");
 
-  script_tag(name: "solution" , value:"Upgrade to LibreOffice 4.2.5 or later,
-  For updates refer to http://www.libreoffice.org");
+  script_tag(name:"solution", value:"Upgrade to LibreOffice 4.2.5 or later.");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
 
@@ -70,6 +66,7 @@ if(description)
   script_family("General");
   script_dependencies("gb_libreoffice_detect_macosx.nasl");
   script_mandatory_keys("LibreOffice/MacOSX/Version");
+  script_xref(name:"URL", value:"http://www.libreoffice.org");
   exit(0);
 }
 
@@ -77,17 +74,12 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-libreVer = "";
-
-## Get version
 if(!libreVer = get_app_version(cpe:CPE)){
   exit(0);
 }
 
-## Check for vulnerable version
 if(version_in_range(version:libreVer, test_version:"4.1.4", test_version2:"4.2.4"))
 {
-  security_message(0);
+  security_message( port: 0, data: "The target host was found to be vulnerable" );
   exit(0);
 }

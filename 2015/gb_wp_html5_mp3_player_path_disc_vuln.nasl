@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wp_html5_mp3_player_path_disc_vuln.nasl 9998 2018-05-29 08:15:38Z cfischer $
+# $Id: gb_wp_html5_mp3_player_path_disc_vuln.nasl 11452 2018-09-18 11:24:16Z mmartin $
 #
 # Wordpress Html5 Mp3 Player 'playlist.php' Path Disclosure Vulnerability
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805120");
-  script_version("$Revision: 9998 $");
+  script_version("$Revision: 11452 $");
   script_cve_id("CVE-2014-9177");
   script_bugtraq_id(71512);
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-29 10:15:38 +0200 (Tue, 29 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-18 13:24:16 +0200 (Tue, 18 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-01-09 12:56:08 +0530 (Fri, 09 Jan 2015)");
   script_name("Wordpress Html5 Mp3 Player 'playlist.php' Path Disclosure Vulnerability");
 
@@ -50,9 +50,7 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to discloses the software's installation path resulting in a
-  loss of confidentiality.
-
-  Impact Level: Application");
+  loss of confidentiality.");
 
   script_tag(name:"affected", value:"Wordpress HTML5 MP3 Player with
   Playlist Free plugin before 2.7");
@@ -62,10 +60,10 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://xforce.iss.net/xforce/xfdb/98988");
-  script_xref(name : "URL" , value : "http://packetstormsecurity.com/files/129286");
-  script_xref(name : "URL" , value : "https://wordpress.org/plugins/html5-mp3-player-with-playlist/changelog");
-  script_xref(name : "URL" , value : "http://h4x0resec.blogspot.in/2014/11/wordpress-html5-mp3-player-with.html");
+  script_xref(name:"URL", value:"http://xforce.iss.net/xforce/xfdb/98988");
+  script_xref(name:"URL", value:"http://packetstormsecurity.com/files/129286");
+  script_xref(name:"URL", value:"https://wordpress.org/plugins/html5-mp3-player-with-playlist/changelog");
+  script_xref(name:"URL", value:"http://h4x0resec.blogspot.in/2014/11/wordpress-html5-mp3-player-with.html");
 
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_subversion_remote_detect.nasl 9608 2018-04-25 13:33:05Z jschulte $
+# $Id: gb_subversion_remote_detect.nasl 11420 2018-09-17 06:33:13Z cfischer $
 #
 # Subversion Server Detection Version Detection
 #
@@ -27,37 +27,31 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804405");
-  script_version("$Revision: 9608 $");
+  script_version("$Revision: 11420 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-25 15:33:05 +0200 (Wed, 25 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-17 08:33:13 +0200 (Mon, 17 Sep 2018) $");
   script_tag(name:"creation_date", value:"2014-04-03 15:54:53 +0530 (Thu, 03 Apr 2014)");
   script_tag(name:"qod_type", value:"remote_banner");
   script_name("Subversion Server Detection Version Detection");
 
+  script_tag(name:"summary", value:"Detection of Subversion Server version.
 
-  script_tag(name : "summary" , value : "Detection of Subversion Server version.
-
-The script sends a connection request to the server and attempts to
-extract the version number from the reply.");
+  The script sends a connection request to the server and attempts to
+  extract the version number from the reply.");
 
   script_category(ACT_GATHER_INFO);
   script_family("Product detection");
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
   script_dependencies("find_service2.nasl");
   script_require_ports("Services/subversion", 3690);
+
   exit(0);
 }
-
 
 include("cpe.inc");
 include("ftp_func.inc");
 include("host_details.inc");
-
-subPort = "";
-soc = "";
-resp = "";
-cpe = "";
 
 subPort = get_kb_item("Services/subversion");
 if (!subPort){
@@ -83,7 +77,6 @@ if(resp =~ '^\\( success \\( [0-9] [0-9] \\(.*\\) \\(.*')
   subVer = eregmatch(pattern:".*subversion-([0-9.]+)", string:resp);
   if(subVer[1])
   {
-    ## set the details
     set_kb_item(name:"Subversion/Server/Ver", value:subVer[1]);
     set_kb_item(name:"Subversion/installed",value:TRUE);
 
@@ -91,7 +84,6 @@ if(resp =~ '^\\( success \\( [0-9] [0-9] \\(.*\\) \\(.*')
     if(!cpe)
       cpe = 'cpe:/a:apache:subversion';
 
-    ## register
     register_product(cpe:cpe, location:"/", port:subPort);
     log_message(data: build_detection_report(app:"Subversion Server",
                                              version:subVer[1],

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_flash_player_within_google_chrome_detect_win.nasl 10133 2018-06-08 11:13:34Z asteins $
+# $Id: gb_flash_player_within_google_chrome_detect_win.nasl 11794 2018-10-09 11:48:44Z cfischer $
 #
 # Adobe Flash Player Within Google Chrome Detection (Windows)
 #
@@ -27,94 +27,82 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.810612");
-  script_version("$Revision: 10133 $");
+  script_version("$Revision: 11794 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-08 13:13:34 +0200 (Fri, 08 Jun 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-09 13:48:44 +0200 (Tue, 09 Oct 2018) $");
   script_tag(name:"creation_date", value:"2017-03-13 12:06:29 +0530 (Mon, 13 Mar 2017)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Adobe Flash Player Within Google Chrome Detection (Windows)");
 
-  script_tag(name : "summary" , value : "Detection of installed version of Adobe
+  script_tag(name:"summary", value:"Detects the installed version of Adobe
   Flash within google chrome.
 
   The script logs in via smb, searches for file 'pepflashplayer.dll' and gets
   version from the file.");
 
   script_category(ACT_GATHER_INFO);
-  script_xref(name: "URL" , value: "https://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html");
+  script_xref(name:"URL", value:"https://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html");
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
   script_family("Product detection");
   script_dependencies("gb_google_chrome_detect_portable_win.nasl");
   script_mandatory_keys("GoogleChrome/Win/Ver");
-  script_require_ports(139, 445);
+
   exit(0);
 }
 
-include("smb_nt.inc");
+include("wmi_file.inc");
+include("misc_func.inc");
 include("cpe.inc");
 include("host_details.inc");
+include("smb_nt.inc");
 
-host    = get_host_ip();
+infos = kb_smb_wmi_connectinfo();
+if( ! infos ) exit( 0 );
+
+handle = wmi_connect( host:infos["host"], username:infos["username_wmi_smb"], password:infos["password"] );
+if( ! handle ) exit( 0 );
+
+fileList = wmi_file_fileversion( handle:handle, dirPathLike:"%google%chrome%", fileName:"pepflashplayer", fileExtn:"dll", includeHeader:FALSE );
+wmi_close( wmi_handle:handle );
+if( ! fileList || ! is_array( fileList ) ) {
+  exit( 0 );
+}
+
 checkduplicate = "";
 checkduplicate_path = "";
 
-usrname = get_kb_item("SMB/login");
-passwd  = get_kb_item("SMB/password");
-domain  = get_kb_item("SMB/domain");
-if( domain ) usrname = domain + '\\' + usrname;
+foreach filePath( keys( fileList ) ) {
 
-if(!host || !usrname || !passwd){
-  exit(0);
-}
+  vers = fileList[filePath];
 
-handle = wmi_connect(host:host, username:usrname, password:passwd);
-if(!handle){
-  exit(0);
-}
+  if( vers && version = eregmatch( string:vers, pattern:"^([0-9.]+)" ) ) {
 
-## WMI query to grep the file version
-query = 'Select Version from CIM_DataFile Where FileName ='
-        + raw_string(0x22) +'pepflashplayer' +raw_string(0x22) + ' AND Extension ='
-        + raw_string(0x22) +'dll' + raw_string(0x22);
+    # wmi_file_fileversion returns the pepflashplayer.dll filename so we're stripping it away
+    # to keep only the install location path
+    location = filePath - "\pepflashplayer.dll";
 
-fileVer = wmi_query(wmi_handle:handle, query:query);
-if(fileVer) {
-  fileVer = tolower(fileVer);
-} else {
-  exit(0);
-}
-
-foreach ver (split(fileVer))
-{
-  if(ver =~ "google.chrome")
-  {
-    version = eregmatch(pattern:"(.*)pepflashplayer.dll.?([0-9.]+)", string:ver);
-    if(version[1] && version[2])
-    {
-      flashVer = version[2];
-      insPath = version[1];
-
-      if (flashVer + ", " >< checkduplicate && insPath + ", " >< checkduplicate_path){
-        continue;
-      }
-      ##Assign detected version value to checkduplicate so as to check in next loop iteration
-      checkduplicate  += flashVer + ", ";
-      checkduplicate_path += insPath + ", ";
-
-      set_kb_item(name:"AdobeFlashPlayer/Chrome/Win/Ver", value:flashVer);
-
-      cpe = build_cpe(value:flashVer, exp:"^([0-9.]+)", base:"cpe:/a:adobe:flash_player_chrome:");
-      if(isnull(cpe))
-        cpe = "cpe:/a:adobe:flash_player_chrome";
-
-      register_product(cpe:cpe, location:insPath);
-      log_message(data: build_detection_report(app: "Flash Player Within Google Chrome",
-                                               version: flashVer,
-                                               install: insPath,
-                                               cpe: cpe,
-                                               concluded: flashVer));
+    if( version[1] + ", " >< checkduplicate && location + ", " >< checkduplicate_path ) {
+      continue;
     }
+
+    # Assign the detected version value to checkduplicate so as to check in next loop iteration
+    checkduplicate += version[1] + ", ";
+    checkduplicate_path += location + ", ";
+
+    set_kb_item( name:"AdobeFlashPlayer/Chrome/Win/Ver", value:version[1] );
+
+    cpe = build_cpe( value:version[1], exp:"^([0-9.]+)", base:"cpe:/a:adobe:flash_player_chrome:" );
+    if( isnull( cpe ) )
+      cpe = "cpe:/a:adobe:flash_player_chrome";
+
+    register_product( cpe:cpe, location:location );
+    log_message( data:build_detection_report( app:"Flash Player Within Google Chrome",
+                                              version:version[1],
+                                              install:location,
+                                              cpe:cpe,
+                                              concluded:version[0] ) );
   }
 }
-exit(0);
+
+exit( 0 );

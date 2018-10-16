@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_trend_micro_worry_free_business_security_detect.nasl 9633 2018-04-26 14:07:08Z jschulte $
+# $Id: gb_trend_micro_worry_free_business_security_detect.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # Trend Micro Worry-Free Business Security Version Detection (Windows)
 #
@@ -27,13 +27,13 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.809142");
-  script_version("$Revision: 9633 $");
+  script_version("$Revision: 11279 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2016-08-23 11:41:39 +0530 (Tue, 23 Aug 2016)");
   script_name("Trend Micro Worry-Free Business Security Version Detection (Windows)");
-  script_tag(name: "summary" , value: "Detection of installed version of Trend
+  script_tag(name:"summary", value:"Detects the installed version of Trend
   Micro Worry-Free Business Security.
 
   The script logs in via smb, searches for string 'Trend Micro Worry-Free
@@ -44,12 +44,11 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
 }
-
 
 include("smb_nt.inc");
 include("secpod_smb_func.inc");
@@ -59,7 +58,7 @@ include("version_func.inc");
 
 os_arch = get_kb_item("SMB/Windows/Arch");
 if(!os_arch){
-  exit(-1);
+  exit(0);
 }
 
 if(!registry_key_exists(key:"SOFTWARE\TrendMicro\WFBS") &&

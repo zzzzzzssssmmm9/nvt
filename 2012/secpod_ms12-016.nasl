@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_ms12-016.nasl 9323 2018-04-05 08:44:52Z cfischer $
+# $Id: secpod_ms12-016.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # Microsoft .NET Framework and Microsoft Silverlight Remote Code Execution Vulnerabilities (2651026)
 #
@@ -27,33 +27,31 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902811");
-  script_version("$Revision: 9323 $");
+  script_version("$Revision: 11857 $");
   script_cve_id("CVE-2012-0014", "CVE-2012-0015");
   script_bugtraq_id(51938, 51940);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-05 10:44:52 +0200 (Thu, 05 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 10:25:16 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-02-15 10:10:10 +0530 (Wed, 15 Feb 2012)");
   script_name("Microsoft .NET Framework and Microsoft Silverlight Remote Code Execution Vulnerabilities (2651026)");
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/48030");
-  script_xref(name : "URL" , value : "http://support.microsoft.com/kb/2651026");
-  script_xref(name : "URL" , value : "http://www.securitytracker.com/id/1026681");
-  script_xref(name : "URL" , value : "http://technet.microsoft.com/en-us/security/bulletin/ms12-016");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/48030");
+  script_xref(name:"URL", value:"http://support.microsoft.com/kb/2651026");
+  script_xref(name:"URL", value:"http://www.securitytracker.com/id/1026681");
+  script_xref(name:"URL", value:"http://technet.microsoft.com/en-us/security/bulletin/ms12-016");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2012 SecPod");
   script_family("Windows : Microsoft Bulletins");
   script_dependencies("secpod_reg_enum.nasl", "gb_ms_silverlight_detect.nasl");
   script_require_ports(139, 445);
-  script_mandatory_keys("SMB/WindowsVersion");
+  script_mandatory_keys("SMB/registry_enumerated");
 
-  script_tag(name : "impact" , value : "Successful exploitation could allow attacker to execute arbitrary code within
+  script_tag(name:"impact", value:"Successful exploitation could allow attacker to execute arbitrary code within
   the context of the affected application. Failed exploit attempts will likely
-  result in a denial-of-service condition.
+  result in a denial-of-service condition.");
 
-  Impact Level: System/Application");
-
-  script_tag(name : "affected" , value : "Microsoft Silverlight 4.0
+  script_tag(name:"affected", value:"Microsoft Silverlight 4.0
 
   Microsoft .NET Framework 4.0
 
@@ -61,7 +59,7 @@ if(description)
 
   Microsoft .NET Framework 2.0 Service Pack 2");
 
-  script_tag(name : "insight" , value : "Multiple flaws are due to
+  script_tag(name:"insight", value:"Multiple flaws are due to
 
   - An unspecified error when handling un-managed objects can be exploited via
     a specially crafted XAML Browser Application (XBAP).
@@ -69,17 +67,15 @@ if(description)
   - An error when calculating certain buffer lengths can be exploited to corrupt
     memory via a specially crafted XAML Browser Application (XBAP).");
 
+  script_tag(name:"solution", value:"Run Windows Update and install the listed hotfixes or download and
+  install the hotfixes from the referenced advisory.");
 
-  script_tag(name : "solution" , value : "Run Windows Update and update the listed hotfixes or download and
-  update mentioned hotfixes in the advisory from the below link,
-
-  http://technet.microsoft.com/en-us/security/bulletin/ms12-016");
-
-  script_tag(name : "summary" , value : "This host is missing a critical security update according to
+  script_tag(name:"summary", value:"This host is missing a critical security update according to
   Microsoft Bulletin MS12-016.");
 
   script_tag(name:"qod_type", value:"registry");
   script_tag(name:"solution_type", value:"VendorFix");
+
   exit(0);
 }
 
@@ -98,7 +94,6 @@ if( infos = get_app_version_and_location( cpe:"cpe:/a:microsoft:silverlight", ex
   mslPath = infos['location'];
 
   if( mslVers ) {
-    ## Check for Microsoft Silverlight version prior to 4.1.10111
     if( version_is_less( version:mslVers, test_version:"4.1.10111" ) ) {
       report = report_fixed_ver( installed_version:mslVers, fixed_version:"4.1.10111", install_path:mslPath );
       security_message( port:0, data:report );
@@ -107,19 +102,16 @@ if( infos = get_app_version_and_location( cpe:"cpe:/a:microsoft:silverlight", ex
   }
 }
 
-## Confirm .NET
 key = "SOFTWARE\Microsoft\ASP.NET\";
 if(!registry_key_exists(key:key)){
   exit(0);
 }
 
-## Try to Get Version
 foreach item (registry_enum_keys(key:key))
 {
   path = registry_get_sz(key:key + item, item:"Path");
   if(path && "\Microsoft.NET\Framework" >< path)
   {
-    ## Get version from System.dll file
     dllVer = fetch_file_version(sysPath:path, file_name:"System.dll");
     if(dllVer)
     {
@@ -129,7 +121,7 @@ foreach item (registry_enum_keys(key:key))
         if(version_in_range(version:dllVer, test_version:"4.0.30319.000", test_version2:"4.0.30319.257")||
            version_in_range(version:dllVer, test_version:"4.0.30319.500", test_version2:"4.0.30319.522"))
         {
-          security_message(0);
+          security_message( port: 0, data: "The target host was found to be vulnerable" );
           exit(0);
         }
       }
@@ -142,7 +134,7 @@ foreach item (registry_enum_keys(key:key))
            version_in_range(version:dllVer, test_version:"2.0.50727.5000", test_version2:"2.0.50727.5452")||
            version_in_range(version:dllVer, test_version:"2.0.50727.5600", test_version2:"2.0.50727.5702"))
         {
-          security_message(0);
+          security_message( port: 0, data: "The target host was found to be vulnerable" );
           exit(0);
         }
       }
@@ -154,7 +146,7 @@ foreach item (registry_enum_keys(key:key))
         if(version_in_range(version:dllVer, test_version:"2.0.50727.4000", test_version2:"2.0.50727.4219")||
            version_in_range(version:dllVer, test_version:"2.0.50727.5600", test_version2:"2.0.50727.5702"))
         {
-          security_message(0);
+          security_message( port: 0, data: "The target host was found to be vulnerable" );
           exit(0);
         }
       }
@@ -166,7 +158,7 @@ foreach item (registry_enum_keys(key:key))
         if(version_in_range(version:dllVer, test_version:"2.0.50727.3000", test_version2:"2.0.50727.3630")||
            version_in_range(version:dllVer, test_version:"2.0.50727.5600", test_version2:"2.0.50727.5703"))
         {
-          security_message(0);
+          security_message( port: 0, data: "The target host was found to be vulnerable" );
           exit(0);
         }
       }

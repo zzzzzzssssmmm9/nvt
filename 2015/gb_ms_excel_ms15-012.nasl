@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_excel_ms15-012.nasl 6534 2017-07-05 09:58:29Z teissa $
+# $Id: gb_ms_excel_ms15-012.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Microsoft Office Excel Remote Code Execution Vulnerability (3032328)
 #
@@ -27,49 +27,43 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805042");
-  script_version("$Revision: 6534 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-0063");
   script_bugtraq_id(72460);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-05 11:58:29 +0200 (Wed, 05 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-02-11 10:12:07 +0530 (Wed, 11 Feb 2015)");
   script_name("Microsoft Office Excel Remote Code Execution Vulnerability (3032328)");
 
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft Bulletin MS15-012.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"A remote code execution vulnerability exists
   in Microsoft Excel that is caused when Excel improperly handles objects
   in memory while parsing specially crafted Office files.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to execute arbitrary code on the affected system.
+  attackers to execute arbitrary code on the affected system.");
 
-  Impact Level: System/Application");
-
-  script_tag(name:"affected", value:"
-  Microsoft Excel 2013
+  script_tag(name:"affected", value:"Microsoft Excel 2013
   Microsoft Excel 2007 Service Pack 3 and prior
   Microsoft Excel 2010 Service Pack 2 and prior");
 
   script_tag(name:"solution", value:"Run Windows Update and update the listed
-  hotfixes or download and update mentioned hotfixes in the advisory from the
-  below link,
-  https://technet.microsoft.com/en-us/security/bulletin/ms15-012");
+  hotfixes or download and install the hotfixes from the referenced advisory.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
   script_tag(name:"qod_type", value:"executable_version");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/kb/3032328");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/kb/2920753");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/kb/2920788");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/kb/2956081");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/en-us/security/bulletin/ms15-012");
+  script_xref(name:"URL", value:"https://support.microsoft.com/kb/3032328");
+  script_xref(name:"URL", value:"https://support.microsoft.com/kb/2920753");
+  script_xref(name:"URL", value:"https://support.microsoft.com/kb/2920788");
+  script_xref(name:"URL", value:"https://support.microsoft.com/kb/2956081");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/en-us/security/bulletin/ms15-012");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
@@ -82,19 +76,14 @@ if(description)
 include("smb_nt.inc");
 include("version_func.inc");
 
-# Variable Initialization
-excelVer = "";
-
-## Check for Office Excel 2007/2010/2013
 excelVer = get_kb_item("SMB/Office/Excel/Version");
 if(excelVer =~ "^(12|14|15)\..*")
 {
-  ## Check version Excel.exe
   if(version_in_range(version:excelVer, test_version:"12.0", test_version2:"12.0.6715.4999") ||
      version_in_range(version:excelVer, test_version:"14.0", test_version2:"14.0.7143.4999") ||
      version_in_range(version:excelVer, test_version:"15.0", test_version2:"15.0.4693.999"))
   {
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }

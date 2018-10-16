@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: sw_apc_web_default_credentials.nasl 6443 2017-06-27 10:00:22Z teissa $
+# $Id: sw_apc_web_default_credentials.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # APC Network Management Card Webinterface Default Credentials
 #
@@ -27,12 +27,12 @@
 
 if(description)
 {
-  script_oid("1.3.6.1.4.1.25623.1.0.111052"); 
-  script_version("$Revision: 6443 $");
+  script_oid("1.3.6.1.4.1.25623.1.0.111052");
+  script_version("$Revision: 11872 $");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
   script_name("APC Network Management Card Webinterface Default Credentials");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-27 12:00:22 +0200 (Tue, 27 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-11-12 15:00:00 +0100 (Thu, 12 Nov 2015)");
   script_category(ACT_ATTACK);
   script_family("Default Accounts");
@@ -57,7 +57,7 @@ if(description)
   script_tag(name:"solution_type", value:"Workaround");
   script_tag(name:"qod_type", value:"remote_app");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");
@@ -65,7 +65,7 @@ include("http_keepalive.inc");
 include("host_details.inc");
 
 port = get_http_port( default:80 );
-
+useragent = get_http_user_agent();
 res = http_get_cache( item:"/logon.htm", port:port );
 
 if( "APC Website" >< res || "http://www.apc.com" >< res || "<title>APC | Log On</title>" >< res ) {
@@ -85,7 +85,7 @@ if( "APC Website" >< res || "http://www.apc.com" >< res || "<title>APC | Log On<
 
     req = 'POST /Forms/login1 HTTP/1.1\r\n' +
           'Host: ' + host + '\r\n' +
-          'User-Agent: ' + OPENVAS_HTTP_USER_AGENT +'\r\n' +
+          'User-Agent: ' + useragent + '\r\n' +
           'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
           'Accept-Language: en-US,en;q=0.5\r\n' +
           'Content-Type: application/x-www-form-urlencoded\r\n' +
@@ -116,7 +116,7 @@ if( "APC Website" >< res || "http://www.apc.com" >< res || "<title>APC | Log On<
 
     req = 'GET ' + redirect + 'home.htm HTTP/1.1\r\n' +
           'Host: ' + host + '\r\n' +
-          'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+          'User-Agent: ' + useragent + '\r\n' +
           'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
           'Accept-Language: en-US,en;q=0.5\r\n' +
           'Cookie: ' + cookie + '\r\n' +
@@ -131,7 +131,7 @@ if( "APC Website" >< res || "http://www.apc.com" >< res || "<title>APC | Log On<
     # Logoff to avoid locking the webinterface for other users
     req = 'GET ' + redirect + 'logout.htm HTTP/1.1\r\n' +
           'Host: ' + host + '\r\n' +
-          'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+          'User-Agent: ' + useragent + '\r\n' +
           'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
           'Accept-Language: en-US,en;q=0.5\r\n' +
           'Cookie: ' + cookie + '\r\n' +

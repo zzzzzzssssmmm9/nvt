@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ge_snmp_web_interface_adapter_detect.nasl 6065 2017-05-04 09:03:08Z teissa $
+# $Id: gb_ge_snmp_web_interface_adapter_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # GE SNMP/Web Interface Adapter Version Detection
 #
@@ -27,27 +27,27 @@
 
 if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.807076");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 6065 $");
- script_tag(name:"last_modification", value:"$Date: 2017-05-04 11:03:08 +0200 (Thu, 04 May 2017) $");
- script_tag(name:"creation_date", value:"2016-03-01 14:45:32 +0530 (Tue, 01 Mar 2016)");
- script_name("GE SNMP/Web Interface Adapter Version Detection");
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_require_ports("Services/telnet", 23);
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("telnetserver_detect_type_nd_version.nasl");
+  script_oid("1.3.6.1.4.1.25623.1.0.807076");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-03-01 14:45:32 +0530 (Tue, 01 Mar 2016)");
+  script_name("GE SNMP/Web Interface Adapter Version Detection");
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_require_ports("Services/telnet", 23);
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("telnetserver_detect_type_nd_version.nasl");
 
- script_tag(name:"summary", value:"Detection of installed version
+  script_tag(name:"summary", value:"Detection of installed version
  of SNMP/Web Adapter.
- 
+
  The script performs Telnet based detection of SNMP/Web Adapter");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- exit(0);
+  exit(0);
 }
 
 
@@ -56,12 +56,10 @@ include("misc_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Get port
 if( ! port = get_kb_item( "Services/telnet" ) ) {
   port = 23;
 }
 
-## Checking port state
 if( ! get_port_state( port ) ) {
   exit( 0 );
 }
@@ -73,15 +71,12 @@ if( banner && banner =~ "GE.*SNMP/Web Interface" && "UPS" >< banner ) {
   version = "unknown";
   install = "/";
 
-  ## Grep for the version
   ver = eregmatch( pattern:'SNMP/Web Interface Ver.([0-9.]+)', string:banner );
   if( ver[1] ) version = ver[1];
 
-  ## Set the KB value
   set_kb_item( name:"SNMP/Web/Adapter/telnet/version", value:version );
   set_kb_item( name:"SNMP/Web/Adapter/Installed", value:TRUE );
 
-  ## build cpe and store it as host_detail
   cpe = build_cpe( value:version, exp:"^([0-9.]+)", base:"cpe:/a:ge:ups_snmp_web_adapter_firmware:" );
   if( ! cpe )
     cpe = "cpe:/a:ge:ups_snmp_web_adapter_firmware";

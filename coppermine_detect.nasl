@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: coppermine_detect.nasl 8782 2018-02-13 10:06:23Z ckuersteiner $
+# $Id: coppermine_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Coppermine Detection
 #
@@ -26,31 +26,31 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100174");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 8782 $");
- script_tag(name:"last_modification", value:"$Date: 2018-02-13 11:06:23 +0100 (Tue, 13 Feb 2018) $");
- script_tag(name:"creation_date", value:"2009-05-02 19:46:33 +0200 (Sat, 02 May 2009)");
- script_tag(name:"cvss_base", value:"0.0");
+  script_oid("1.3.6.1.4.1.25623.1.0.100174");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2009-05-02 19:46:33 +0200 (Sat, 02 May 2009)");
+  script_tag(name:"cvss_base", value:"0.0");
 
- script_name("Coppermine Detection");
- 
- script_category(ACT_GATHER_INFO);
+  script_name("Coppermine Detection");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_category(ACT_GATHER_INFO);
 
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_tag(name: "summary", value: "This host is running Coppermine, a web picture gallery script written in PHP
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+
+  script_tag(name:"summary", value:"This host is running Coppermine, a web picture gallery script written in PHP
 using GD or ImageMagick as image library with a MySQL backend.");
 
- script_xref(name: "URL", value: "http://coppermine-gallery.net/");
+  script_xref(name:"URL", value:"http://coppermine-gallery.net/");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");
@@ -70,7 +70,7 @@ foreach dir( make_list_unique("/", "/coppermine", "/gallery", cgi_dirs( port:por
  buf = http_get_cache( item:url, port:port );
 
  if (egrep(pattern: 'Powered by <a [^>]+Coppermine Photo Gallery', string: buf, icase: TRUE) &&
-     egrep(pattern: 'Set-Cookie: (coppermine_data.*|cpg.*)', string: buf, icase: TRUE)) { 
+     egrep(pattern: 'Set-Cookie: (coppermine_data.*|cpg.*)', string: buf, icase: TRUE)) {
    vers = "unknown";
 
    version = eregmatch(string: buf, pattern: 'Coppermine Photo Gallery ([0-9.]+)',icase:TRUE);
@@ -98,9 +98,9 @@ foreach dir( make_list_unique("/", "/coppermine", "/gallery", cgi_dirs( port:por
 	 if (!isnull(version[1])) {
            vers = version[1];
            concUrl = url;
-	 }  
-       }  
-     }  
+	 }
+       }
+     }
    }
 
    set_kb_item(name: "coppermine_gallery/installed", value: TRUE);

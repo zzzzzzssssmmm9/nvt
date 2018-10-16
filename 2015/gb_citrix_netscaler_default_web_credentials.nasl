@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_citrix_netscaler_default_web_credentials.nasl 8384 2018-01-12 02:32:15Z ckuersteiner $
+# $Id: gb_citrix_netscaler_default_web_credentials.nasl 11536 2018-09-21 19:44:30Z cfischer $
 #
 # Citrix NetScaler Web Management Interface Default Credentials
 #
@@ -28,11 +28,11 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.105277");
-  script_version("$Revision: 8384 $");
+  script_version("$Revision: 11536 $");
   script_name("Citrix NetScaler Web Management Interface Default Credentials");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-12 03:32:15 +0100 (Fri, 12 Jan 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 21:44:30 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-05-12 18:01:07 +0200 (Tue, 12 May 2015)");
   script_category(ACT_ATTACK);
   script_family("Default Accounts");
@@ -41,17 +41,17 @@ if(description)
   script_require_ports("Services/www", 80);
   script_mandatory_keys("citrix_netscaler/http/detected");
 
-  script_tag(name: "summary" , value: 'The remote Citrix NetScaler Web Management Interface is prone to a default
+  script_tag(name:"summary", value:'The remote Citrix NetScaler Web Management Interface is prone to a default
 account authentication bypass vulnerability.');
 
-  script_tag(name: "impact" , value:'This issue may be exploited by a remote attacker to gain
+  script_tag(name:"impact", value:'This issue may be exploited by a remote attacker to gain
   access to sensitive information or modify system configuration.');
 
-  script_tag(name: "vuldetect" , value: 'Try to login with default credentials.');
+  script_tag(name:"vuldetect", value:'Try to login with default credentials.');
 
-  script_tag(name: "insight" , value: 'It was possible to login with default credentials: nsroot/nsroot');
+  script_tag(name:"insight", value:'It was possible to login with default credentials: nsroot/nsroot');
 
-  script_tag(name: "solution" , value: 'Change the password.');
+  script_tag(name:"solution", value:'Change the password.');
 
   script_tag(name:"solution_type", value:"Mitigation");
   script_tag(name:"qod_type", value:"exploit");
@@ -69,10 +69,11 @@ host = http_host_name( port:port );
 postdata = 'username=nsroot&password=nsroot&timezone_offset=7200';
 
 len = strlen( postdata );
+useragent = get_http_user_agent();
 
 req = 'POST /login/do_login HTTP/1.1\r\n' +
       'Host: ' + host + '\r\n' +
-      'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+      'User-Agent: ' + useragent + '\r\n' +
       'Accept-Encoding: identity\r\n' +
       'Referer: http://' + host + '/\r\n' +
       'Cookie: startupapp=neo; is_cisco_platform=0; st_splitter=350px\r\n' +

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: cutenews_detect.nasl 9542 2018-04-20 01:34:17Z ckuersteiner $
+# $Id: cutenews_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # CuteNews Detection
 #
@@ -29,29 +29,29 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100105");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9542 $");
- script_tag(name:"last_modification", value:"$Date: 2018-04-20 03:34:17 +0200 (Fri, 20 Apr 2018) $");
- script_tag(name:"creation_date", value:"2009-04-05 20:39:41 +0200 (Sun, 05 Apr 2009)");
- script_tag(name:"cvss_base", value:"0.0");
+  script_oid("1.3.6.1.4.1.25623.1.0.100105");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2009-04-05 20:39:41 +0200 (Sun, 05 Apr 2009)");
+  script_tag(name:"cvss_base", value:"0.0");
 
- script_name("CuteNews Detection");
+  script_name("CuteNews Detection");
 
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_tag(name: "summary", value: "This host is running CuteNews, a powerful and easy to use news management
+  script_tag(name:"summary", value:"This host is running CuteNews, a powerful and easy to use news management
 system that uses flat files to store its database");
 
- script_xref(name: "URL", value: "http://cutephp.com/cutenews/");
+  script_xref(name:"URL", value:"http://cutephp.com/cutenews/");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_thegreenbow_ipsec_vpn_client_detect.nasl 5499 2017-03-06 13:06:09Z teissa $
+# $Id: secpod_thegreenbow_ipsec_vpn_client_detect.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # TheGreenBow IPSec VPN Client Version Detection
 #
@@ -28,31 +28,26 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.900921");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 5499 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-03-06 14:06:09 +0100 (Mon, 06 Mar 2017) $");
+  script_version("$Revision: 11279 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2009-08-26 14:01:08 +0200 (Wed, 26 Aug 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"qod_type", value:"registry");
   script_name("TheGreenBow IPSec VPN Client Version Detection");
 
-  tag_summary =
-"Detection of installed version of TheGreenBow IPSec VPN Client on Windows.
+  script_tag(name:"summary", value:"Detects the installed version of TheGreenBow IPSec VPN Client on Windows.
 
 The script logs in via smb, searches for TheGreenBow IPSec VPN Client in the
-registry, gets the from registry.";
-
-
-  script_tag(name : "summary" , value : tag_summary);
+registry, gets the from registry.");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2009 SecPod");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
 }
-
 
 include("smb_nt.inc");
 include("secpod_reg.inc");
@@ -61,16 +56,9 @@ include("cpe.inc");
 include("host_details.inc");
 include("version_func.inc");
 
-osArch = "";
-key_list = "";
-vpnName = "";
-version = "";
-path = "";
-
 osArch = get_kb_item("SMB/Windows/Arch");
-if(!osArch)
-{
-  exit(-1);
+if(!osArch){
+  exit(0);
 }
 
 
@@ -79,7 +67,6 @@ if("x86" >< osArch){
   key_list = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\";
 }
 
-## Check for 64 bit platform
 else if("x64" >< osArch){
  key_list = make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\",
                       "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\");
@@ -91,7 +78,6 @@ foreach key (key_list)
   {
     vpnName = registry_get_sz(key:key + item, item:"DisplayIcon");
 
-    ## confirm the application
     if("TheGreenBow VPN" >< vpnName)
     {
       path = registry_get_sz(key:key, item:"InstallLocation");
@@ -105,7 +91,6 @@ foreach key (key_list)
       if(vpnVer != NULL)
       {
         set_kb_item(name:"TheGreenBow-IPSec-VPN-Client/Ver", value:vpnVer);
-        ## build cpe and store it as host_detail
         cpe = build_cpe(value:vpnVer, exp:"^([0-9.]+)", base:"cpe:/a:thegreenbow:thegreenbow_vpn_client:");
         if(!cpe)
           cpe = "cpe:/a:thegreenbow:thegreenbow_vpn_client";
@@ -114,13 +99,11 @@ foreach key (key_list)
         {
           set_kb_item(name:"TheGreenBow-IPSec-VPN-Client64/Ver", value:vpnVer);
 
-          ## Build CPE
           cpe = build_cpe(value:vpnVer, exp:"^([0-9.]+)", base:"cpe:/a:thegreenbow:thegreenbow_vpn_client:x64:");
           if(isnull(cpe))
             cpe = 'cpe:/a:thegreenbow:thegreenbow_vpn_client:x64';
 
         }
-        ## Register Product and Build Report
         register_product(cpe:cpe, location:path);
         log_message(data: build_detection_report(app: "TheGreenBow VPN",
                                                  version: vpnVer,

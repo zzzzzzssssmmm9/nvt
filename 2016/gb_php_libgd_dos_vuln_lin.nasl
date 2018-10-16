@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_php_libgd_dos_vuln_lin.nasl 10455 2018-07-09 05:52:14Z cfischer $
+# $Id: gb_php_libgd_dos_vuln_lin.nasl 11811 2018-10-10 09:55:00Z asteins $
 #
 # PHP 'libgd' Denial of Service Vulnerability (Linux)
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.809338");
-  script_version("$Revision: 10455 $");
+  script_version("$Revision: 11811 $");
   script_cve_id("CVE-2016-7568");
   script_bugtraq_id(93184);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 07:52:14 +0200 (Mon, 09 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-10 11:55:00 +0200 (Wed, 10 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-10-03 12:09:46 +0530 (Mon, 03 Oct 2016)");
   script_name("PHP 'libgd' Denial of Service Vulnerability (Linux)");
 
@@ -48,14 +48,11 @@ if(description)
 
   script_tag(name:"impact", value:"Successfully exploiting this issue allow
   remote attackers to cause a denial of service, or possibly have unspecified
-  other impact.
-
-  Impact Level: Application");
+  other impact.");
 
   script_tag(name:"affected", value:"PHP versions 5.x through 5.6.26 and 7.0.x through 7.0.11 on Linux");
 
-  script_tag(name:"solution", value:"Update to PHP version 5.6.27 or 7.0.12.
-  For updates refer to http://www.php.net");
+  script_tag(name:"solution", value:"Update to PHP version 5.6.27 or 7.0.12.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_banner_unreliable");
@@ -71,6 +68,7 @@ if(description)
   script_dependencies("gb_php_detect.nasl", "os_detection.nasl");
   script_mandatory_keys("php/installed", "Host/runs_unixoide");
 
+  script_xref(name:"URL", value:"http://www.php.net");
   exit(0);
 }
 

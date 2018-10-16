@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mantisbt_xss_vuln_jan15.nasl 6183 2017-05-22 09:03:43Z teissa $
+# $Id: gb_mantisbt_xss_vuln_jan15.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # MantisBT 'adm_config_report.php' Cross-Site Scripting Vulnerability - January15
 #
@@ -29,20 +29,19 @@ CPE = "cpe:/a:mantisbt:mantisbt";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805236");
-  script_version("$Revision: 6183 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2014-8986");
   script_bugtraq_id(71197);
   script_tag(name:"cvss_base", value:"3.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:S/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-22 11:03:43 +0200 (Mon, 22 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-01-08 18:58:08 +0530 (Thu, 08 Jan 2015)");
   script_name("MantisBT 'adm_config_report.php' Cross-Site Scripting Vulnerability - January15");
 
   script_tag(name:"summary", value:"This host is installed with
   MantisBT and is prone to cross-site scripting vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with
-  the help of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw exists as the
   adm_config_report.php script does not validate input when handling
@@ -51,14 +50,11 @@ if(description)
   script_tag(name:"impact", value:"Successful exploitation will allow
   attackers to execute arbitrary script code in a user's browser
   session within the trust relationship between their browser and the
-  server.
-
-  Impact Level: Application");
+  server.");
 
   script_tag(name:"affected", value:"MantisBT version 1.2.13 through 1.2.17");
 
-  script_tag(name:"solution", value:"Upgrade to MantisBT version 1.2.18 or later.
-  For updates refer to http://www.mantisbt.org/download.php");
+  script_tag(name:"solution", value:"Upgrade to MantisBT version 1.2.18 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
@@ -71,6 +67,7 @@ if(description)
   script_dependencies("mantis_detect.nasl");
   script_mandatory_keys("mantisbt/installed");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"http://www.mantisbt.org/download.php");
   exit(0);
 }
 
@@ -78,21 +75,14 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-manPort = "";
-manVer = "";
-
-## get the port
 if(!manPort = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get the version
 if(!manVer = get_app_version(cpe:CPE, port:manPort)){
   exit(0);
 }
 
-##Check for version less than 1.2.18
 if(version_in_range(version:manVer, test_version:"1.2.13", test_version2:"1.2.17"))
 {
   security_message(port:manPort);

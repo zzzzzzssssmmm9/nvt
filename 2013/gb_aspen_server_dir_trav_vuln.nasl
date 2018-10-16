@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_aspen_server_dir_trav_vuln.nasl 7577 2017-10-26 10:41:56Z cfischer $
+# $Id: gb_aspen_server_dir_trav_vuln.nasl 11865 2018-10-12 10:03:43Z cfischer $
 #
 # Aspen Sever Directory Traversal Vulnerability
 #
@@ -27,11 +27,11 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.803367");
-  script_version("$Revision: 7577 $");
+  script_version("$Revision: 11865 $");
   script_cve_id("CVE-2013-2619");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-26 12:41:56 +0200 (Thu, 26 Oct 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:03:43 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2013-04-04 12:47:57 +0530 (Thu, 04 Apr 2013)");
   script_name("Aspen Sever Directory Traversal Vulnerability");
 
@@ -48,16 +48,15 @@ if(description)
   script_mandatory_keys("Aspen/banner");
 
   script_tag(name:"insight", value:"The flaw is due to the program not properly sanitizing user supplied input.");
-  script_tag(name:"solution", value:"Upgrade to Aspen Server 0.22 or later,
-  For updates refer to http://aspen.io");
+  script_tag(name:"solution", value:"Upgrade to Aspen Server 0.22 or later.");
+  script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"summary", value:"This host is running Aspen Server and is prone to directory
   traversal vulnerability.");
   script_tag(name:"impact", value:"Successful exploitation will allow attackers to perform directory traversal
-  attacks and read arbitrary files on the affected application.
-
-  Impact Level: Application");
+  attacks and read arbitrary files on the affected application.");
   script_tag(name:"affected", value:"Aspen Server version 0.8 and prior");
 
+  script_xref(name:"URL", value:"http://aspen.io");
   exit(0);
 }
 
@@ -66,16 +65,8 @@ include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
 
-## Variable Initialization
-url = "";
-port = "";
-files = "";
-banner = "";
-
-## Get HTTP Port
 port = get_http_port(default:8080);
 
-## Get the banner and confirm the application
 banner = get_http_banner(port:port);
 
 if("Server: Aspen" >< banner)
@@ -84,10 +75,8 @@ if("Server: Aspen" >< banner)
 
   foreach file (keys(files))
   {
-    ## Construct directory traversal attack
     url = "/" + crap(data:"../",length:15) + files[file];
 
-    ## Confirm exploit worked properly or not
     if(http_vuln_check(port:port, url:url, pattern:file))
     {
       report = report_vuln_url( port:port, url:url );

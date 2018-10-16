@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wordpress_social_discussions_plugin_mult_vuln.nasl 10257 2018-06-19 14:04:53Z cfischer $
+# $Id: gb_wordpress_social_discussions_plugin_mult_vuln.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # WordPress Social Discussions Plugin Multiple Vulnerabilities
 #
@@ -29,7 +29,7 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.803100");
-  script_version("$Revision: 10257 $");
+  script_version("$Revision: 11857 $");
   script_tag(name:"last_modification", value:"$Date: 2017-04-14 11:02:12 +0200 (Fr, 14 Apr 2017)$");
   script_tag(name:"creation_date", value:"2012-10-18 13:12:20 +0530 (Thu, 18 Oct 2012)");
   script_tag(name:"cvss_base", value:"4.3");
@@ -46,9 +46,7 @@ if(description)
   script_xref(name:"URL", value:"http://seclists.org/bugtraq/2012/Oct/98");
 
   script_tag(name:"impact", value:"Successful exploitation could allow attackers to attackers to
-  execute arbitrary PHP code and to gain sensitive information like installation path location.
-
-  Impact Level: Application");
+  execute arbitrary PHP code and to gain sensitive information like installation path location.");
 
   script_tag(name:"affected", value:"WordPress Social Discussions Plugin version 6.1.1");
 
@@ -62,8 +60,7 @@ if(description)
   social-discussions/social_discussions_service_names.php, which reveals the
   full installation path of the script.");
 
-  script_tag(name:"solution", value:"Update to version 6.1.2 or later,
-  For updates refer to http://wordpress.org/extend/plugins/social-discussions");
+  script_tag(name:"solution", value:"Update to version 6.1.2 or later.");
 
   script_tag(name:"summary", value:"This host is running WordPress Social Discussions Plugin and is
   prone to remote file inclusion and full path disclosure vulnerabilities.");
@@ -71,6 +68,7 @@ if(description)
   script_tag(name:"qod_type", value:"remote_active");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://wordpress.org/extend/plugins/social-discussions");
   exit(0);
 }
 

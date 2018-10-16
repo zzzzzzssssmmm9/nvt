@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cisco_ucs_central_version.nasl 8370 2018-01-11 09:44:52Z cfischer $
+# $Id: gb_cisco_ucs_central_version.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Cisco UCS Central Version Detection
 #
@@ -27,24 +27,24 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105573");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 8370 $");
- script_tag(name:"last_modification", value:"$Date: 2018-01-11 10:44:52 +0100 (Thu, 11 Jan 2018) $");
- script_tag(name:"creation_date", value:"2016-03-17 14:04:35 +0100 (Thu, 17 Mar 2016)");
- script_name("Cisco UCS Central Version Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105573");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-03-17 14:04:35 +0100 (Thu, 17 Mar 2016)");
+  script_name("Cisco UCS Central Version Detection");
 
- script_tag(name: "summary" , value: "This Script consolidate the via SSH or HTTP(s) detected version of Cisco UCS Central for later use.");
+  script_tag(name:"summary", value:"This Script consolidate the via SSH or HTTP(s) detected version of Cisco UCS Central for later use.");
 
- script_tag(name:"qod_type", value:"package");
+  script_tag(name:"qod_type", value:"package");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("gb_cisco_ucs_central_version_ssh.nasl", "gb_cisco_ucs_central_version_http.nasl");
- script_mandatory_keys( "cisco_ucs_central/installed" );
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("gb_cisco_ucs_central_version_ssh.nasl", "gb_cisco_ucs_central_version_http.nasl");
+  script_mandatory_keys("cisco_ucs_central/installed");
+  exit(0);
 }
 
 

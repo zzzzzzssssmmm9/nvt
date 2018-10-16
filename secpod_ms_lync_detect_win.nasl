@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_ms_lync_detect_win.nasl 8159 2017-12-18 15:10:39Z cfischer $
+# $Id: secpod_ms_lync_detect_win.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
 # Microsoft Lync Version Detection
 #
@@ -30,56 +30,42 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902843");
-  script_version("$Revision: 8159 $");
+  script_version("$Revision: 11279 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-18 16:10:39 +0100 (Mon, 18 Dec 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2012-06-13 12:12:12 +0530 (Wed, 13 Jun 2012)");
   script_tag(name:"qod_type", value:"registry");
   script_name("Microsoft Lync Version Detection");
 
-  tag_summary =
-"Detection of installed version of Microsoft Lync.
+  script_tag(name:"summary", value:"Detects the installed version of Microsoft Lync.
 
 The script logs in via smb, searches for Microsoft Lync in the registry and
-gets the version from 'DisplayVersion' string in registry";
-
-
-  script_tag(name : "summary" , value : tag_summary);
+gets the version from 'DisplayVersion' string in registry");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2012 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
 }
-
 
 include("cpe.inc");
 include("smb_nt.inc");
 include("host_details.inc");
 include("secpod_smb_func.inc");
 
-## Variable Initialization
-lyncName = "";
-ver = NULL;
-cpe = NULL;
-path = "";
-
-## Get OS Architecture
 os_arch = get_kb_item("SMB/Windows/Arch");
 if(!os_arch){
-  exit(-1);
+  exit(0);
 }
 
-## Check for 32 bit platform
 if("x86" >< os_arch){
   key_list = make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\");
 }
 
-## Check for 64 bit platform
 else if("x64" >< os_arch)
 {
   key_list =  make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\",
@@ -89,7 +75,6 @@ else if("x64" >< os_arch)
 
 foreach key (key_list)
 {
-  ## Get Lync version from registry
   foreach item (registry_enum_keys(key:key))
   {
     lyncName = registry_get_sz(key:key + item, item:"DisplayName");
@@ -100,7 +85,6 @@ foreach key (key_list)
       ver = registry_get_sz(key:key + item, item:"DisplayVersion");
       if(ver)
       {
-        ## Get Install Location
         path = registry_get_sz(key:key + item, item:"InstallLocation");
         if(! path){
           path = "Could not find the install path from registry";
@@ -108,19 +92,16 @@ foreach key (key_list)
 
         rlsVer = eregmatch(pattern: "[0-9]+", string: lyncName);
 
-        ## Check for Microsoft Lync Attendant
         if("Attendant" >< lyncName)
         {
           set_kb_item(name:"MS/Lync/Attendant/path", value:path);
           set_kb_item(name:"MS/Lync/Installed", value:TRUE);
           set_kb_item(name:"MS/Lync/Attendant6432/Installed", value:TRUE);
 
-          ## Register for 64 bit app on 64 bit OS once again
           if("32" >< os_arch || "Wow6432Node" >< key) {
             set_kb_item(name:"MS/Lync/Attendant/Ver", value:ver);
             register_and_report_cpe( app:lyncName, ver:ver, concluded:ver, base:"cpe:/a:microsoft:lync:" + rlsVer[0] + "::attendant_x86:", expr:"^([0-9.]+)", insloc:path );
           }
-          ## Register for 64 bit app on 64 bit OS
           else if("64" >< os_arch && "Wow6432Node" >!< key)
           {
             set_kb_item(name:"MS/Lync/Attendant64/Ver", value:ver);
@@ -128,7 +109,6 @@ foreach key (key_list)
           }
         }
 
-        ## Check for Microsoft Lync Attendee
         else if("Attendee" >< lyncName)
         {
           set_kb_item(name:"MS/Lync/Attendee/Ver", value:ver);
@@ -137,13 +117,11 @@ foreach key (key_list)
           register_and_report_cpe( app:lyncName, ver:ver, concluded:ver, base:"cpe:/a:microsoft:lync:" + rlsVer[0] + "::attendee:", expr:"^([0-9.]+)", insloc:path );
         }
 
-        ## Check for Microsoft Office Communicator
         else if("Microsoft Office Communicator" >< lyncName)
         {
           set_kb_item(name:"MS/Office/Communicator/path", value:path);
           set_kb_item(name:"MS/Office/Communicator6432/Installed", value:TRUE);
 
-          ## Register for 64 bit app on 64 bit OS
           if("64" >< os_arch && "Wow6432Node" >!< key) {
             set_kb_item(name:"MS/Office/Communicator64/Ver", value:ver);
             register_and_report_cpe( app:lyncName, ver:ver, concluded:ver, base:"cpe:/a:microsoft:office_communicator:" + rlsVer[0] + ":x64:", expr:"^([0-9.]+)", insloc:path );
@@ -153,7 +131,6 @@ foreach key (key_list)
           }
         }
 
-        ## Check for Microsoft Lync Basic
         else if("Lync Basic" >< lyncName)
         {
           set_kb_item(name:"MS/Lync/Basic/path", value:path);

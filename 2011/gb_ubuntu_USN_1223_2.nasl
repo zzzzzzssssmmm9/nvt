@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_1223_2.nasl 9648 2018-04-27 08:29:05Z cfischer $
+# $Id: gb_ubuntu_USN_1223_2.nasl 11721 2018-10-02 08:19:21Z cfischer $
 #
 # Ubuntu Update for puppet USN-1223-2
 #
@@ -29,12 +29,12 @@ include("revisions-lib.inc");
 
 if(description)
 {
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-1223-2/");
+  script_xref(name:"URL", value:"http://www.ubuntu.com/usn/usn-1223-2/");
   script_oid("1.3.6.1.4.1.25623.1.0.840766");
-  script_version("$Revision: 9648 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-27 10:29:05 +0200 (Fri, 27 Apr 2018) $");
+  script_version("$Revision: 11721 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-02 10:19:21 +0200 (Tue, 02 Oct 2018) $");
   script_tag(name:"creation_date", value:"2011-10-10 16:05:48 +0200 (Mon, 10 Oct 2011)");
-  script_xref(name: "USN", value: "1223-2");
+  script_xref(name:"USN", value:"1223-2");
   script_tag(name:"cvss_base", value:"6.3");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:M/Au:N/C:N/I:C/A:C");
   script_cve_id("CVE-2011-3869", "CVE-2011-3870", "CVE-2011-3871");
@@ -45,10 +45,10 @@ if(description)
   script_family("Ubuntu Local Security Checks");
   script_dependencies("gather-package-list.nasl");
   script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU10\.04 LTS");
-  script_tag(name : "summary" , value : "Ubuntu Update for Linux kernel vulnerabilities USN-1223-2");
-  script_tag(name : "affected" , value : "puppet on Ubuntu 10.04 LTS");
-  script_tag(name : "solution" , value : "Please Install the Updated Packages.");
-  script_tag(name : "insight" , value : "USN-1223-1 fixed vulnerabilities in Puppet. A regression was found on
+  script_tag(name:"summary", value:"Ubuntu Update for Linux kernel vulnerabilities USN-1223-2");
+  script_tag(name:"affected", value:"puppet on Ubuntu 10.04 LTS");
+  script_tag(name:"solution", value:"Please Install the Updated Packages.");
+  script_tag(name:"insight", value:"USN-1223-1 fixed vulnerabilities in Puppet. A regression was found on
   Ubuntu 10.04 LTS that caused permission denied errors when managing SSH
   authorized_keys files with Puppet. This update fixes the problem.
 
@@ -64,10 +64,9 @@ if(description)
   SSH authorized_keys files. A local attacker could exploit this to overwrite
   arbitrary files as root. (CVE-2011-3870)
 
-  It was discovered that Puppet used a predictable filename when using the
-  --edit resource. A local attacker could exploit this to edit arbitrary
-  files or run arbitrary code as the user invoking the program, typically
-  root. (CVE-2011-3871)");
+  It was discovered that Puppet used a predictable filename when using the --edit resource.
+  A local attacker could exploit this to edit arbitrary files or run arbitrary code as the
+  user invoking the program, typically root. (CVE-2011-3871)");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
   exit(0);
@@ -76,7 +75,7 @@ if(description)
 
 include("pkg-lib-deb.inc");
 
-release = get_kb_item("ssh/login/release");
+release = dpkg_get_ssh_release();
 
 
 res = "";

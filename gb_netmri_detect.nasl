@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_netmri_detect.nasl 7600 2017-10-30 09:52:59Z ckuersteiner $
+# $Id: gb_netmri_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # NetMRI Detection
 #
@@ -27,30 +27,30 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.103575");
- script_version("$Revision: 7600 $");
- script_tag(name:"last_modification", value:"$Date: 2017-10-30 10:52:59 +0100 (Mon, 30 Oct 2017) $");
- script_tag(name:"creation_date", value:"2012-09-25 12:05:19 +0200 (Tue, 25 Sep 2012)");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.103575");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2012-09-25 12:05:19 +0200 (Tue, 25 Sep 2012)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("NetMRI Detection");
+  script_name("NetMRI Detection");
 
- script_tag(name: "summary", value: "Detection of NetMRI.
-                    
+  script_tag(name:"summary", value:"Detection of NetMRI.
+
 The script sends a connection request to the server and attempts to extract the version number from the reply.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2012 Greenbone Networks GmbH");
- script_family("Product detection");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 443);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_copyright("This script is Copyright (C) 2012 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");
@@ -75,13 +75,13 @@ if ("<title>NetMRI Login" >< res || "<title>Network Automation Login" >< res) {
     c++;
     vers = 'unknown';
     if ("Version:" >< line) {
-       version = eregmatch(pattern: "<td>([^<]+)</td>", string: lines[c]); 
+       version = eregmatch(pattern: "<td>([^<]+)</td>", string: lines[c]);
        if (!isnull(version[1]))
          vers = version[1];
-    }    
+    }
 
     set_kb_item(name: string("www/", port, "/netmri"), value: string(vers," under /"));
-    set_kb_item(name:"netMRI/installed", value:TRUE);
+    set_kb_item(name:"netMRI/detected", value:TRUE);
 
     cpe = build_cpe(value: vers, exp: "^([0-9.]+)", base: "cpe:/a:infoblox:netmri:");
     if (!cpe)
@@ -94,7 +94,7 @@ if ("<title>NetMRI Login" >< res || "<title>Network Automation Login" >< res) {
                 port: port);
 
     exit(0);
-  }  
-}  
+  }
+}
 
 exit(0);

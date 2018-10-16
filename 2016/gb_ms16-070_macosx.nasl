@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms16-070_macosx.nasl 5782 2017-03-30 09:01:05Z teissa $
+# $Id: gb_ms16-070_macosx.nasl 11837 2018-10-11 09:17:05Z asteins $
 #
 # Microsoft Office Remote Code Execution Vulnerability-3163610(Mac OS X)
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:microsoft:office";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.807846");
-  script_version("$Revision: 5782 $");
+  script_version("$Revision: 11837 $");
   script_cve_id("CVE-2016-0025");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-03-30 11:01:05 +0200 (Thu, 30 Mar 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-11 11:17:05 +0200 (Thu, 11 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-06-16 09:43:02 +0530 (Thu, 16 Jun 2016)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Microsoft Office Remote Code Execution Vulnerability-3163610(Mac OS X)");
@@ -41,26 +41,22 @@ if(description)
   script_tag(name:"summary", value:"This host is missing a critical security
   update according to Microsoft Bulletin MS16-070");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw exists due to error in Microsoft Office
   software when the Office software fails to properly handle objects in memory.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers  to execute arbitrary code in the context of the currently
-  logged-in user.
-
-  Impact Level: System/Application");
+  logged-in user.");
 
   script_tag(name:"affected", value:"Microsoft Office 2011 on Mac OS X");
 
-  script_tag(name:"solution", value:"Apply the patch from below link,
-  https://technet.microsoft.com/library/security/MS16-070");
+  script_tag(name:"solution", value:"Apply the patch");
 
   script_tag(name:"solution_type", value:"VendorFix");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3165796");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/library/security/MS16-070");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3165796");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/library/security/MS16-070");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
@@ -74,24 +70,17 @@ include("smb_nt.inc");
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-offVer = "";
-
-## Get the version from KB
 offVer = get_kb_item("MS/Office/MacOSX/Ver");
 
-## check the version from KB
 if(!offVer){
   exit(0);
 }
 
-## Get the installed path
 officePath = get_app_location(cpe:CPE);
 if(!officePath || "Could not find the install location" >< officePath){
   exit(0);
 }
 
-## Check for Office Version < (14.6.5)
 if(version_in_range(version:offVer, test_version:"14.1.0", test_version2:"14.6.4"))
 {
   report = 'File checked:      ' + officePath + '\n' +

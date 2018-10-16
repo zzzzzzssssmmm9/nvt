@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_dotcms_eol.nasl 9825 2018-05-14 14:05:11Z cfischer $
+# $Id: gb_dotcms_eol.nasl 11836 2018-10-11 08:56:08Z mmartin $
 #
 # dotCMS End of Life Detection (Windows)
 #
@@ -28,8 +28,8 @@
 if( description )
 {
   script_oid("1.3.6.1.4.1.25623.1.0.112093");
-  script_version("$Revision: 9825 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-14 16:05:11 +0200 (Mon, 14 May 2018) $");
+  script_version("$Revision: 11836 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-11 10:56:08 +0200 (Thu, 11 Oct 2018) $");
   script_tag(name:"creation_date", value:"2017-10-23 16:45:53 +0200 (Mon, 23 Oct 2017)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
@@ -55,11 +55,11 @@ if( description )
 
   script_tag(name:"solution", value:"Update the dotCMS version on the remote host to a still supported version.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help of the detection NVT and check if the version is unsupported.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_xref(name:"URL", value:"https://dotcms.com/docs/latest/release-lifecycle");
 
-  exit( 0 );
+  exit(0);
 }
 
 CPE = "cpe:/a:dotcms:dotcms";
@@ -68,8 +68,7 @@ include( "misc_func.inc" );
 include( "products_eol.inc" );
 include( "version_func.inc" );
 include( "host_details.inc" );
-include( "http_func.inc" ); # Both http_ for report_vuln_url()
-include( "http_keepalive.inc" );
+include( "http_func.inc" ); # For report_vuln_url()
 
 if( ! port = get_app_port( cpe: CPE ) ) exit( 0 );
 if( ! infos = get_app_version_and_location( cpe: CPE, port: port, exit_no_version: TRUE ) ) exit( 0 );

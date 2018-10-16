@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apache_atlas_detect.nasl 7038 2017-09-01 07:59:38Z asteins $
+# $Id: gb_apache_atlas_detect.nasl 11321 2018-09-11 10:05:53Z cfischer $
 #
 # Apache Atlas Version Detection
 #
@@ -24,13 +24,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if (description)
+if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.112030");
-  script_version("$Revision: 7038 $");
+  script_version("$Revision: 11321 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-01 09:59:38 +0200 (Fri, 01 Sep 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-11 12:05:53 +0200 (Tue, 11 Sep 2018) $");
   script_tag(name:"creation_date", value:"2017-08-31 13:26:04 +0200 (Thu, 31 Aug 2017)");
   script_name("Apache Atlas Version Detection");
   script_tag(name:"summary", value:"Detection of installed version
@@ -47,6 +47,7 @@ if (description)
   script_dependencies("http_version.nasl", "find_service.nasl");
   script_require_ports("Services/www", 21000);
   script_exclude_keys("Settings/disable_cgi_scanning");
+
   exit(0);
 }
 
@@ -55,23 +56,18 @@ include("http_keepalive.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Get HTTP Port
 port = get_http_port(default:21000);
 
-## Receive response
 rcvRes = http_get_cache(port:port, item:"/#!/search");
 
-## Confirm the application
 if (rcvRes =~ "HTTP/1.. 200" && "<title>Apache Atlas</title>" >< rcvRes
-    && "/modules/home/views/header.html" >< rcvRes) 
+    && "/modules/home/views/header.html" >< rcvRes)
 {
 
   version = "unknown";
 
-  ## Set the KB value
   set_kb_item( name:"Apache/Atlas/Installed", value:TRUE );
 
-  ## Get version
   req = http_get(port:port, item:"/api/atlas/admin/version");
   res = http_keepalive_send_recv(port:port, data:req);
   ver = eregmatch( pattern:'"Version":"([0-9.]+)[^"]+', string:res);
@@ -82,7 +78,6 @@ if (rcvRes =~ "HTTP/1.. 200" && "<title>Apache Atlas</title>" >< rcvRes
     url = "/api/atlas/admin/version";
   }
 
- ## Build CPE and store it as host_detail
   cpe = build_cpe(value:version, exp:"^([0-9.]+)", base:"cpe:/a:apache:atlas:");
   if (!cpe)
     cpe = "cpe:/a:apache:atlas";

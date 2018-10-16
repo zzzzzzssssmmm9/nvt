@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_kerisystems_access_control_detect.nasl 6486 2017-06-29 09:59:06Z teissa $
+# $Id: gb_kerisystems_access_control_detect.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Keri Systems Access Control Systems Detection
 #
@@ -27,24 +27,24 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105418");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 6486 $");
- script_tag(name:"last_modification", value:"$Date: 2017-06-29 11:59:06 +0200 (Thu, 29 Jun 2017) $");
- script_tag(name:"creation_date", value:"2015-10-21 16:57:28 +0200 (Wed, 21 Oct 2015)");
- script_name("Keri Systems Access Control Systems Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105418");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11872 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-10-21 16:57:28 +0200 (Wed, 21 Oct 2015)");
+  script_name("Keri Systems Access Control Systems Detection");
 
- script_tag(name: "summary" , value: "This script performs telnet banner based idetection of Keri Systems Access Control systems");
+  script_tag(name:"summary", value:"This script performs telnet banner based idetection of Keri Systems Access Control systems");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Service detection");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("telnetserver_detect_type_nd_version.nasl");
- script_require_ports("Services/telnet", 23);
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Service detection");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("telnetserver_detect_type_nd_version.nasl");
+  script_require_ports("Services/telnet", 23);
+  exit(0);
 }
 
 include("misc_func.inc");
@@ -59,13 +59,12 @@ if( "KERI-ENET" >!< banner ) exit( 0 );
 
 version = eregmatch( pattern:'Software version V([^ ]+)( \\(([0-9]+)\\))?', string:banner );
 
-if( ! isnull(version[1] ) ) 
+if( ! isnull(version[1] ) )
 {
   vers = version[1];
   set_kb_item( name:"keri_systems_access_control/version", value:vers );
 }
 
-# build?
 if( ! isnull(version[3] ) )
 {
   build = version[3];

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_nuuo_nvr_default_credentials.nasl 10525 2018-07-17 10:10:14Z asteins $
+# $Id: gb_nuuo_nvr_default_credentials.nasl 11317 2018-09-11 08:57:27Z asteins $
 #
 # NUUO Network Video Recorder Devices Default Credentials
 #
@@ -30,11 +30,11 @@ CPE = "cpe:/a:nuuo:nuuo";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.112328");
-  script_version("$Revision: 10525 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-17 12:10:14 +0200 (Tue, 17 Jul 2018) $");
+  script_version("$Revision: 11317 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-11 10:57:27 +0200 (Tue, 11 Sep 2018) $");
   script_tag(name:"creation_date", value:"2018-07-17 11:26:00 +0200 (Tue, 17 Jul 2018)");
-  script_tag(name:"cvss_base", value:"7.5");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_tag(name:"cvss_base", value:"10.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
 
   script_cve_id("CVE-2016-6553");
   script_bugtraq_id(93807);
@@ -75,11 +75,23 @@ if( ! dir = get_app_location( cpe:CPE, port:port ) ) exit( 0 );
 cookie = get_kb_item("nuuo/web/cookie");
 if( isnull( cookie ) ) exit( 0 );
 
+# GET request to fetch a fresh cookie
+req = http_get( port:port , item:"/" );
+res = http_keepalive_send_recv( port:port, data:req );
+
+cookie_match = eregmatch( pattern:'Set-Cookie: ([^\r\n]+)', string:res );
+if( cookie_match[1] ){
+  cookie = cookie_match[1];
+} else {
+  exit(0);
+}
+
 vuln = FALSE;
 report = "";
 
 credentials = make_list( "admin:admin", "localdisplay:111111" );
 
+useragent = get_http_user_agent();
 host = http_host_name( port:port );
 
 foreach credential( credentials ) {
@@ -96,7 +108,7 @@ foreach credential( credentials ) {
 
   req = 'POST /login.php HTTP/1.1\r\n' +
         'Host: ' + host + '\r\n' +
-        'User-Agent: ' + OPENVAS_HTTP_USER_AGENT +'\r\n' +
+        'User-Agent: ' + useragent + '\r\n' +
         'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
         'Accept-Language: en-US,en;q=0.5\r\n' +
         'Referer: http://' + host + '/login.php/\r\n' +
@@ -112,7 +124,7 @@ foreach credential( credentials ) {
 
     req = 'GET /setting.php HTTP/1.1\r\n' +
           'Host: ' + host + '\r\n' +
-          'User-Agent: ' + OPENVAS_HTTP_USER_AGENT + '\r\n' +
+          'User-Agent: ' + useragent + '\r\n' +
           'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n' +
           'Accept-Language: en-US,en;q=0.5\r\n' +
           'Referer: http://' + host + '/setting.php\r\n' +

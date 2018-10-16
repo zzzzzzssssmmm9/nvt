@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_atcom_pbx_detect.nasl 4893 2016-12-30 15:49:57Z cfi $
+# $Id: gb_atcom_pbx_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # ATCOM PBX Detection
 #
@@ -27,31 +27,31 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.106101");
- script_version ("$Revision: 4893 $");
- script_tag(name: "last_modification", value: "$Date: 2016-12-30 16:49:57 +0100 (Fri, 30 Dec 2016) $");
- script_tag(name: "creation_date", value: "2016-06-20 15:49:16 +0700 (Mon, 20 Jun 2016)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.106101");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-06-20 15:49:16 +0700 (Mon, 20 Jun 2016)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("ATCOM PBX Detection");
+  script_name("ATCOM PBX Detection");
 
- script_tag(name: "summary" , value: "Detection of ATCOM PBX
+  script_tag(name:"summary", value:"Detection of ATCOM PBX
 
 The script attempts to identify ATCOM via SIP banner to extract the version number.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_family("Product detection");
- script_dependencies("sip_detection.nasl", "find_service.nasl");
- script_mandatory_keys("sip/detected");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("sip_detection.nasl", "find_service.nasl");
+  script_mandatory_keys("sip/detected");
 
- script_xref(name: "URL", value: "http://www.atcom.cn"); 
+  script_xref(name:"URL", value:"http://www.atcom.cn");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");

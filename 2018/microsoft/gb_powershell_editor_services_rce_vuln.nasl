@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_powershell_editor_services_rce_vuln.nasl 10538 2018-07-18 10:58:40Z santu $
+# $Id: gb_powershell_editor_services_rce_vuln.nasl 11782 2018-10-08 14:01:44Z cfischer $
 #
 # Microsoft PowerShell Editor Services Remote Code Execution Vulnerability
 #
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.813676");
-  script_version("$Revision: 10538 $");
+  script_version("$Revision: 11782 $");
   script_cve_id("CVE-2018-8327");
   script_bugtraq_id(104649);
-  script_tag(name:"cvss_base", value:"5.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-18 12:58:40 +0200 (Wed, 18 Jul 2018) $");
+  script_tag(name:"cvss_base", value:"10.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-08 16:01:44 +0200 (Mon, 08 Oct 2018) $");
   script_tag(name:"creation_date", value:"2018-07-17 14:49:04 +0530 (Tue, 17 Jul 2018)");
   script_name("Microsoft PowerShell Editor Services Remote Code Execution Vulnerability");
 
@@ -45,15 +45,13 @@ if(description)
   script_tag(name:"insight", value:"The flaw is due to an improper way of securing
   local connections by PowerShell Editor Services.");
 
-  script_tag(name:"impact" , value:"Successful exploitation will allow attackers 
-  to execute malicious code on a vulnerable system.
-
-  Impact Level: System/Application");
+  script_tag(name:"impact", value:"Successful exploitation will allow attackers
+  to execute malicious code on a vulnerable system.");
 
   script_tag(name:"affected", value:"PowerShell Editor Services 1.7.0 and below.");
 
-  script_tag(name:"solution", value:"Upgrade PowerShell Editor Services to 
-  version 1.8.0 or later. For updates refer to Reference links.");
+  script_tag(name:"solution", value:"Upgrade PowerShell Editor Services to
+  version 1.8.0 or later. Please see the references for more info.");
 
   script_tag(name:"qod_type", value:"executable_version");
   script_tag(name:"solution_type", value:"VendorFix");
@@ -64,47 +62,47 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_family("Windows");
   script_dependencies("smb_reg_service_pack.nasl", "gb_wmi_access.nasl");
-  script_require_ports(139, 445);
   script_mandatory_keys("WMI/access_successful", "SMB/WindowsVersion");
+
   exit(0);
 }
 
 include("smb_nt.inc");
-include("host_details.inc");
 include("version_func.inc");
-include("secpod_smb_func.inc");
+include("misc_func.inc");
+include("wmi_file.inc");
 
-host    = get_host_ip();
-usrname = get_kb_item( "SMB/login" );
-passwd  = get_kb_item( "SMB/password" );
-if( ! host || ! usrname || ! passwd ) exit( 0 );
+infos = kb_smb_wmi_connectinfo();
+if( ! infos ) exit( 0 );
 
-domain  = get_kb_item( "SMB/domain" );
-if( domain ) usrname = domain + '\\' + usrname;
-
-handle = wmi_connect( host:host, username:usrname, password:passwd );
+handle = wmi_connect( host:infos["host"], username:infos["username_wmi_smb"], password:infos["password"] );
 if( ! handle ) exit( 0 );
 
-query = 'Select Version from CIM_DataFile Where FileName ='
-        + raw_string(0x22) + 'Microsoft.PowerShell.EditorServices' + raw_string(0x22) + ' AND Extension ='
-        + raw_string(0x22) + 'dll' + raw_string(0x22);
-fileVer = wmi_query( wmi_handle:handle, query:query);
-
+# TODO: Limit to a possible known common path
+fileList = wmi_file_fileversion( handle:handle, fileName:"Microsoft.PowerShell.EditorServices", fileExtn:"dll", includeHeader:FALSE );
 wmi_close( wmi_handle:handle );
+if( ! fileList || ! is_array( fileList ) ) {
+  exit( 0 );
+}
 
-if(!fileVer) exit( 0 );
+report = "";
 
-foreach ver(split( fileVer ))
-{
-  ver = eregmatch(pattern:"(.*)\microsoft.powershell.editorservices.dll.?([0-9.]+)", string:ver );
-  version = ver[2];
-  file = ver[1] + "Microsoft.PowerShell.EditorServices.dll";
+foreach filePath( keys( fileList ) ) {
 
-  if(version_is_less(version:version, test_version:"1.8.0"))
-  {
-    report = report_fixed_ver( installed_version:version, fixed_version:"1.8.0", file_checked:file);
-    security_message( data:report );
-    exit(0);
+  vers = fileList[filePath];
+
+  if( vers && version = eregmatch( string:vers, pattern:"^([0-9.]+)" ) ) {
+
+    if( version_is_less( version:version[1], test_version:"1.8.0" ) ) {
+      VULN = TRUE;
+      report += report_fixed_ver( file_version:version[1], file_checked:filePath, fixed_version:"1.8.0" ) + '\n';
+    }
   }
 }
-exit(0);
+
+if( VULN ) {
+  security_message( port:0, data:report );
+  exit( 0 );
+}
+
+exit( 99 );

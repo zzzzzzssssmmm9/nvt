@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wp_w3_total_cache_xss_vuln.nasl 10000 2018-05-29 12:20:12Z cfischer $
+# $Id: gb_wp_w3_total_cache_xss_vuln.nasl 11402 2018-09-15 09:13:36Z cfischer $
 #
 # Wordpress W3 Total Cache Cross Site Scripting Vulnerability
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805117");
-  script_version("$Revision: 10000 $");
+  script_version("$Revision: 11402 $");
   script_cve_id("CVE-2014-8724");
   script_bugtraq_id(71665);
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-29 14:20:12 +0200 (Tue, 29 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:13:36 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2014-12-23 19:03:57 +0530 (Tue, 23 Dec 2014)");
   script_name("Wordpress W3 Total Cache Cross Site Scripting Vulnerability");
 
@@ -50,9 +50,7 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to execute arbitrary HTML and script code in a users browser session
-  in the context of an affected site.
-
-  Impact Level: Application");
+  in the context of an affected site.");
 
   script_tag(name:"affected", value:"Wordpress W3 Total Cache version
   before 0.9.4.1");
@@ -62,9 +60,9 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://wpvulndb.com/vulnerabilities/7718");
-  script_xref(name : "URL" , value : "http://packetstormsecurity.com/files/129626");
-  script_xref(name : "URL" , value : "https://www.secuvera.de/advisories/secuvera-SA-2014-01.txt");
+  script_xref(name:"URL", value:"https://wpvulndb.com/vulnerabilities/7718");
+  script_xref(name:"URL", value:"http://packetstormsecurity.com/files/129626");
+  script_xref(name:"URL", value:"https://www.secuvera.de/advisories/secuvera-SA-2014-01.txt");
 
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");

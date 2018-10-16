@@ -1,8 +1,8 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cisco_webexarf_detect_win.nasl 9030 2018-03-06 07:03:50Z ckuersteiner $
+# $Id: gb_cisco_webexarf_detect_win.nasl 11279 2018-09-07 09:08:31Z cfischer $
 #
-# Cisco WebEx ARF (Advanced Recording Formate) Player Version Detection (Windows)
+# Cisco WebEx ARF (Advanced Recording Format) Player Version Detection (Windows)
 #
 # Authors:
 # Tameem Eissa <tameem.eissa@greenbone.net>
@@ -27,15 +27,15 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107078");
-  script_version("$Revision: 9030 $");
+  script_version("$Revision: 11279 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-03-06 08:03:50 +0100 (Tue, 06 Mar 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-07 11:08:31 +0200 (Fri, 07 Sep 2018) $");
   script_tag(name:"creation_date", value:"2016-11-10 11:19:11 +0100 (Thu, 10 Nov 2016)");
   script_tag(name:"qod_type", value:"registry");
-  script_name("Cisco WebEx ARF (Advanced Recording Formate) Player Version Detection (Windows)");
+  script_name("Cisco WebEx ARF (Advanced Recording Format) Player Version Detection (Windows)");
 
-  script_tag(name: "summary" , value: "Detection of installed version of
+  script_tag(name:"summary", value:"Detects the installed version of
   Cisco WebEx Advanced Recording Format (ARF) Player.
 
   The script logs in via smb, searches for Cisco WebEx Advanced Recording Format (ARF) Player in the registry and gets the version from 'DisplayVersion' string from registry.");
@@ -43,28 +43,26 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Product detection");
-  script_dependencies("secpod_reg_enum.nasl", "smb_reg_service_pack.nasl");
+  script_dependencies("smb_reg_service_pack.nasl");
   script_mandatory_keys("SMB/WindowsVersion", "SMB/Windows/Arch");
   script_require_ports(139, 445);
   exit(0);
 }
+
 include("smb_nt.inc");
 include("secpod_smb_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Get OS Architecture
 os_arch = get_kb_item("SMB/Windows/Arch");
 if(!os_arch){
-  exit(-1);
+  exit(0);
 }
 
-## Check for 32 bit platform
 if("x86" >< os_arch){
   key_list = make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\");
 }
 
-#check for 64 bit platform
 else if("x64" >< os_arch)
 {
   key_list =  make_list("SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\",

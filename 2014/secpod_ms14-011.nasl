@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_ms14-011.nasl 9487 2018-04-16 05:40:30Z cfischer $
+# $Id: secpod_ms14-011.nasl 11876 2018-10-12 12:20:01Z cfischer $
 #
 # Microsoft VBScript Remote Code Execution Vulnerability (2928390)
 #
@@ -29,18 +29,19 @@ CPE = "cpe:/a:microsoft:ie";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.903229");
-  script_version("$Revision: 9487 $");
+  script_version("$Revision: 11876 $");
   script_cve_id("CVE-2014-0271");
   script_bugtraq_id(65395);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-16 07:40:30 +0200 (Mon, 16 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 14:20:01 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-02-12 09:18:06 +0530 (Wed, 12 Feb 2014)");
   script_name("Microsoft VBScript Remote Code Execution Vulnerability (2928390)");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2014 SecPod");
   script_family("Windows : Microsoft Bulletins");
-  script_dependencies("secpod_reg_enum.nasl", "gb_ms_ie_detect.nasl");
+  script_dependencies("smb_reg_service_pack.nasl", "gb_ms_ie_detect.nasl");
+  script_require_ports(139, 445);
   script_mandatory_keys("MS/IE/Version");
 
   script_xref(name:"URL", value:"http://secunia.com/advisories/56796");
@@ -50,15 +51,12 @@ if(description)
   script_tag(name:"summary", value:"This host is missing an critical security update according to Microsoft
   Bulletin MS14-011.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check appropriate patch is applied
-  or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Flaw is due to improper handling of memory objects in VBScript engine.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow attackers to execute arbitrary code and
-  corrupt memory.
-
-  Impact Level: System/Application");
+  corrupt memory.");
 
   script_tag(name:"affected", value:"Microsoft Windows XP Service Pack 3 and prior
 
@@ -85,9 +83,7 @@ if(description)
   Microsoft Windows Server 2012 R2");
 
   script_tag(name:"solution", value:"Run Windows Update and update the listed hotfixes or download and
-  update mentioned hotfixes in the advisory from the below link,
-
-  https://technet.microsoft.com/en-us/security/bulletin/ms14-011");
+  install the hotfixes from the referenced advisory.");
 
   script_tag(name:"qod_type", value:"registry");
   script_tag(name:"solution_type", value:"VendorFix");
@@ -112,17 +108,16 @@ if(!sysPath){
   exit(0);
 }
 
-ieVer = get_app_version(cpe:CPE);
+ieVer = get_app_version(cpe:CPE, nofork: TRUE);
 if(!ieVer || !(ieVer =~ "^(6|7|8|9|10|11)")){
   exit(0);
 }
 
-sysVer = fetch_file_version(sysPath, file_name:"system32\Vbscript.dll");
+sysVer = fetch_file_version(sysPath:sysPath, file_name:"system32\Vbscript.dll");
 if(!sysVer){
   exit(0);
 }
 
-## Windows XP
 if(hotfix_check_sp(xp:4) > 0){
   if(version_is_less(version:sysVer, test_version:"5.7.6002.23292") ||
     (ieVer =~ "^8" && version_in_range(version:sysVer, test_version:"5.8", test_version2:"5.8.6001.23551"))){
@@ -132,7 +127,6 @@ if(hotfix_check_sp(xp:4) > 0){
   exit(0);
 }
 
-## Windows 2003 x86, Windows XP x64 and Windows 2003 x64
 else if(hotfix_check_sp(win2003:3, xpx64:3, win2003x64:3) > 0){
   if(version_is_less(version:sysVer, test_version:"5.6.0.8852") ||
      version_in_range(version:sysVer, test_version:"5.7", test_version2:"5.7.6002.23291") ||
@@ -143,7 +137,6 @@ else if(hotfix_check_sp(win2003:3, xpx64:3, win2003x64:3) > 0){
   exit(0);
 }
 
-## Windows Vista and Windows Server 2008
 ## Currently no support for Vista and Windows Server 2008 64 bit
 else if(hotfix_check_sp(winVista:3, win2008:3) > 0){
   if(version_is_less(version:sysVer, test_version:"5.7.6002.19005") ||
@@ -156,7 +149,6 @@ else if(hotfix_check_sp(winVista:3, win2008:3) > 0){
   exit(0);
 }
 
-## Windows 7 and Windows 2008 R2
 else if(hotfix_check_sp(win7:2, win7x64:2, win2008r2:2, win8:1, win8x64:1, win2012:1) > 0){
   if(version_is_less(version:sysVer, test_version:"5.8.7601.18337") ||
      version_in_range(version:sysVer, test_version:"5.8.7601.22000", test_version2:"5.8.7601.22534")){

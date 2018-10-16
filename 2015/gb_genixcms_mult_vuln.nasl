@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_genixcms_mult_vuln.nasl 9579 2018-04-24 08:28:33Z cfischer $
+# $Id: gb_genixcms_mult_vuln.nasl 11492 2018-09-20 08:38:50Z mmartin $
 #
 # GeniXCMS Multiple Vulnerabilities
 #
@@ -27,10 +27,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805495");
-  script_version("$Revision: 9579 $");
+  script_version("$Revision: 11492 $");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-24 10:28:33 +0200 (Tue, 24 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-20 10:38:50 +0200 (Thu, 20 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-03-17 14:25:35 +0530 (Tue, 17 Mar 2015)");
   script_tag(name:"qod_type", value:"remote_vul");
   script_name("GeniXCMS Multiple Vulnerabilities");
@@ -45,16 +45,13 @@ if(description)
   of user supplied input to the 'page' parameter by genixcms/index.php script.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow attacker
-  to execute arbitrary HTML and script code in the context of an affected site.
-
-  Impact Level: Application");
+  to execute arbitrary HTML and script code in the context of an affected site.");
 
   script_tag(name:"affected", value:"GeniXCMS 0.0.1.");
 
-  script_tag(name:"solution", value:"No solution or patch was made available for at least one year
-  since disclosure of this vulnerability. Likely none will be provided anymore. General solution options
-  are to upgrade to a newer release, disable respective features, remove the product or replace the
-  product by another one.");
+  script_tag(name:"solution", value:"No known solution was made available for at least one year since the disclosure of this vulnerability.
+Likely none will be provided anymore.
+General solution options are to upgrade to a newer release, disable respective features, remove the product or replace the product by another one.");
 
   script_tag(name:"solution_type", value:"WillNotFix");
   script_xref(name:"URL", value:"http://www.exploit-db.com/exploits/36321/");
@@ -85,11 +82,11 @@ foreach dir( make_list_unique( "/", "/genixcms", "/cms", cgi_dirs( port:http_por
   if(rcvRes && rcvRes =~ "content.*GeniXCMS") {
 
     host = http_host_name( port:http_port );
-
+    useragent = get_http_user_agent();
     url = dir + "/index.php/?page=1%27%3E%3Cscript%3Ealert(document.cookie)%3C/script%3E";
     sndReq = string("GET ", url, " HTTP/1.1\r\n",
                     "Host: ", host, "\r\n",
-                    "User-Agent: ", OPENVAS_HTTP_USER_AGENT, "\r\n",
+                    "User-Agent: ", useragent, "\r\n",
                     "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n\r\n");
 
     rcvRes = http_keepalive_send_recv(port:http_port, data:sndReq);

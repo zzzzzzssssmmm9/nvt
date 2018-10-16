@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_easyio_bacnet_detect.nasl 5187 2017-02-03 09:59:11Z ckuerste $
+# $Id: gb_easyio_bacnet_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # EasyIO Detection (BACNET)
 #
@@ -27,31 +27,31 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.106502");
- script_version ("$Revision: 5187 $");
- script_tag(name: "last_modification", value: "$Date: 2017-02-03 10:59:11 +0100 (Fri, 03 Feb 2017) $");
- script_tag(name: "creation_date", value: "2017-01-09 11:19:19 +0700 (Mon, 09 Jan 2017)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.106502");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2017-01-09 11:19:19 +0700 (Mon, 09 Jan 2017)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("EasyIO Detection (BACNET)");
+  script_name("EasyIO Detection (BACNET)");
 
- script_tag(name: "summary" , value: "Detection of EasyIO Devices
+  script_tag(name:"summary", value:"Detection of EasyIO Devices
 
 Tries to detect EasyIO devices over the BACnet protocol.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
- script_family("Product detection");
- script_dependencies("gb_bacnet_detect.nasl");
- script_mandatory_keys("bacnet/vendor", "bacnet/model_name");
+  script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("gb_bacnet_detect.nasl");
+  script_mandatory_keys("bacnet/vendor", "bacnet/model_name");
 
- script_xref(name: "URL", value: "https://www.easyio.eu/");
+  script_xref(name:"URL", value:"https://www.easyio.eu/");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");

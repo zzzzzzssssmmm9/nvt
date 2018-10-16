@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cisco_sg3xx_snmp_detect.nasl 8481 2018-01-22 06:34:20Z ckuersteiner $
+# $Id: gb_cisco_sg3xx_snmp_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Cisco Small Business 300 Series Managed Switch SNMP Detection
 #
@@ -27,26 +27,26 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105587");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 8481 $");
- script_tag(name:"last_modification", value:"$Date: 2018-01-22 07:34:20 +0100 (Mon, 22 Jan 2018) $");
- script_tag(name:"creation_date", value:"2013-10-14 14:24:09 +0200 (Mon, 14 Oct 2013)");
- script_name('Cisco Small Business 300 Series Managed Switch SNMP Detection');
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("gb_snmp_sysdesc.nasl");
- script_require_udp_ports("Services/udp/snmp", 161);
- script_mandatory_keys("SNMP/sysdesc/available");
+  script_oid("1.3.6.1.4.1.25623.1.0.105587");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2013-10-14 14:24:09 +0200 (Mon, 14 Oct 2013)");
+  script_name('Cisco Small Business 300 Series Managed Switch SNMP Detection');
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("gb_snmp_sysdesc.nasl");
+  script_require_udp_ports("Services/udp/snmp", 161);
+  script_mandatory_keys("SNMP/sysdesc/available");
 
- script_tag(name: "summary", value: "This script performs SNMP based detection of Cisco Small Business 300 Series
+  script_tag(name:"summary", value:"This script performs SNMP based detection of Cisco Small Business 300 Series
 Managed Switch.");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");

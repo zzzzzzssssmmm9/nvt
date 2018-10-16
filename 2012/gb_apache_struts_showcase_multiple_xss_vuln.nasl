@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apache_struts_showcase_multiple_xss_vuln.nasl 9352 2018-04-06 07:13:02Z cfischer $
+# $Id: gb_apache_struts_showcase_multiple_xss_vuln.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # Apache Struts Showcase Multiple Persistence Cross-Site Scripting Vulnerabilities
 #
@@ -29,68 +29,59 @@ CPE = "cpe:/a:apache:struts";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802422");
-  script_version("$Revision: 9352 $");
+  script_version("$Revision: 11857 $");
   script_bugtraq_id(51902);
   script_cve_id("CVE-2012-1006");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:13:02 +0200 (Fri, 06 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 10:25:16 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-02-08 12:14:38 +0530 (Wed, 08 Feb 2012)");
   script_tag(name:"qod_type", value:"remote_vul");
   script_name("Apache Struts Showcase Multiple Persistence Cross-Site Scripting Vulnerabilities");
 
-  script_tag(name: "summary" , value:"This host is running Apache Struts Showcase
+  script_tag(name:"summary", value:"This host is running Apache Struts Showcase
   and is prone to multiple persistence cross-site scripting vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Send a crafted HTTP POST request
+  script_tag(name:"vuldetect", value:"Send a crafted HTTP POST request
   and check whether it is able to read cookie or not.");
 
-  script_tag(name: "insight" , value:"Multiple flaws due to an,
+  script_tag(name:"insight", value:"Multiple flaws due to an,
+
   - Input passed via the 'name' and 'lastName' parameter in
   '/struts2-showcase/person/editPerson.action' is not properly verified
   before it is returned to the user.
+
   - Input passed via the 'clientName' parameter in
   '/struts2-rest-showcase/orders' action is not properly verified before
   it is returned to the user.");
 
-  script_tag(name: "impact" , value:"Successful exploitation could allow an attacker
+  script_tag(name:"impact", value:"Successful exploitation could allow an attacker
   to execute arbitrary HTML code in a user's browser session in the context of a vulnerable
-  application.
+  application.");
 
-  Impact Level: Application.");
-  
-  script_tag(name:"affected", value:"Apache struts 1.3.10, 2.0.14 and 2.2.3 and 2.3.1.2"); 
+  script_tag(name:"affected", value:"Apache struts 1.3.10, 2.0.14 and 2.2.3 and 2.3.1.2");
 
 
-  script_tag(name: "solution" , value:"Upgrade to Apache Struts to version 2.3.3 or later,
-  For updates refer to http://struts.apache.org/download.cgi");
+  script_tag(name:"solution", value:"Upgrade to Apache Struts to version 2.3.3 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://secpod.org/blog/?p=450");
-  script_xref(name : "URL" , value : "http://secpod.org/advisories/SecPod_Apache_Struts_Multiple_Parsistant_XSS_Vulns.txt");
-  script_category(ACT_ATTACK);
+  script_xref(name:"URL", value:"http://secpod.org/blog/?p=450");
+  script_xref(name:"URL", value:"http://secpod.org/advisories/SecPod_Apache_Struts_Multiple_Parsistant_XSS_Vulns.txt");
+  script_category(ACT_DESTRUCTIVE_ATTACK); # Stored XSS
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_dependencies("gb_apache_struts2_detection.nasl");
   script_mandatory_keys("ApacheStruts/installed");
   script_family("Web application abuses");
   script_require_ports("Services/www", 8080);
+
+  script_xref(name:"URL", value:"http://struts.apache.org/download.cgi");
   exit(0);
 }
 
 include("http_func.inc");
 include("host_details.inc");
 include("http_keepalive.inc");
-
-asport = 0;
-asreq = NULL;
-asres = NULL;
-asresp = NULL;
-
-## Stored XSS (Not a safe check)
-if(safe_checks()){
-  exit(0);
-}
 
 if(!asport = get_app_port(cpe:CPE)){
   exit(0);
@@ -100,9 +91,9 @@ if(!dir = get_app_location(cpe:CPE, port:asport)){
   exit(0);
 }
 
+useragent = get_http_user_agent();
 host = http_host_name(port:asport);
 
-## Send and Receive the response
 asreq = http_get(item:string(dir,"/showcase.action"), port:asport);
 if(!isnull(asreq))
 {
@@ -110,18 +101,15 @@ if(!isnull(asreq))
 
   if(!isnull(asres))
   {
-    ## Confirm the application
     if(">Showcase</" >< asres && ">Struts Showcase<" >< asres)
     {
-      ## Construct the POST data
       postdata = "person.name=%3Cscript%3Ealert%28document.cookie%29%3C%2" +
                    "Fscript%3E&person.lastName=%3Cscript%3Ealert%28document" +
                   ".cookie%29%3C%2Fscript%3E";
 
-        ## Construct the POST request
         asReq = string("POST ", dir, "/person/newPerson.action HTTP/1.1\r\n",
                        "Host: ", host, "\r\n",
-                       "User-Agent: ", OPENVAS_HTTP_USER_AGENT, "\r\n",
+                       "User-Agent: ", useragent, "\r\n",
                        "Content-Type: application/x-www-form-urlencoded\r\n",
                        "Content-Length: ", strlen(postdata), "\r\n",
                        "\r\n", postdata);
@@ -135,7 +123,6 @@ if(!isnull(asreq))
           {
             asresp = http_keepalive_send_recv(port:asport, data:asreq);
 
-            ##  Confirm the exploit
             if(asresp =~ "HTTP/1\.. 200" &&
                ("<script>alert(document.cookie)</script>" >< asresp) &&
                ">Struts Showcase<" >< asresp)

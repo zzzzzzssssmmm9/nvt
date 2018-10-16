@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_typo3_backend_username_disclosure_vuln.nasl 5843 2017-04-03 13:42:51Z cfi $
+# $Id: gb_typo3_backend_username_disclosure_vuln.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # TYPO3 Backend Username Disclosure Vulnerability
 #
@@ -29,42 +29,28 @@ CPE = "cpe:/a:typo3:typo3";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804210");
-  script_version("$Revision: 5843 $");
+  script_version("$Revision: 11867 $");
   script_bugtraq_id(49072);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-04-03 15:42:51 +0200 (Mon, 03 Apr 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-01-07 15:31:34 +0530 (Tue, 07 Jan 2014)");
   script_name("TYPO3 Backend Username Disclosure Vulnerability");
 
-tag_summary = "This host is installed with TYPO3 and is prone to username disclosure
-vulnerability.";
-
-tag_vuldetect = "Send a Crafted HTTP POST request and check whether it is able to get sensitive
-information.";
-
-tag_insight = "An error exists in application, which returns a different response for
+  script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to obtain valid usernames.");
+  script_tag(name:"vuldetect", value:"Send a Crafted HTTP POST request and check whether it is able to get sensitive
+information.");
+  script_tag(name:"insight", value:"An error exists in application, which returns a different response for
 incorrect authentication attempts depending on whether or not the username
-is incorrect";
+is incorrect");
+  script_tag(name:"solution", value:"Upgrade to TYPO3 version 4.3.12, 4.4.9 or 4.5.4 or later.");
+  script_tag(name:"solution_type", value:"VendorFix");
+  script_tag(name:"summary", value:"This host is installed with TYPO3 and is prone to username disclosure
+vulnerability.");
+  script_tag(name:"affected", value:"TYPO3 version before 4.3.11 and below, 4.4.8 and below, 4.5.3 and below");
 
-tag_impact = "Successful exploitation will allow remote attackers to obtain valid usernames.
-
-Impact Level: Application";
-
-tag_affected = "TYPO3 version before 4.3.11 and below, 4.4.8 and below, 4.5.3 and below";
-
-tag_solution = "Upgrade to TYPO3 version 4.3.12, 4.4.9 or 4.5.4 or later,
-For updates refer to http://typo3.org";
-
-  script_tag(name : "impact" , value : tag_impact);
-  script_tag(name : "vuldetect" , value : tag_vuldetect);
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "solution" , value : tag_solution);
-  script_tag(name : "summary" , value : tag_summary);
-  script_tag(name : "affected" , value : tag_affected);
-
-  script_xref(name : "URL" , value : "http://secunia.com/advisories/45557/");
-  script_xref(name : "URL" , value : "http://typo3.org/teams/security/security-bulletins/typo3-core/typo3-CORE-sa-2011-001");
+  script_xref(name:"URL", value:"http://secunia.com/advisories/45557/");
+  script_xref(name:"URL", value:"http://typo3.org/teams/security/security-bulletins/typo3-core/typo3-CORE-sa-2011-001");
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
   script_family("Web application abuses");
@@ -72,6 +58,7 @@ For updates refer to http://typo3.org";
   script_dependencies("gb_typo3_detect.nasl");
   script_mandatory_keys("TYPO3/installed");
   script_require_ports("Services/www", 80);
+
   exit(0);
 }
 
@@ -80,11 +67,6 @@ include("http_func.inc");
 include("misc_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
-
-## Variable initialisation
-url = "";
-typoPort = "";
-typoLoca = "";
 
 if(!typoPort = get_app_port(cpe:CPE)){
   exit(0);
@@ -102,6 +84,7 @@ if(typoLoca = get_app_location(cpe:CPE, port:typoPort))
   if(!username)
     username = "admin";
 
+  useragent = get_http_user_agent();
   host = http_host_name(port:typoPort);
 
   challenge = eregmatch(pattern:'name="challenge" value="([a-z0-9]+)"' , string:tres);
@@ -126,7 +109,7 @@ if(typoLoca = get_app_location(cpe:CPE, port:typoPort))
 
       req = string("POST ",url," HTTP/1.0\r\n",
                    "Host: " + host + "\r\n",
-                   "User-Agent: " + OPENVAS_HTTP_USER_AGENT + "\r\n",
+                   "User-Agent: " + useragent + "\r\n",
                    "Referer: http://" + host + "/typo3/alt_menu.php \r\n",
                    "Connection: keep-alive\r\n",
                    "Cookie: ",cCookie,"\r\n",
@@ -135,7 +118,6 @@ if(typoLoca = get_app_location(cpe:CPE, port:typoPort))
                    payload);
       buf = http_keepalive_send_recv(port:typoPort, data:req);
 
-      ## Confirm exploit worked by checking the response
       if(buf && buf =~ "HTTP/1.. 200" && "Expires: 0" >< buf)
       {
         security_message(typoPort);

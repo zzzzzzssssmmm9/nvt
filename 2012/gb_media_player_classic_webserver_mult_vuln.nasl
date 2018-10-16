@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_media_player_classic_webserver_mult_vuln.nasl 6697 2017-07-12 11:40:05Z cfischer $
+# $Id: gb_media_player_classic_webserver_mult_vuln.nasl 11580 2018-09-25 06:06:13Z cfischer $
 #
 # Media Player Classic (MPC) Webserver Multiple Vulnerabilities
 #
@@ -27,10 +27,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802494");
-  script_version("$Revision: 6697 $");
+  script_version("$Revision: 11580 $");
   script_tag(name:"cvss_base", value:"7.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 13:40:05 +0200 (Wed, 12 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-25 08:06:13 +0200 (Tue, 25 Sep 2018) $");
   script_tag(name:"creation_date", value:"2012-11-16 16:43:52 +0530 (Fri, 16 Nov 2012)");
   script_name("Media Player Classic (MPC) Webserver Multiple Vulnerabilities");
 
@@ -46,17 +46,14 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to insert
   arbitrary HTML and script code, which will be executed in a user's browser
-  session in the context of an affected site and cause denial of service.
-
-  Impact Level: Application");
+  session in the context of an affected site and cause denial of service.");
   script_tag(name:"affected", value:"MPC (Media Player Classic) version 1.6.4");
   script_tag(name:"insight", value:"Multiple flaws are due to improper validation of user-supplied
   input via the 'path' parameter to browser.html and buffer overflow occurs when
   large data is sent to the default port 13579.");
-  script_tag(name:"solution", value:"No solution or patch was made available for at least one year
-  since disclosure of this vulnerability. Likely none will be provided anymore.
-  General solution options are to upgrade to a newer release, disable respective
-  features, remove the product or replace the product by another one.");
+  script_tag(name:"solution", value:"No known solution was made available for at least one year since the disclosure of this vulnerability.
+Likely none will be provided anymore.
+General solution options are to upgrade to a newer release, disable respective features, remove the product or replace the product by another one.");
   script_tag(name:"summary", value:"This host is running Media Player Classic (MPC) Webserver and is
   prone to multiple vulnerabilities.");
 
@@ -66,26 +63,17 @@ if(description)
   exit(0);
 }
 
-
 include("http_func.inc");
 include("http_keepalive.inc");
 
-port = "";
-banner = "";
-
-## Get HTTP Port
 port = get_http_port(default:13579);
-
-## Check Banner And Confirm Application
 banner = get_http_banner(port:port);
 if("Server: MPC-HC WebServer" >!< banner) {
   exit(0);
 }
 
-## Construct the Attack Request
 url = '/browser.html?path=<script>alert(document.cookie)</script>';
 
-## Try attack and check the response to confirm vulnerability.
 if(http_vuln_check(port:port, url:url, pattern:"<script>alert\(document." +
    "cookie\)</script>", extra_check: make_list('>Directory<',
    '>MPC-HC WebServer', 'File Browser<'), check_header:TRUE)){

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_office_2016_may17_macosx.nasl 6178 2017-05-19 13:20:53Z antu123 $
+# $Id: gb_ms_office_2016_may17_macosx.nasl 11816 2018-10-10 10:42:56Z mmartin $
 #
 # Microsoft Office 2016 Memory Corruption Vulnerability (Mac OS X)
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:microsoft:office";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.811048");
-  script_version("$Revision: 6178 $");
+  script_version("$Revision: 11816 $");
   script_cve_id("CVE-2017-0254");
   script_bugtraq_id(98101);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-19 15:20:53 +0200 (Fri, 19 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-10 12:42:56 +0200 (Wed, 10 Oct 2018) $");
   script_tag(name:"creation_date", value:"2017-05-19 15:20:17 +0530 (Fri, 19 May 2017)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Microsoft Office 2016 Memory Corruption Vulnerability (Mac OS X)");
@@ -43,44 +43,36 @@ if(description)
   update for Microsoft Office 2016 on Mac OSX according to Microsoft security
   update May 2017");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw exists due to error when the
   software fails to properly handle objects in memory.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to run arbitrary code in the context of the current user.
-
-  Impact Level: System/Application");
+  attackers to run arbitrary code in the context of the current user.");
 
   script_tag(name:"affected", value:"Microsoft Office 2016 on Mac OS X");
 
-  script_tag(name:"solution", value:"Apply the patch from below link,
-  https://support.office.com/en-us/article/Release-notes-for-Office-2016-for-Mac-ed2da564-6d53-4542-9954-7e3209681a41");
+  script_tag(name:"solution", value:"Apply the patch ");
 
   script_tag(name:"solution_type", value:"VendorFix");
-  script_xref(name : "URL" , value : "https://support.office.com/en-us/article/Release-notes-for-Office-2016-for-Mac-ed2da564-6d53-4542-9954-7e3209681a41");
+  script_xref(name:"URL", value:"https://support.office.com/en-us/article/Release-notes-for-Office-2016-for-Mac-ed2da564-6d53-4542-9954-7e3209681a41");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
   script_family("Mac OS X Local Security Checks");
   script_dependencies("gb_microsoft_office_detect_macosx.nasl");
   script_mandatory_keys("MS/Office/MacOSX/Ver");
+  script_xref(name:"URL", value:"https://support.office.com/en-us/article/Release-notes-for-Office-2016-for-Mac-ed2da564-6d53-4542-9954-7e3209681a41");
   exit(0);
 }
 
 include("version_func.inc");
 
-## Variable Initialization
-offVer = "";
-
-## Get the version from KB
 if(!offVer = get_kb_item("MS/Office/MacOSX/Ver")){
   exit(0);
 }
 
-## Check for Office Version (15.34.0)
 if(offVer =~ "^(15\.)" && version_is_less(version:offVer, test_version:"15.34.0"))
 {
   report = 'File version:     ' + offVer   + '\n' +

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: hp_power_manager_detect.nasl 10035 2018-05-31 09:24:47Z ckuersteiner $
+# $Id: hp_power_manager_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # HP Power Manager Detection
 #
@@ -26,29 +26,29 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100456");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 10035 $");
- script_tag(name:"last_modification", value:"$Date: 2018-05-31 11:24:47 +0200 (Thu, 31 May 2018) $");
- script_tag(name:"creation_date", value:"2010-01-20 19:30:24 +0100 (Wed, 20 Jan 2010)");
- script_tag(name:"cvss_base", value:"0.0");
+  script_oid("1.3.6.1.4.1.25623.1.0.100456");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2010-01-20 19:30:24 +0100 (Wed, 20 Jan 2010)");
+  script_tag(name:"cvss_base", value:"0.0");
 
- script_name("HP Power Manager Detection");
+  script_name("HP Power Manager Detection");
 
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2010 Greenbone Networks GmbH");
- script_dependencies("gb_get_http_banner.nasl");
- script_require_ports("Services/www", 80);
- script_mandatory_keys("GoAhead-Webs/banner");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2010 Greenbone Networks GmbH");
+  script_dependencies("gb_get_http_banner.nasl");
+  script_require_ports("Services/www", 80);
+  script_mandatory_keys("GoAhead-Webs/banner");
 
- script_tag(name: "summary", value: "This host is running HP Power Manager, an UPS management and monitoring
+  script_tag(name:"summary", value:"This host is running HP Power Manager, an UPS management and monitoring
 utility.");
 
- script_xref(name: "URL", value: "https://www.hpe.com/");
+  script_xref(name:"URL", value:"https://www.hpe.com/");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");

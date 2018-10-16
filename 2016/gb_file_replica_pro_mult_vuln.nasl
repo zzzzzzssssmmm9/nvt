@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_file_replica_pro_mult_vuln.nasl 7577 2017-10-26 10:41:56Z cfischer $
+# $Id: gb_file_replica_pro_mult_vuln.nasl 11811 2018-10-10 09:55:00Z asteins $
 #
 # File Replication Pro Multiple Vulnerabilities
 #
@@ -29,10 +29,10 @@ CPE = "cpe:/a:file:replication:pro";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806689");
-  script_version("$Revision: 7577 $");
+  script_version("$Revision: 11811 $");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-26 12:41:56 +0200 (Thu, 26 Oct 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-10 11:55:00 +0200 (Wed, 10 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-03-01 14:45:28 +0530 (Tue, 01 Mar 2016)");
   script_tag(name:"qod_type", value:"remote_vul");
   script_name("File Replication Pro Multiple Vulnerabilities");
@@ -48,18 +48,16 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attacker to gain access to sensitive information and execute arbitrary commands
-  on the affected system.
-
-  Impact Level: System/Application");
+  on the affected system.");
 
   script_tag(name:"affected", value:"File Replication Pro version 7.2.0 and prior.");
 
-  script_tag(name:"solution", value :"Upgrade to File Replication Pro 
-  version 7.3.0 or later. For updates refer to http://www.filereplicationpro.com");
+  script_tag(name:"solution", value:"Upgrade to File Replication Pro
+  version 7.3.0 or later. ");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://seclists.org/fulldisclosure/2016/Feb/61");
+  script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2016/Feb/61");
 
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
@@ -67,6 +65,7 @@ if(description)
   script_dependencies("gb_file_replica_pro_detect.nasl", "os_detection.nasl");
   script_mandatory_keys("FileReplicationPro/Installed");
   script_require_ports("Services/www", 9100);
+  script_xref(name:"URL", value:"http://www.filereplicationpro.com");
   exit(0);
 }
 
@@ -75,22 +74,14 @@ include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
 
-## Variable Initialization
-dir = "";
-url = "";
-http_port = 0;
-
-## Get HTTP Port
 if(!http_port = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## iterate over list
 files = traversal_files();
 
 foreach file (keys(files))
 {
-  ##Construct Attack Request
   url = "/DetailedLogReader.jsp?log_path=" + crap(data: "../", length: 3*15) +
         files[file];
 

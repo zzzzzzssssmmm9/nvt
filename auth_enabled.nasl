@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: auth_enabled.nasl 4378 2016-10-28 09:01:50Z cfi $
+# $Id: auth_enabled.nasl 11015 2018-08-17 06:31:19Z cfischer $
 #
 # Check for ident Service
 #
@@ -27,13 +27,13 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.100081");
-  script_version("$Revision: 4378 $");
-  script_tag(name:"last_modification", value:"$Date: 2016-10-28 11:01:50 +0200 (Fri, 28 Oct 2016) $");
+  script_version("$Revision: 11015 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 08:31:19 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2009-03-26 19:23:59 +0100 (Thu, 26 Mar 2009)");
   #Remark: NIST don't see "configuration issues" as software flaws so this CVSS has a value of 0.0.
   #However we still should report such a configuration issue with a criticality so this has been commented
   #out to avoid that the automatic CVSS score correction is setting the CVSS back to 0.0
-  #script_cve_id("CVE-1999-0629");
+  #  script_cve_id("CVE-1999-0629");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
   script_name("Check for ident Service");
@@ -45,22 +45,16 @@ if(description)
 
   script_xref(name:"URL", value:"https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-1999-0629");
 
-  tag_summary = "The remote host is running an ident daemon.
+  script_tag(name:"summary", value:"The remote host is running an ident daemon.
 
   The Ident Protocol is designed to work as a server daemon, on a user's
   computer, where it receives requests to a specified port, generally 113. The
   server will then send a specially designed response that identifies the
-  username of the current user.";
-
-  tag_impact = "The ident protocol is considered dangerous because it allows hackers to gain
-  a list of usernames on a computer system which can later be used for attacks.";
-
-  tag_solution = "Disable the ident Service.";
-
-  script_tag(name:"summary", value:tag_summary);
-  script_tag(name:"impact", value:tag_impact);
-  script_tag(name:"solution", value:tag_solution);
-
+  username of the current user.");
+  script_tag(name:"impact", value:"The ident protocol is considered dangerous because it allows hackers to gain
+  a list of usernames on a computer system which can later be used for attacks.");
+  script_tag(name:"solution", value:"Disable the ident Service.");
+  script_tag(name:"solution_type", value:"Mitigation");
   script_tag(name:"qod_type", value:"remote_banner");
 
   exit(0);

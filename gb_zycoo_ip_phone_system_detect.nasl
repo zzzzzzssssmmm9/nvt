@@ -1,8 +1,8 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_zycoo_ip_phone_system_detect.nasl 7119 2017-09-13 15:12:25Z cfischer $
+# $Id: gb_zycoo_ip_phone_system_detect.nasl 11407 2018-09-15 11:02:05Z cfischer $
 #
-# ZYCOO IP Phone System Detection 
+# ZYCOO IP Phone System Detection
 #
 # Authors:
 # Christian Kuersteiner <christian.kuersteiner@greenbone.net>
@@ -25,34 +25,35 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if (description)
+if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.106213");
- script_version ("$Revision: 7119 $");
- script_tag(name: "last_modification", value: "$Date: 2017-09-13 17:12:25 +0200 (Wed, 13 Sep 2017) $");
- script_tag(name: "creation_date", value: "2016-08-29 14:37:34 +0700 (Mon, 29 Aug 2016)");
- script_tag(name: "cvss_base", value: "0.0");
- script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_oid("1.3.6.1.4.1.25623.1.0.106213");
+  script_version("$Revision: 11407 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 13:02:05 +0200 (Sat, 15 Sep 2018) $");
+  script_tag(name:"creation_date", value:"2016-08-29 14:37:34 +0700 (Mon, 29 Aug 2016)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
 
- script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_name("ZYCOO IP Phone System Detection");
+  script_name("ZYCOO IP Phone System Detection");
 
- script_tag(name: "summary" , value: "Detection of ZYCOO IP Phone System
+  script_tag(name:"summary", value:"Detection of ZYCOO IP Phone System
 
-The script sends a connection request to the server and attempts to detect the presence of ZYCOO IP Phone System
-and to extract its version.");
+  The script sends a connection request to the server and attempts to detect the presence of ZYCOO IP Phone System
+  and to extract its version.");
 
- script_category(ACT_GATHER_INFO);
+  script_category(ACT_GATHER_INFO);
 
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_family("Product detection");
- script_dependencies("find_service.nasl");
- script_require_ports("Services/www", 9999);
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 9999);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_xref(name: "URL", value: "http://www.zycoo.com/html/IP_Phone_System.html");
+  script_xref(name:"URL", value:"http://www.zycoo.com/html/IP_Phone_System.html");
 
- exit(0);
+  exit(0);
 }
 
 include("cpe.inc");

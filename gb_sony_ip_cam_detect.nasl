@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sony_ip_cam_detect.nasl 9153 2018-03-21 09:31:39Z asteins $
+# $Id: gb_sony_ip_cam_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Sony IPELA Engine IP Cameras Detection
 #
@@ -27,25 +27,25 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.107105");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 9153 $");
- script_tag(name:"last_modification", value:"$Date: 2018-03-21 10:31:39 +0100 (Wed, 21 Mar 2018) $");
- script_tag(name:"creation_date", value:"2016-12-09 12:56:26 +0100 (Fri, 09 Dec 2016)");
- script_name("Sony IPELA Engine IP Cameras Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.107105");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2016-12-09 12:56:26 +0100 (Fri, 09 Dec 2016)");
+  script_name("Sony IPELA Engine IP Cameras Detection");
 
- script_tag(name: "summary" , value: "This script performs HTTP based detection of Sony IPELA Engine IP Cameras");
+  script_tag(name:"summary", value:"This script performs HTTP based detection of Sony IPELA Engine IP Cameras");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 8080, 443);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 8080, 443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  exit(0);
 }
 
 

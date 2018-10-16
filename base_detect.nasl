@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: base_detect.nasl 8487 2018-01-22 10:21:31Z ckuersteiner $
+# $Id: base_detect.nasl 11028 2018-08-17 09:26:08Z cfischer $
 #
 # Basic Analysis and Security Engine Detection
 #
@@ -30,27 +30,27 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.100322");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 8487 $");
- script_tag(name:"last_modification", value:"$Date: 2018-01-22 11:21:31 +0100 (Mon, 22 Jan 2018) $");
- script_tag(name:"creation_date", value:"2009-10-29 12:31:54 +0100 (Thu, 29 Oct 2009)");
- script_tag(name:"cvss_base", value:"0.0");
- script_name("Basic Analysis and Security Engine Detection");
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Service detection");
- script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 80);
- script_exclude_keys("Settings/disable_cgi_scanning");
+  script_oid("1.3.6.1.4.1.25623.1.0.100322");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11028 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 11:26:08 +0200 (Fri, 17 Aug 2018) $");
+  script_tag(name:"creation_date", value:"2009-10-29 12:31:54 +0100 (Thu, 29 Oct 2009)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_name("Basic Analysis and Security Engine Detection");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 80);
+  script_exclude_keys("Settings/disable_cgi_scanning");
 
- script_tag(name: "summary", value: "This host is running Basic Analysis and Security Engine (BASE). BASE provides
-a web front-end to query and analyze the alerts coming from a SNORT IDS system.");
+  script_tag(name:"summary", value:"This host is running Basic Analysis and Security Engine (BASE). BASE provides
+  a web front-end to query and analyze the alerts coming from a SNORT IDS system.");
 
- script_xref(name: "URL", value: "https://sourceforge.net/projects/secureideas/");
+  script_xref(name:"URL", value:"https://sourceforge.net/projects/secureideas/");
 
- exit(0);
+  exit(0);
 }
 
 include("http_func.inc");
@@ -59,7 +59,6 @@ include("cpe.inc");
 include("host_details.inc");
 
 port = get_http_port(default:80);
-
 if(!can_host_php(port:port))exit(0);
 
 foreach dir( make_list_unique( "/base", "/snort/base", cgi_dirs( port:port ) ) ) {
@@ -71,7 +70,7 @@ foreach dir( make_list_unique( "/base", "/snort/base", cgi_dirs( port:port ) ) )
 
   if(egrep(pattern: "<title>Basic Analysis and Security Engine \(BASE\)", string: buf, icase: TRUE) ) {
     vers = "unknown";
-    
+
     version = eregmatch(string: buf, pattern: "BASE[)</a>]* ([0-9.]+)",icase:TRUE);
 
     if (!isnull(version[1]))

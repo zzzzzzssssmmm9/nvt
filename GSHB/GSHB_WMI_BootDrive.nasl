@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_WMI_BootDrive.nasl 9365 2018-04-06 07:34:21Z cfischer $
+# $Id: GSHB_WMI_BootDrive.nasl 11369 2018-09-13 11:30:29Z cfischer $
 #
 # WMI Drives Test
 #
@@ -9,9 +9,6 @@
 #
 # Copyright:
 # Copyright (c) 2009 Greenbone Networks GmbH, http://www.greenbone.net
-#
-# Set in an Workgroup Environment under Vista with enabled UAC this DWORD to access WMI:
-# HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system\LocalAccountTokenFilterPolicy to 1
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -27,41 +24,38 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "Tests WMI Drives Status.";
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.96012");
-  script_version("$Revision: 9365 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:34:21 +0200 (Fri, 06 Apr 2018) $");
+  script_version("$Revision: 11369 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-13 13:30:29 +0200 (Thu, 13 Sep 2018) $");
   script_tag(name:"creation_date", value:"2009-10-23 12:32:24 +0200 (Fri, 23 Oct 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"qod_type", value:"registry");  
+  script_tag(name:"qod_type", value:"registry");
   script_name("WMI Drives Status (win)");
-
-
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2009 Greenbone Networks GmbH");
   script_family("IT-Grundschutz");
-  script_mandatory_keys("Compliance/Launch/GSHB");
-  script_mandatory_keys("Tools/Present/wmi");
-   
-#  script_require_ports(139, 445);
-  script_dependencies("secpod_reg_enum.nasl", "GSHB_WMI_OSInfo.nasl");
-  script_tag(name : "summary" , value : tag_summary);
+  script_mandatory_keys("Compliance/Launch/GSHB", "Tools/Present/wmi");
+  script_dependencies("smb_reg_service_pack.nasl", "GSHB/GSHB_WMI_OSInfo.nasl");
+
+  script_tag(name:"summary", value:"Tests WMI Drives Status.");
+
   exit(0);
 }
 
 include("wmi_file.inc");
+include("smb_nt.inc");
 
 host    = get_host_ip();
-usrname = get_kb_item("SMB/login");
-domain  = get_kb_item("SMB/domain");
+usrname = kb_smb_login();
+domain  = kb_smb_domain();
 if (domain){
   usrname = domain + '\\' + usrname;
 }
-passwd  = get_kb_item("SMB/password");
+passwd = kb_smb_password();
+
 OSVER = get_kb_item("WMI/WMI_OSVER");
 OSTYPE = get_kb_item("WMI/WMI_OSTYPE");
 
@@ -97,10 +91,12 @@ WMIFDD = wmi_query(wmi_handle:handle, query:query1);
 WMICD = wmi_query(wmi_handle:handle, query:query2);
 WMIUSB = wmi_query(wmi_handle:handle, query:query3);
 WMIFS = wmi_query(wmi_handle:handle, query:query4);
-if (OSVER < 6){
-    BOOTINI = wmi_file_is_file_writeable(handle:handle, filePath:"c:\\boot.ini");
-}else BOOTINI = "No boot.ini";
-
+if (OSVER < 6) {
+  BOOTINI = wmi_file_is_file_writeable(handle:handle, filePath:"c:\\boot.ini", includeHeader:FALSE);
+  if(BOOTINI) BOOTINI = BOOTINI["c:\boot.ini"];
+} else {
+  BOOTINI = "No boot.ini";
+}
 
 if(!WMIFDD) WMIFDD = "None";
 if(!WMICD) WMICD = "None";
@@ -117,4 +113,3 @@ set_kb_item(name:"WMI/BOOTINI", value:BOOTINI);
 wmi_close(wmi_handle:handle);
 
 exit(0);
-

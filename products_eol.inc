@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: products_eol.inc 10332 2018-06-26 13:42:18Z asteins $
+# $Id: products_eol.inc 11624 2018-09-26 12:00:34Z santu $
 #
 # Authors:
 # Michael Meyer <michael.meyer@greenbone.net>
@@ -22,7 +22,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 10332 $
+# $Revision: 11624 $
 #
 ###############################################################################
 
@@ -32,6 +32,18 @@ eol_cpes = make_array();
 eol_cpes[ 'cpe:/a:apache:http_server' ] = make_array(
   'versions',      '2.2:2017-12-31;2.0:2013-07-10;1.3:2010-02-03',
   'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://helpx.adobe.com/support/programs/eol-matrix.html
+eol_cpes[ 'cpe:/a:adobe:acrobat_reader' ] = make_array(
+  'versions',      '7:2009-12-28;8:2011-11-03;9:2013-06-26;10:2015-11-18;11:2017-10-15',
+  'version_regex', '^([0-9]+)'
+);
+
+# https://helpx.adobe.com/in/flash-player/kb/flash-player-9-support-discontinued.html
+eol_cpes[ 'cpe:/a:adobe:flash_player' ] = make_array(
+  'versions',      '9:2011-02-08',
+  'version_regex', '^([0-9]+)'
 );
 
 # https://tomcat.apache.org/whichversion.html
@@ -161,7 +173,7 @@ eol_cpes[ 'cpe:/a:mediawiki:mediawiki' ] = make_array(
 # https://support.microsoft.com/en-us/lifecycle/search?sort=PN&alpha=exchange%20server&Filter=FilterNO
 eol_cpes[ 'cpe:/a:microsoft:exchange_server' ] = make_array(
   'versions',      '2013sp3:2017-10-01;2013sp2:2017-01-01;2013sp1:2017-01-01;2013:2017-01-01;2007:2017-01-01;5.5:2010-01-01',
-  'version_regex', '^([0-9.]+)(sp[0-9])?'
+  'version_regex', '^([0-9]+)\\.?(sp[0-9])?'
 );
 
 # IIS EOL dates are mostly coupled to the EOL of the OS, see os_eol.inc
@@ -173,13 +185,13 @@ eol_cpes[ 'cpe:/a:microsoft:iis' ] = make_array(
 # https://support.microsoft.com/en-us/lifecycle/search?sort=PN&alpha=sharepoint%20foundation&Filter=FilterNO
 eol_cpes[ 'cpe:/a:microsoft:sharepoint_foundation' ] = make_array(
   'versions',      '2013sp1:2023-04-11;2013:2015-04-14;2010sp2:2020-10-13;2010sp1:2014-10-14;2010:2012-07-10',
-  'version_regex', '^([0-9.]+)(sp[0-9])?'
+  'version_regex', '^([0-9]+)\\.?(sp[0-9])?'
 );
 
 # https://support.microsoft.com/en-us/lifecycle/search?sort=PN&alpha=sharepoint%20server&Filter=FilterNO
 eol_cpes[ 'cpe:/a:microsoft:sharepoint_server' ] = make_array(
   'versions',      '2016:2026-07-14;2013sp1:2023-04-11;2013:2015-04-14;2010sp2:2020-10-13;2010sp1:2014-10-14;2010:2012-07-10;2007sp3:2017-10-10;2007sp2:2013-01-08;2007sp1:2010-07-13;2007:2009-01-13;2003:2014-04-08',
-  'version_regex', '^([0-9.]+)(sp[0-9])?'
+  'version_regex', '^([0-9.+)\\.?(sp[0-9])?'
 );
 
 # https://support.microsoft.com/en-us/lifecycle/search?sort=PN&alpha=sql%20server&Filter=FilterNO
@@ -196,6 +208,62 @@ eol_cpes[ 'cpe:/a:microsoft:sql_server' ] = make_array(
 eol_cpes[ 'cpe:/a:mysql:mysql' ] = make_array(
   'versions',      '5.1:2013-12-04;5.0:2012-01-09;4.1:2009-12-31;4.0:2008-12-31;3.2:2006-08-01',
   'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://www.microfocus.com/lifecycle/
+eol_cpes[ 'cpe:/a:netiq:access_manager' ] = make_array(
+  'versions',      '4.4:2019-08-31;4.3:2018-09-30;4.2:2017-11-30;4.1:2016-11-30;4.0:2016-05-31',
+  'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://www.microfocus.com/lifecycle/
+eol_cpes[ 'cpe:/a:netiq:edirectory' ] = make_array(
+  'versions',      '9.1:2020-02-28;9.0:2019-02-01;8.8:2017-10-31',
+  'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://www.microfocus.com/lifecycle/
+eol_cpes[ 'cpe:/a:netiq:imanager' ] = make_array(
+  'versions',      '3.0:2020-02-28;2.7:2017-10-31',
+  'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://www.microfocus.com/lifecycle/
+eol_cpes[ 'cpe:/a:netiq:sentinel' ] = make_array(
+  'versions',      '8.2:2019-11-30;8.1:2019-07-31;8.0:2018-06-30;7.4:2017-11-30;7.3:2016-12-31;7.2:2016-02-29;7.1:2015-07-31;7.0:2014-06-30',
+  'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://www.microfocus.com/lifecycle/
+eol_cpes[ 'cpe:/a:novell:edirectory' ] = make_array(
+  'versions',      '9.1:2020-02-28;9.0:2019-02-01;8.8:2017-10-31',
+  'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://www.microfocus.com/lifecycle/
+# nb: versions 2014 & 2012 have been reduced to 14 & 12
+# TODO: version not yet determined by detection script
+eol_cpes[ 'cpe:/a:novell:groupwise' ] = make_array(
+  'versions',      '18:2020-12-11;14:2018-06-30;12:2015-06-30;8:2014-06-30;7:2010-04-02',
+  'version_regex', '^([0-9]+)'
+);
+
+# https://www.microfocus.com/lifecycle/
+eol_cpes[ 'cpe:/a:novell:imanager' ] = make_array(
+  'versions',      '3.0:2020-02-28;2.7:2017-10-31',
+  'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://www.microfocus.com/lifecycle/
+eol_cpes[ 'cpe:/a:novell:open_enterprise_server' ] = make_array(
+  'versions',      '2018:2022-11-28;2015.sp1:2019-03-31;2015:2017-06-14;11sp3:2017-06-13;11sp2:2017-06-13;11sp1:2015-01-29:11:2013-08-28;2sp3:2012-12-22;2sp2:2009-11-11;2sp1:2008-12-01',
+  'version_regex', '^([0-9]+)\\.?([sp0-9])?'
+);
+
+# https://www.microfocus.com/lifecycle/
+eol_cpes[ 'cpe:/a:novell:service_desk' ] = make_array(
+  'versions',      '7:2018-04-27',
+  'version_regex', '^([0-9]+)'
 );
 
 # https://www.openssl.org/policies/releasestrat.html
@@ -228,7 +296,7 @@ eol_cpes[ 'cpe:/a:owncloud:owncloud' ] = make_array(
 # https://lists.pfsense.org/pipermail/list/2012-April/002017.html
 # EOL date is mainly the release date of the next release
 eol_cpes[ 'cpe:/a:pfsense:pfsense' ] = make_array(
-  'versions',      '2.2:2016-04-12;2.1:2015-01-23;2.0:2013-09-15;1.2:2011-09-17;1.1:2008-02-25;1.0:unknown;',
+  'versions',      '2.2:2016-04-12;2.1:2015-01-23;2.0:2013-09-15;1.2:2011-09-17;1.1:2008-02-25;1.0:unknown',
   'version_regex', '^([0-9]+\\.[0-9]+)'
 );
 
@@ -236,6 +304,15 @@ eol_cpes[ 'cpe:/a:pfsense:pfsense' ] = make_array(
 eol_cpes[ 'cpe:/a:php:php' ] = make_array(
   'versions',      '7.2:2020-11-30;7.1:2019-12-01;7.0:2018-12-03;5.6:2018-12-31;5.5:2016-07-21;5.4:2015-09-03;5.3:2014-08-14;5.2:2011-01-06;5.1:2006-08-24;5.0:2005-09-05;4.4:2008-08-07;4.3:2005-03-31;4.2:2002-09-06;4.1:2002-03-12;4.0:2001-06-23;3.0:2000-10-20',
   'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://github.com/PHPMailer/PHPMailer#legacy-versions
+# Currently everything from https://github.com/PHPMailer/PHPMailer/blob/master/changelog.md < 5.2 is EOL
+# nb: Up to 1.73 PHPMailer used no patch level and started to use one with 2.0.0 so the version_regex
+# below is just grabbing one digit of the minor version for now.
+eol_cpes[ 'cpe:/a:phpmailer_project:phpmailer' ] = make_array(
+  'versions',      '5.1:unknown;5.0:unknown;2.3:unknown;2.2:unknown;2.1:unknown;2.0:unknown;1.7:unknown;1.6:unknown;1.5:unknown;1.4:unknown;1.2:unknown;1.1:unknown;1.0:unknown;0.9:unknown',
+  'version_regex', '^([0-9]+\\.[0-9])'
 );
 
 # EOL basically means all branches like 4.2 listed at https://www.phpmyadmin.net/files/
@@ -279,6 +356,12 @@ eol_cpes[ 'cpe:/a:redhat:jboss_operations_network' ] = make_array(
 # https://wiki.samba.org/index.php/Samba_Release_Planning
 eol_cpes[ 'cpe:/a:samba:samba' ] = make_array(
   'versions',      '4.4:2017-09-21;4.3:2017-03-07;4.2:2016-09-07;4.1:2016-03-22;4.0:2015-09-08;3.6:2015-03-04;3.5:2013-10-11;3.4:2012-12-11;3.3:2011-08-09;3.2:2010-03-01;3.0:2009-08-05',
+  'version_regex', '^([0-9]+\\.[0-9]+)'
+);
+
+# https://symfony.com/roadmap
+eol_cpes[ 'cpe:/a:sensiolabs:symfony' ] = make_array(
+  'versions',      '4.4:2022-11-30;4.3:2020-07-31;4.2:2020-01-31;4.1:2019-07-31;4.0:2019-01-31;3.4:2021-11-30;3.3:2018-07-31;3.2:2018-01-31;3.1:2017-07-31;3.0:2017-01-31;2.8:2019-11-30;2.7:2019-05-31;2.6:2016-01-31;2.5:2015-07-31;2.4:2015-01-31;2.3:2017-05-31;2.2:2014-05-31;2.1:2013-11-30;2.0:2013-09-30',
   'version_regex', '^([0-9]+\\.[0-9]+)'
 );
 
@@ -349,6 +432,7 @@ function product_reached_eol( cpe, version, debug ) {
       if( debug ) display( "DEBUG: Passed version_regex: " + eol_array[ 'version_regex' ] + " doesn't match version : " + version + " . No EOL version identified." );
       return;
     } else {
+      if( debug ) display( "DEBUG: Passed version_regex: " + eol_array[ 'version_regex' ] + " is matching : " + version + " ." );
       version = v[0];
     }
   }
@@ -358,6 +442,8 @@ function product_reached_eol( cpe, version, debug ) {
     if( debug ) display( "DEBUG: versions of " + cpe + " couldn't be split into an array." );
     return;
   }
+
+  if( debug ) display( "DEBUG: versions/dates of " + cpe + " used for this test: " + test_versions );
 
   foreach tv( test_versions ) {
 
@@ -372,6 +458,7 @@ function product_reached_eol( cpe, version, debug ) {
 
     test_version = v_d[1];
     eol_date     = v_d[2];
+    if( debug ) display( "DEBUG: Current product version: '" + version + "' tested with an exact match against EOL version '" + test_version + "' and EOL date '" + eol_date + "' (unknown means instantly EOL)" );
 
     if( version == test_version )
       if( eol_date_reached( eol_date:eol_date ) )

@@ -27,12 +27,19 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.808753");
-  script_version("$Revision: 8143 $");
+  script_version("$Revision: 11021 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 14:11:11 +0100 (Fri, 15 Dec 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-17 09:48:11 +0200 (Fri, 17 Aug 2018) $");
   script_tag(name:"creation_date", value:"2016-08-08 15:37:50 +0530 (Mon, 08 Aug 2016)");
   script_name("OrientDB Server Version Detection");
+  script_category(ACT_GATHER_INFO);
+  script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
+  script_family("Product detection");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 2480);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+
   script_tag(name:"summary", value:"Detection of installed version
   of OrientDB Server.
 
@@ -40,12 +47,6 @@ if(description)
   OrientDB Server from the response.");
 
   script_tag(name:"qod_type", value:"remote_banner");
-  script_category(ACT_GATHER_INFO);
-  script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
-  script_family("Product detection");
-  script_dependencies("find_service.nasl", "http_version.nasl");
-  script_exclude_keys("Settings/disable_cgi_scanning");
-  script_require_ports("Services/www", 2480);
 
   exit(0);
 }
@@ -54,8 +55,10 @@ include("http_func.inc");
 include("http_keepalive.inc");
 include("cpe.inc");
 include("host_details.inc");
+include("misc_func.inc");
 
 port = get_http_port(default: 2480);
+host = http_host_name(dont_add_port: TRUE);
 found = FALSE;
 version = "unknown";
 banner = get_http_banner(port: port);
@@ -85,7 +88,7 @@ if (found) {
 
   if (dbs = eregmatch(pattern: '"databases":\\[(.*)\\]', string: buf)) {
     databases = split(dbs[1],sep:",", keep:FALSE);
-    set_kb_item(name: "OrientDB/" + port + "/databases", value: dbs[1]);
+    set_kb_item(name: "OrientDB/" + host + "/" + port + "/databases", value: dbs[1]);
 
     extra = 'The following databases were found on the OrientDB Server:\n';
 
@@ -100,9 +103,9 @@ if (found) {
       res = http_keepalive_send_recv(port: port, data: req);
 
       if ('"code": 401' >< res && '"reason": "Unauthorized"' >< res &&  '"content": "401 Unauthorized."' >< res) {
-        set_kb_item( name: "www/" + port + "/content/auth_required", value: url);
+        set_kb_item( name: "www/" + host + "/" + port + "/content/auth_required", value: url);
         set_kb_item(name: "www/content/auth_required", value: TRUE);
-        set_kb_item(name: "www/" + port + "/OrientDB/auth_required", value: url);
+        set_kb_item(name: "www/" + host + "/" + port + "/OrientDB/auth_required", value: url);
         set_kb_item(name: "OrientDB/auth_required", value: TRUE );
       }
     }

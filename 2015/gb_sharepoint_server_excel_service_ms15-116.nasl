@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sharepoint_server_excel_service_ms15-116.nasl 9317 2018-04-05 07:37:07Z cfischer $
+# $Id: gb_sharepoint_server_excel_service_ms15-116.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # MS SharePoint Server Excel Services Multiple Vulnerabilities (3104540)
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:microsoft:sharepoint_server";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806166");
-  script_version("$Revision: 9317 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-6038", "CVE-2015-6094");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-05 09:37:07 +0200 (Thu, 05 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-11-11 16:35:07 +0530 (Wed, 11 Nov 2015)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("MS SharePoint Server Excel Services Multiple Vulnerabilities (3104540)");
@@ -41,8 +41,7 @@ if(description)
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft Bulletin MS15-116.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Multiple flaws are due to,
 
@@ -53,30 +52,29 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow a
   context-dependent attacker to corrupt memory, execute arbitrary code on
-  affected system and perform cross-site scripting attacks.
-
-  Impact Level: System/Application");
+  affected system and perform cross-site scripting attacks.");
 
   script_tag(name:"affected", value:"Microsoft SharePoint Server 2007 Service Pack 3 Excel Services,
 
   Microsoft SharePoint Server 2010 Service Pack 2 Excel Services.");
 
   script_tag(name:"solution", value:"Run Windows Update and update the listed
-  hotfixes or download and update mentioned hotfixes in the advisory from the
-  below link, https://technet.microsoft.com/en-us/library/security/MS15-116");
+  hotfixes or download and install the hotfixes from the referenced advisory.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3101559");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3101525");
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3101364");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/en-us/library/security/ms15-116");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3101559");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3101525");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3101364");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/en-us/library/security/ms15-116");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
   script_dependencies("gb_ms_sharepoint_sever_n_foundation_detect.nasl");
+  script_require_ports(139, 445);
   script_mandatory_keys("MS/SharePoint/Server/Ver");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/en-us/library/security/MS15-116");
   exit(0);
 }
 

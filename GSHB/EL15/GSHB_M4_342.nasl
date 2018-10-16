@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_M4_342.nasl 9365 2018-04-06 07:34:21Z cfischer $
+# $Id: GSHB_M4_342.nasl 11387 2018-09-14 12:19:57Z emoss $
 #
 # IT-Grundschutz, 14. EL, Maßnahme 4.342
 #
@@ -27,26 +27,23 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.94247");
-  script_version("$Revision: 9365 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:34:21 +0200 (Fri, 06 Apr 2018) $");
+  script_version("$Revision: 11387 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-14 14:19:57 +0200 (Fri, 14 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-03-25 10:14:11 +0100 (Wed, 25 Mar 2015)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"qod_type", value:"registry");
   script_name("IT-Grundschutz M4.342: Aktivierung des Last Access Zeitstempels ab Windows Vista");
-  script_xref(name : "URL" , value : "http://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKataloge/Inhalt/_content/m/m04/m04342.html");
+  script_xref(name:"URL", value:"http://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKataloge/Inhalt/_content/m/m04/m04342.html");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2015 Greenbone Networks GmbH");
   script_family("IT-Grundschutz-15");
-  script_mandatory_keys("Tools/Present/wmi");
-  script_mandatory_keys("Compliance/Launch/GSHB-15");
-  script_dependencies("GSHB/GSHB_WMI_OSInfo.nasl", "GSHB/GSHB_WMI_LastAccessTimestamp.nasl");
-  script_require_keys("WMI/NtfsDisableLastAccessUpdate");
-  script_tag(name : "summary" , value :
-"IT-Grundschutz M4.342: Aktivierung des Last Access Zeitstempels ab Windows Vista.
+  script_mandatory_keys("Compliance/Launch/GSHB-15", "Tools/Present/wmi");
+  script_dependencies("GSHB/GSHB_WMI_OSInfo.nasl", "Policy/Microsoft/WindowsGeneral/MSSLegacy/win_last_access_timestamp.nasl");
+  script_require_keys("1.3.6.1.4.1.25623.1.0.96047/RESULT");
+  script_tag(name:"summary", value:"IT-Grundschutz M4.342: Aktivierung des Last Access Zeitstempels ab Windows Vista.
 
-Stand: 14. Ergänzungslieferung (14. EL).
-");
+Stand: 14. Ergänzungslieferung (14. EL).");
 
   exit(0);
 }
@@ -60,18 +57,16 @@ gshbm =  "IT-Grundschutz M4.342: ";
 OSVER = get_kb_item("WMI/WMI_OSVER");
 OSTYPE = get_kb_item("WMI/WMI_OSTYPE");
 WMIOSLOG = get_kb_item("WMI/WMI_OS/log");
-NtfsDisableLastAccessUpdate = get_kb_item("WMI/NtfsDisableLastAccessUpdate");
-log = get_kb_item("WMI/NtfsDisableLastAccessUpdate/log");
+NtfsDisableLastAccessUpdate = get_kb_item("1.3.6.1.4.1.25623.1.0.96047/RESULT");
 
 if (WMIOSLOG == "On the Target System runs Samba, it is not an Microsoft System."){
   result = string("nicht zutreffend");
   desc = string("Auf dem System läuft Samba,\nes ist kein Microsoft Windows System.");
-}else if(NtfsDisableLastAccessUpdate >< "error"){
+}else if(NtfsDisableLastAccessUpdate == "-1"){
   result = string("Fehler");
-  if (!log) desc = string("Beim Testen des Systems trat ein Fehler auf.");
-  if (log) desc = string("Beim Testen des Systems trat ein Fehler auf:\n" + log);
-}else if(OSVER  >=  "6.0" && OSTYPE == "1"){ 
-  if(NtfsDisableLastAccessUpdate == "0")  
+  desc = string("Beim Testen des Systems trat ein Fehler auf. Der Registry-Wert konnte nicht gefunden werden.");
+}else if(OSVER  >=  "6.0" && OSTYPE == "1"){
+  if(NtfsDisableLastAccessUpdate == "0")
   {
     result = string("erfüllt");
     desc = string("Das System Entspricht der IT-Grundschutz Maßnahme M4.342");

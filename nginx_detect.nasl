@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: nginx_detect.nasl 8139 2017-12-15 11:57:25Z cfischer $
+# $Id: nginx_detect.nasl 10774 2018-08-04 21:34:13Z cfischer $
 #
 # nginx Detection
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.100274");
-  script_version("$Revision: 8139 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 12:57:25 +0100 (Fri, 15 Dec 2017) $");
+  script_version("$Revision: 10774 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-04 23:34:13 +0200 (Sat, 04 Aug 2018) $");
   script_tag(name:"creation_date", value:"2009-10-01 18:57:31 +0200 (Thu, 01 Oct 2009)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -69,7 +69,8 @@ if( banner && egrep( pattern:"Server: nginx", string:banner, icase:TRUE ) ) {
     vers = chomp( version[1] );
   } else {
     # Some configs are reporting the version in the banner if a index.php is called
-    phpList = get_kb_list( "www/" + port + "/content/extensions/php" );
+    host = http_host_name( dont_add_port:TRUE );
+    phpList = get_http_kb_file_extensions( port:port, host:host, ext:"php" );
     if( phpList ) phpFiles = make_list( phpList );
 
     if( phpFiles[0] ) {
@@ -107,6 +108,18 @@ if( installed ) {
   set_kb_item( name:"nginx/" + port + "/version", value:vers );
   set_kb_item( name:"nginx/installed", value:TRUE );
 
+  # Status page of the HttpStubStatusModule (https://nginx.org/en/docs/http/ngx_http_stub_status_module.html) module
+  foreach ngnx_status( make_list( "/", "/basic_status", "/nginx_status" ) ) {
+    res = http_get_cache( port:port, item:ngnx_status );
+    if( res =~ "^HTTP/1\.[01] 200" &&
+        ( egrep( string:res, pattern:"^Active connections: [0-9]+" ) || # Active connections: 4
+          egrep( string:res, pattern:"^server accepts handled requests( request_time)?" ) || # "server accepts handled requests request_time" or only "server accepts handled requests"
+          egrep( string:res, pattern:"^Reading: [0-9]+ Writing: [0-9]+ Waiting: [0-9]+" ) ) ) { # Reading: 0 Writing: 1 Waiting: 0
+      extra = '\nOutput of the HttpStubStatusModule module available at ' + report_vuln_url( port:port, url:ngnx_status, url_only:TRUE );
+      break;
+    }
+  }
+
   cpe = build_cpe( value:vers, exp:"^([0-9.]+)", base:"cpe:/a:nginx:nginx:" );
   if( isnull( cpe ) )
     cpe = 'cpe:/a:nginx:nginx';
@@ -118,7 +131,8 @@ if( installed ) {
                                             install:install,
                                             cpe:cpe,
                                             concludedUrl:conclUrl,
-                                            concluded:version[0] ),
+                                            concluded:version[0],
+                                            extra:extra ),
                                             port:port );
 }
 

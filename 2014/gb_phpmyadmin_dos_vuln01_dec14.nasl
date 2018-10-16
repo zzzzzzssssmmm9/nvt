@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_phpmyadmin_dos_vuln01_dec14.nasl 6759 2017-07-19 09:56:33Z teissa $
+# $Id: gb_phpmyadmin_dos_vuln01_dec14.nasl 11402 2018-09-15 09:13:36Z cfischer $
 #
 # phpMyAdmin Denial-of-Service Vulnerability -01 Dec14
 #
@@ -29,29 +29,26 @@ CPE = "cpe:/a:phpmyadmin:phpmyadmin";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805307");
-  script_version("$Revision: 6759 $");
+  script_version("$Revision: 11402 $");
   script_cve_id("CVE-2014-9218");
   script_bugtraq_id(71434);
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-19 11:56:33 +0200 (Wed, 19 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 11:13:36 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2014-12-26 15:10:42 +0530 (Fri, 26 Dec 2014)");
   script_name("phpMyAdmin Denial-of-Service Vulnerability -01 Dec14");
 
   script_tag(name:"summary", value:"This host is installed with phpMyAdmin and
   is prone to denial-of-service vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"The flaw exists due to an error triggered
   during the handling of long passwords");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to cause the affected application to crash, denying service to
-  legitimate users.
-
-  Impact Level: Application");
+  legitimate users.");
 
   script_tag(name:"affected", value:"phpMyAdmin versions 4.0.x prior to 4.0.10.7,
   4.1.x prior to 4.1.14.8 and 4.2.x prior to 4.2.13.1");
@@ -77,28 +74,19 @@ if(description)
 include("version_func.inc");
 include("host_details.inc");
 
-# Variable Initialization
-phpPort = "";
-phpVer = "";
-
-## get the port
 if( ! phpPort = get_app_port( cpe:CPE ) ) exit( 0 );
 
-## Get the version
 if( ! phpVer = get_app_version( cpe:CPE, port:phpPort ) ) exit( 0 );
 
-##Check for versions 4.0.x before 4.0.10.7
 if( version_in_range( version:phpVer, test_version:"4.0.0", test_version2:"4.0.10.6" ) ) {
   fix = "4.0.10.7";
   VULN = TRUE;
 }
-##Check for versions 4.1.x before 4.1.14.8
 if( version_in_range( version:phpVer, test_version:"4.1.0", test_version2:"4.1.14.7" ) ) {
   fix = "4.1.14.8";
   VULN = TRUE;
 }
 
-##Check for versions 4.2.x before 4.2.13.1
 if( version_in_range( version:phpVer, test_version:"4.2.0", test_version2:"4.2.13.0" ) ) {
   fix = "4.2.13.1";
   VULN = TRUE;

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_office_web_apps_ms15-116.nasl 9317 2018-04-05 07:37:07Z cfischer $
+# $Id: gb_ms_office_web_apps_ms15-116.nasl 11635 2018-09-27 06:07:37Z cfischer $
 #
 # Microsoft Office Web Apps Memory Corruption Vulnerability (3104540)
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:microsoft:office_web_apps";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806168");
-  script_version("$Revision: 9317 $");
+  script_version("$Revision: 11635 $");
   script_cve_id("CVE-2015-6093");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-05 09:37:07 +0200 (Thu, 05 Apr 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-27 08:07:37 +0200 (Thu, 27 Sep 2018) $");
   script_tag(name:"creation_date", value:"2015-11-11 17:07:20 +0530 (Wed, 11 Nov 2015)");
   script_tag(name:"qod_type", value:"executable_version");
   script_name("Microsoft Office Web Apps Memory Corruption Vulnerability (3104540)");
@@ -41,17 +41,14 @@ if(description)
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft Bulletin MS15-116.");
 
-  script_tag(name:"vuldetect", value:"Get the vulnerable file version and check
-  appropriate patch is applied or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name:"insight", value:"Flaw exists as the application fails to
   properly sanitize the malicious crafted request.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow a
   context-dependent attacker to perform cross-site scripting attacks on
-  affected systems and run script in the security context of the current user.
-
-  Impact Level: Application");
+  affected systems and run script in the security context of the current user.");
 
   script_tag(name:"affected", value:"Microsoft Office Web Apps 2010 Service Pack 2 and prior,
 
@@ -63,13 +60,14 @@ if(description)
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://support.microsoft.com/en-us/kb/3101367");
-  script_xref(name : "URL" , value : "https://technet.microsoft.com/library/security/MS15-116");
+  script_xref(name:"URL", value:"https://support.microsoft.com/en-us/kb/3101367");
+  script_xref(name:"URL", value:"https://technet.microsoft.com/library/security/MS15-116");
 
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_family("Windows : Microsoft Bulletins");
   script_dependencies("gb_ms_office_web_apps_detect.nasl");
+  script_require_ports(139, 445);
   script_mandatory_keys("MS/Office/Web/Apps/Ver");
   exit(0);
 }

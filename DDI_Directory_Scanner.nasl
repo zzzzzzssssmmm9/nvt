@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: DDI_Directory_Scanner.nasl 10452 2018-07-07 10:59:52Z cfischer $
+# $Id: DDI_Directory_Scanner.nasl 10929 2018-08-11 11:39:44Z cfischer $
 #
 # Directory Scanner
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.11032");
-  script_version("$Revision: 10452 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-07 12:59:52 +0200 (Sat, 07 Jul 2018) $");
+  script_version("$Revision: 10929 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-11 13:39:44 +0200 (Sat, 11 Aug 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -51,7 +51,7 @@ if(description)
   exit(0);
 }
 
-include("global_settings.inc");
+
 include("http_func.inc");
 include("http_keepalive.inc");
 include("404.inc"); # For errmessages_404 list
@@ -65,6 +65,7 @@ authDirList = make_list();
 
 cgi_dirs_exclude_pattern = get_kb_item( "global_settings/cgi_dirs_exclude_pattern" );
 use_cgi_dirs_exclude_pattern = get_kb_item( "global_settings/use_cgi_dirs_exclude_pattern" );
+cgi_dirs_exclude_servermanual = get_kb_item( "global_settings/cgi_dirs_exclude_servermanual" );
 
 function check_cgi_dir( dir, port ) {
 
@@ -81,30 +82,30 @@ function check_cgi_dir( dir, port ) {
   }
 }
 
-function add_discovered_list( dir, port ) {
+function add_discovered_list( dir, port, host ) {
 
-  local_var dir, port, dir_key;
+  local_var dir, port, host, dir_key;
 
   if( ! in_array( search:dir, array:discoveredDirList ) ) {
     discoveredDirList = make_list( discoveredDirList, dir );
 
     if( use_cgi_dirs_exclude_pattern ) {
       if( egrep( pattern:cgi_dirs_exclude_pattern, string:dir ) ) {
-        set_kb_item( name:"www/" + port + "/content/excluded_directories", value:dir );
+        set_kb_item( name:"www/" + host + "/" + port + "/content/excluded_directories", value:dir );
         return;
       }
     }
 
     #TBD: Do a check_cgi_dir( dir:dir, port:port ); before?
-    dir_key = "www/" + port + "/content/directories";
+    dir_key = "www/" + host + "/" + port + "/content/directories";
     if( debug ) display( "Setting KB key: ", dir_key, " to '", dir, "'\n" );
     set_kb_item( name:dir_key, value:dir );
   }
 }
 
-function add_auth_dir_list( dir, port, basic, realm ) {
+function add_auth_dir_list( dir, port, host, basic, realm ) {
 
-  local_var dir, port, dir_key, basic, realm;
+  local_var dir, port, host, dir_key, basic, realm;
 
   if( ! in_array( search:dir, array:authDirList ) ) {
 
@@ -112,13 +113,13 @@ function add_auth_dir_list( dir, port, basic, realm ) {
 
     if( use_cgi_dirs_exclude_pattern ) {
       if( egrep( pattern:cgi_dirs_exclude_pattern, string:dir ) ) {
-        set_kb_item( name:"www/" + port + "/content/excluded_directories", value:dir );
+        set_kb_item( name:"www/" + host + "/" + port + "/content/excluded_directories", value:dir );
         return;
       }
     }
 
-    dir_key = "www/" + port + "/content/auth_required";
     set_kb_item( name:"www/content/auth_required", value:TRUE );
+    dir_key = "www/" + host + "/" + port + "/content/auth_required";
     if( debug ) display( "Setting KB key: ", dir_key, " to '", dir, "'\n" );
     set_kb_item( name:dir_key, value:dir );
 
@@ -127,7 +128,7 @@ function add_auth_dir_list( dir, port, basic, realm ) {
       set_kb_item( name:"www/basic_auth/detected", value:TRUE );
       set_kb_item( name:"www/pw_input_field_or_basic_auth/detected", value:TRUE );
       # Used in 2018/gb_http_cleartext_creds_submit.nasl
-      set_kb_item( name:"www/" + port + "/content/basic_auth/" + dir, value:report_vuln_url( port:port, url:dir, url_only:TRUE ) + ":" + realm );
+      set_kb_item( name:"www/" + host + "/" + port + "/content/basic_auth/" + dir, value:report_vuln_url( port:port, url:dir, url_only:TRUE ) + ":" + realm );
     }
   }
 }
@@ -967,6 +968,7 @@ testDirList = make_list(
 "webtools/control/main",
 "workeffort/control/main",
 # Tomcat
+"tomcat-docs", #nb: Will be ignored by default
 "manager/html",
 "host-manager/html",
 "manager/status" );
@@ -994,6 +996,9 @@ failedReqs = 0;
 #The NVT will exit if this is reached
 #TBD: Make this configurable?
 maxFailedReqs = 3;
+
+host = http_host_name( dont_add_port:TRUE );
+if( debug ) display( ":: Checking directories on Hostname/IP:port " + host + ":" + port + "...\n" );
 
 # pull the robots.txt file
 if( debug ) display( ":: Checking for robots.txt...\n" );
@@ -1106,7 +1111,8 @@ testDirList = make_list_unique( testDirList );
 
 foreach cdir( testDirList ) {
 
-  res = http_get_cache( item:ScanRootDir + cdir + "/", port:port );
+  url = ScanRootDir + cdir;
+  res = http_get_cache( item:url + "/", port:port );
 
   if( isnull( res ) ) {
     failedReqs++;
@@ -1117,6 +1123,28 @@ foreach cdir( testDirList ) {
     continue;
   }
 
+  if( cgi_dirs_exclude_servermanual ) {
+
+    # Ignore Apache2 manual if it exists. This is just huge static content
+    # and slows down the scanning without any real benefit.
+    if( url =~ "^/manual" ) {
+      res = http_get_cache( item:"/manual/en/index.html", port:port );
+      if( "Documentation - Apache HTTP Server" >< res ) {
+        set_kb_item( name:"www/" + host + "/" + port + "/content/servermanual_directories", value:report_vuln_url( port:port, url:url, url_only:TRUE ) + ", Content: Apache HTTP Server Manual" );
+        continue;
+      }
+    }
+
+    # Similar to the above for Tomcat
+    if( url =~ "^/tomcat-docs" ) {
+      res = http_get_cache( item:"/tomcat-docs/", port:port );
+      if( "Apache Tomcat" >< res && "Documentation Index" >< res ) {
+        set_kb_item( name:"www/" + host + "/" + port + "/content/servermanual_directories", value:report_vuln_url( port:port, url:url, url_only:TRUE ) + ", Content: Apache Tomcat Documentation" );
+        continue;
+      }
+    }
+  }
+
   http_code = int( substr( res, 9, 11 ) );
   if( ! res ) res = "BogusBogusBogus";
 
@@ -1124,7 +1152,7 @@ foreach cdir( testDirList ) {
 
     if( debug ) display( ":: Discovered: " , ScanRootDir, cdir, "\n" );
 
-    add_discovered_list( dir:ScanRootDir + cdir, port:port );
+    add_discovered_list( dir:ScanRootDir + cdir, port:port, host:host );
   }
 
   # Pass any redirects we're getting to webmirror.nasl for further processing
@@ -1140,6 +1168,7 @@ foreach cdir( testDirList ) {
     if( redirect ) {
       if( debug ) display( ":: Passing extracted redirect ", redirect ," to webmirror.nasl...\n" );
       set_kb_item( name:"DDI_Directory_Scanner/" + port + "/received_redirects", value:redirect );
+      set_kb_item( name:"DDI_Directory_Scanner/" + host + "/" + port + "/received_redirects", value:redirect );
     }
   }
 
@@ -1158,7 +1187,7 @@ foreach cdir( testDirList ) {
 
       # the directory just has indexes turned off
       if( debug ) display( ":: Discovered: " , ScanRootDir, cdir, "\n" );
-      add_discovered_list( dir:ScanRootDir + cdir, port:port );
+      add_discovered_list( dir:ScanRootDir + cdir, port:port, host:host );
     }
   }
 
@@ -1167,7 +1196,7 @@ foreach cdir( testDirList ) {
     if( header = egrep( pattern:"^WWW-Authenticate:", string:res, icase:TRUE ) ) {
       if( debug ) display( ":: Got a 401 for ", ScanRootDir + cdir, " containing a WWW-Authenticate header, adding to the dirs requiring auth...\n" );
       basic_auth = extract_basic_auth( data:res );
-      add_auth_dir_list( dir:ScanRootDir + cdir, port:port, basic:basic_auth["basic_auth"], realm:basic_auth["realm"] );
+      add_auth_dir_list( dir:ScanRootDir + cdir, port:port, host:host, basic:basic_auth["basic_auth"], realm:basic_auth["realm"] );
     } else {
       if( debug ) display( ":: Got a 401 for ", ScanRootDir + cdir, " WITHOUT a WWW-Authenticate header, NOT adding to the dirs requiring auth...\n" );
     }

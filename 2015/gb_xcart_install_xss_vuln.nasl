@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_xcart_install_xss_vuln.nasl 6329 2017-06-13 15:39:42Z teissa $
+# $Id: gb_xcart_install_xss_vuln.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # X_CART Installation Script Cross Site Scripting Vulnerability
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:qualiteam:x-cart";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.806059");
-  script_version("$Revision: 6329 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2015-5455");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-13 17:39:42 +0200 (Tue, 13 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-10-05 11:33:14 +0530 (Mon, 05 Oct 2015)");
   script_name("X_CART Installation Script Cross Site Scripting Vulnerability");
   script_category(ACT_ATTACK);
@@ -55,18 +55,16 @@ if(description)
   script_tag(name:"impact", value:"Successful exploitation will allow a
   context-dependent attacker to create a specially crafted request that would
   execute arbitrary script code in a user's browser session within the trust
-  relationship between their browser and the server.
-
-  Impact Level: Application");
+  relationship between their browser and the server.");
   script_tag(name:"affected", value:"XCART versions 4.5.0 and possibly earlier.");
   script_tag(name:"solution", value:"For a workaround, websites running X-Cart
   version 4.5.0 (and possibly below) remove their /install/ directory once it is
-  installed.
-  For updates refer to https://www.x-cart.com");
+  installed.");
 
   script_tag(name:"solution_type", value:"Workaround");
   script_tag(name:"qod_type", value:"remote_vul");
 
+  script_xref(name:"URL", value:"https://www.x-cart.com");
   exit(0);
 }
 
@@ -82,11 +80,10 @@ if( dir == "/" ) dir = "";
 
 url = dir + "/install.php";
 
-## Send and receive response
 sndReq = http_get( item:url, port:port );
 rcvRes = http_keepalive_send_recv( port:port, data:sndReq );
+useragent = get_http_user_agent();
 
-##Confirm Application
 if( rcvRes && rcvRes =~ "HTTP/1.. 200" ) {
 
   host = http_host_name( port:port );
@@ -102,13 +99,12 @@ if( rcvRes && rcvRes =~ "HTTP/1.. 200" ) {
   #Send Attack Request
   sndReq = string("POST ", url, " HTTP/1.1\r\n",
                   "Host: ", host, "\r\n",
-                  "User-Agent: ", OPENVAS_HTTP_USER_AGENT , "\r\n" ,
+                  "User-Agent: ", useragent, "\r\n",
                   "Content-Type: application/x-www-form-urlencoded", "\r\n",
                   "Content-Length: ", strlen(postData), "\r\n\r\n",
                   "\r\n", postData, "\r\n");
   rcvRes = http_keepalive_send_recv( port:port, data:sndReq );
 
-  ## check the response to confirm vulnerability
   if( rcvRes =~ "HTTP/1\.. 200" && "alert(document.cookie)" >< rcvRes && "X-Cart" >< rcvRes ) {
     report = report_vuln_url( port:port, url:url );
     security_message( port:port, data:report );

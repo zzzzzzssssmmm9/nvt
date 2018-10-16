@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mcafee_epolicy_orchestrator_detect.nasl 7000 2017-08-24 11:51:46Z teissa $
+# $Id: gb_mcafee_epolicy_orchestrator_detect.nasl 11407 2018-09-15 11:02:05Z cfischer $
 #
 # McAfee ePolicy Orchestrator (ePO) Detection
 #
@@ -24,18 +24,18 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if (description)
+if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.803862");
-  script_version("$Revision: 7000 $");
+  script_version("$Revision: 11407 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-08-24 13:51:46 +0200 (Thu, 24 Aug 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-09-15 13:02:05 +0200 (Sat, 15 Sep 2018) $");
   script_tag(name:"creation_date", value:"2013-08-08 18:54:25 +0530 (Thu, 08 Aug 2013)");
   script_tag(name:"qod_type", value:"remote_banner");
   script_name("McAfee ePolicy Orchestrator (ePO) Detection");
 
-  script_tag(name: "summary" , value: "Detection of installed version of
+  script_tag(name:"summary", value:"Detects the installed version of
   McAfee ePolicy Orchestrator.
 
   The script sends a connection request to the server and attempts to
@@ -44,11 +44,12 @@ if (description)
   script_category(ACT_GATHER_INFO);
   script_family("Product detection");
   script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
-  script_require_ports("Services/www", 8443);
   script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 8443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+
   exit(0);
 }
-
 
 include("cpe.inc");
 include("http_func.inc");
@@ -56,20 +57,16 @@ include("host_details.inc");
 include("misc_func.inc");
 include("http_keepalive.inc");
 
-## Variable initialization
 port = get_http_port( default:8443 );
 
-## Construct HTTP request
 req = http_get(item:"/core/orionSplashScreen.do", port:port);
 resp = http_keepalive_send_recv(port:port, data:req, bodyonly:FALSE);
 
-## Confirm the application
 if("ePolicy Orchestrator" >< resp && "McAfee" >< resp)
 {
   version = "unknown";
   build = "unknown";
 
-  ## Extract the version from the response
   vers = eregmatch(string: resp, pattern: "ePolicy Orchestrator ([0-9.]+)( \(Build: ([0-9]+)\))?");
   if (!isnull(vers[1])) {
     version =  vers[1];
@@ -83,7 +80,6 @@ if("ePolicy Orchestrator" >< resp && "McAfee" >< resp)
 
   set_kb_item(name:"mcafee_ePO/installed",value:TRUE);
 
-  ## build CPE
   cpe = build_cpe(value:version, exp:"^([0-9.]+)", base:"cpe:/a:mcafee:epolicy_orchestrator:");
   if(isnull(cpe))
     cpe = 'cpe:/a:mcafee:epolicy_orchestrator';

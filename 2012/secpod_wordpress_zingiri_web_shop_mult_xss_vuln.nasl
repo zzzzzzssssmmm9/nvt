@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_wordpress_zingiri_web_shop_mult_xss_vuln.nasl 10257 2018-06-19 14:04:53Z cfischer $
+# $Id: secpod_wordpress_zingiri_web_shop_mult_xss_vuln.nasl 11888 2018-10-12 15:27:49Z cfischer $
 #
 # WordPress Zingiri Web Shop Plugin Multiple Cross Site Scripting Vulnerabilities
 #
@@ -29,7 +29,7 @@ CPE = "cpe:/a:wordpress:wordpress";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902831");
-  script_version("$Revision: 10257 $");
+  script_version("$Revision: 11888 $");
   script_cve_id("CVE-2012-6506");
   script_bugtraq_id(53278);
   script_tag(name:"cvss_base", value:"4.3");
@@ -50,9 +50,7 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to insert arbitrary HTML
   and script code, which will be executed in a user's browser session in the
-  context of an affected site.
-
-  Impact Level: Application");
+  context of an affected site.");
 
   script_tag(name:"affected", value:"WordPress Zingiri Web Shop Plugin Version 2.4.0 and prior");
 
@@ -61,8 +59,7 @@ if(description)
   arbitrary HTML and script code in a user's browser session in the context
   of an affected site.");
 
-  script_tag(name:"solution", value:"Upgrade to WordPress Zingiri Web Shop Plugin 2.4.1 or later,
-  For updates refer to http://wordpress.org/extend/plugins/zingiri-web-shop/");
+  script_tag(name:"solution", value:"Upgrade to WordPress Zingiri Web Shop Plugin 2.4.1 or later.");
 
   script_tag(name:"summary", value:"This host is running WordPress Zingiri Web Shop Plugin and is prone
   to multiple cross site scripting vulnerabilities.");
@@ -70,6 +67,7 @@ if(description)
   script_tag(name:"qod_type", value:"remote_vul");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://wordpress.org/extend/plugins/zingiri-web-shop/");
   exit(0);
 }
 

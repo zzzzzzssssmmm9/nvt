@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_php_http_header_injection_vuln_win.nasl 10458 2018-07-09 06:47:36Z cfischer $
+# $Id: gb_php_http_header_injection_vuln_win.nasl 11857 2018-10-12 08:25:16Z cfischer $
 #
 # PHP 'main/SAPI.c' HTTP Header Injection Vulnerability
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:php:php";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802966");
-  script_version("$Revision: 10458 $");
+  script_version("$Revision: 11857 $");
   script_cve_id("CVE-2012-4388", "CVE-2011-1398");
   script_bugtraq_id(55527, 55297);
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-09 08:47:36 +0200 (Mon, 09 Jul 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 10:25:16 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2012-09-24 18:58:41 +0530 (Mon, 24 Sep 2012)");
   script_name("PHP 'main/SAPI.c' HTTP Header Injection Vulnerability");
 
@@ -52,17 +52,14 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation could allows remote attackers to insert arbitrary
   headers, conduct cross-site request-forgery, cross-site scripting,
-  HTML-injection, and other attacks.
-
-  Impact Level: Application");
+  HTML-injection, and other attacks.");
 
   script_tag(name:"affected", value:"PHP version prior to 5.3.11, PHP version 5.4.x through 5.4.0RC2 on Windows");
 
   script_tag(name:"insight", value:"The sapi_header_op function in main/SAPI.c in PHP does not properly determine
   a pointer during checks for %0D sequences.");
 
-  script_tag(name:"solution", value:"Upgrade to PHP 5.4.1 RC1 or later
-  For updates refer to http://www.php.net/downloads.php");
+  script_tag(name:"solution", value:"Upgrade to PHP 5.4.1 RC1 or later.");
 
   script_tag(name:"summary", value:"This host is running PHP and is prone to HTTP header injection
   vulnerability.");
@@ -70,6 +67,7 @@ if(description)
   script_tag(name:"qod_type", value:"remote_banner");
   script_tag(name:"solution_type", value:"VendorFix");
 
+  script_xref(name:"URL", value:"http://www.php.net/downloads.php");
   exit(0);
 }
 

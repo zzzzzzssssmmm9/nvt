@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_bacula_web_jobid_sql_inj_vuln.nasl 6769 2017-07-20 09:56:33Z teissa $
+# $Id: gb_bacula_web_jobid_sql_inj_vuln.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # Bacula-web 'jobid' Parameter SQL Injection Vulnerability
 #
@@ -27,10 +27,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804771");
-  script_version("$Revision: 6769 $");
+  script_version("$Revision: 11867 $");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-20 11:56:33 +0200 (Thu, 20 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-10-07 11:01:51 +0530 (Tue, 07 Oct 2014)");
 
   script_name("Bacula-web 'jobid' Parameter SQL Injection Vulnerability");
@@ -46,21 +46,19 @@ if(description)
 
   script_tag(name:"impact", value:"Successful exploitation will allow attacker
   to manipulate SQL queries in the backend database, and disclose certain
-  sensitive information.
-
-  Impact Level: Application");
+  sensitive information.");
 
   script_tag(name:"affected", value:"Bacula-web version 5.2.10, Other versions
   may also be affected.");
 
   script_tag(name:"solution", value:"Upgrade to Bacula-web version 6.0.1
-  or later, For updates refer to http://www.bacula-web.org");
+  or later.");
 
   script_tag(name:"qod_type", value:"remote_app");
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "http://www.exploit-db.com/exploits/34851");
-  script_xref(name : "URL" , value : "http://packetstormsecurity.com/files/128480");
+  script_xref(name:"URL", value:"http://www.exploit-db.com/exploits/34851");
+  script_xref(name:"URL", value:"http://packetstormsecurity.com/files/128480");
 
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
@@ -69,6 +67,7 @@ if(description)
   script_require_ports("Services/www", 80);
   script_exclude_keys("Settings/disable_cgi_scanning");
 
+  script_xref(name:"URL", value:"http://www.bacula-web.org");
   exit(0);
 }
 
@@ -76,21 +75,13 @@ if(description)
 include("http_func.inc");
 include("http_keepalive.inc");
 
-## Variable Initialization
-sndReq = "";
-rcvRes = "";
-http_port = "";
 
-
-## Get HTTP Port
 http_port = get_http_port(default:80);
 
-## Check Host Supports PHP
 if(!can_host_php(port:http_port)){
   exit(0);
 }
 
-## Iterate over possible paths
 foreach dir (make_list_unique("/", "/bacula-web", "/baculaweb", "/bacula", cgi_dirs(port:http_port)))
 {
 
@@ -99,13 +90,10 @@ foreach dir (make_list_unique("/", "/bacula-web", "/baculaweb", "/bacula", cgi_d
   sndReq = http_get(item: string(dir, "/test.php"),  port:http_port);
   rcvRes = http_keepalive_send_recv(port:http_port, data:sndReq);
 
-  ## confirm the Application
   if(">bacula-web<" >< rcvRes && ">Dashboard<" >< rcvRes)
   {
-    ## Construct the attack request
     url = dir + "/joblogs.php?jobid='SQL-Injection-Test";
 
-    ## Check the response to confirm vulnerability, extra check not possible
     if(http_vuln_check(port:http_port, url:url, check_header:TRUE,
        pattern:"You have an error in your SQL syntax.*SQL-Injection-Test"))
     {

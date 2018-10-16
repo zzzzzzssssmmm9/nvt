@@ -1,12 +1,13 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: remote-pwcrack-ncrack-telnet.nasl 11886 2018-10-12 13:48:53Z cfischer $
 #
 # telnet Remote password cracking using ncrack
 # svn co svn://svn.insecure.org/nmap-exp/ithilgore/ncrack
 # Tested with SVN r14943.
 #
 # Based on hydra scripts by Michel Arboi <arboi@alussinan.org>
-# 
+#
 # Authors:
 # Vlatko Kosturjak <kost@linux.hr>
 #
@@ -24,32 +25,29 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "This plugin runs ncrack to find telnet accounts & passwords by brute force.";
-
 if(description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.80107");
- script_version("$Revision: 10530 $");
- script_tag(name:"last_modification", value:"$Date: 2018-07-17 16:15:42 +0200 (Tue, 17 Jul 2018) $");
- name = "ncrack: telnet";
- script_name(name);
- script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
- script_tag(name:"cvss_base", value:"7.8");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
- 
+  script_oid("1.3.6.1.4.1.25623.1.0.80107");
+  script_version("$Revision: 11886 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:48:53 +0200 (Fri, 12 Oct 2018) $");
+  script_name("ncrack: telnet");
+  script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
+  script_tag(name:"cvss_base", value:"7.8");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
 
- script_tag(name:"qod_type", value:"remote_vul");
- script_tag(name:"solution_type", value:"Mitigation");
- 
- 
- script_category(ACT_ATTACK);
- script_copyright("This script is Copyright (C) 2009 Vlatko Kosturjak");
- script_family("Brute force attacks");
- script_require_ports("Services/telnet", 23);
- script_dependencies("toolcheck.nasl", "gcf/remote-pwcrack-options.nasl", "find_service.nasl");
- script_mandatory_keys("Tools/Present/ncrack", "Secret/pwcrack/logins_file", "Secret/pwcrack/passwords_file");
- script_tag(name : "summary" , value : tag_summary);
- exit(0);
+
+  script_tag(name:"qod_type", value:"remote_vul");
+  script_tag(name:"solution_type", value:"Mitigation");
+
+
+  script_category(ACT_ATTACK);
+  script_copyright("This script is Copyright (C) 2009 Vlatko Kosturjak");
+  script_family("Brute force attacks");
+  script_require_ports("Services/telnet", 23);
+  script_dependencies("toolcheck.nasl", "gcf/remote-pwcrack-options.nasl", "find_service.nasl");
+  script_mandatory_keys("Tools/Present/ncrack", "Secret/pwcrack/logins_file", "Secret/pwcrack/passwords_file");
+  script_tag(name:"summary", value:"This plugin runs ncrack to find telnet accounts & passwords by brute force.");
+  exit(0);
 }
 
 # Exit if nasl version is too old (<2200)
@@ -113,5 +111,5 @@ foreach line (split(results))
 }
 
 if (report)
-  security_message(port: port, 
+  security_message(port: port,
     data: 'ncrack was able to break the following telnet accounts:\n' + report);

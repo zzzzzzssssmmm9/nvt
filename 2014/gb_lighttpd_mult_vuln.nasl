@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_lighttpd_mult_vuln.nasl 7577 2017-10-26 10:41:56Z cfischer $
+# $Id: gb_lighttpd_mult_vuln.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # Lighttpd Multiple vulnerabilities
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:lighttpd:lighttpd";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.802072");
-  script_version("$Revision: 7577 $");
+  script_version("$Revision: 11867 $");
   script_cve_id("CVE-2014-2323", "CVE-2014-2324");
   script_bugtraq_id(66153, 66157);
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-26 12:41:56 +0200 (Thu, 26 Oct 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2014-05-13 12:18:43 +0530 (Tue, 13 May 2014)");
   script_name("Lighttpd Multiple vulnerabilities");
 
@@ -43,15 +43,13 @@ if(description)
   message.");
   script_tag(name:"insight", value:"- mod_mysql_vhost module not properly sanitizing user supplied input passed
   via the hostname.
+
   - mod_evhost and mod_simple_vhost modules not properly sanitizing user supplied
   input via the hostname.");
   script_tag(name:"impact", value:"Successful exploitation will allow remote attackers to execute arbitrary SQL
-  commands and remote attackers to read arbitrary files via hostname.
-
-  Impact Level: System/Application");
+  commands and remote attackers to read arbitrary files via hostname.");
   script_tag(name:"affected", value:"Lighttpd version before 1.4.35");
-  script_tag(name:"solution", value:"Upgrade to 1.4.35 or higher,
-  For updates refer to http://www.lighttpd.net/download");
+  script_tag(name:"solution", value:"Upgrade to 1.4.35 or later.");
 
   script_xref(name:"URL", value:"http://seclists.org/oss-sec/2014/q1/561");
   script_xref(name:"URL", value:"http://download.lighttpd.net/lighttpd/security/lighttpd_sa_2014_01.txt");
@@ -66,6 +64,7 @@ if(description)
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"remote_vul");
 
+  script_xref(name:"URL", value:"http://www.lighttpd.net/download");
   exit(0);
 }
 
@@ -74,7 +73,6 @@ include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
 
-## Get HTTP port
 if( ! http_port = get_app_port( cpe:CPE ) ) exit( 0 );
 
 ## Send normal request

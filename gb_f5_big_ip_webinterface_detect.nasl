@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_f5_big_ip_webinterface_detect.nasl 7076 2017-09-07 11:53:47Z teissa $
+# $Id: gb_f5_big_ip_webinterface_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # F5 Networks BIG-IP Webinterface Detection
 #
@@ -27,25 +27,25 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105162");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_tag(name:"qod_type", value:"remote_banner");
- script_version ("$Revision: 7076 $");
- script_tag(name:"last_modification", value:"$Date: 2017-09-07 13:53:47 +0200 (Thu, 07 Sep 2017) $");
- script_tag(name:"creation_date", value:"2015-01-09 16:07:09 +0100 (Fri, 09 Jan 2015)");
- script_name("F5 Networks BIG-IP Webinterface Detection");
+  script_oid("1.3.6.1.4.1.25623.1.0.105162");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-01-09 16:07:09 +0100 (Fri, 09 Jan 2015)");
+  script_name("F5 Networks BIG-IP Webinterface Detection");
 
- script_tag(name: "summary" , value: "The script performs http based detection of the BIG-IP Webinterface");
+  script_tag(name:"summary", value:"The script performs http based detection of the BIG-IP Webinterface");
 
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("find_service.nasl", "http_version.nasl");
- script_require_ports("Services/www", 443);
- script_exclude_keys("Settings/disable_cgi_scanning");
- exit(0);
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("find_service.nasl", "http_version.nasl");
+  script_require_ports("Services/www", 443);
+  script_exclude_keys("Settings/disable_cgi_scanning");
+  exit(0);
 }
 
 

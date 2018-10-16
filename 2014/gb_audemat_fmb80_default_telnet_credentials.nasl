@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_audemat_fmb80_default_telnet_credentials.nasl 7287 2017-09-27 06:56:51Z cfischer $
+# $Id: gb_audemat_fmb80_default_telnet_credentials.nasl 11867 2018-10-12 10:48:11Z cfischer $
 #
 # Audemat FMB80 RDS Encoder Default root Credentials
 #
@@ -25,44 +25,35 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-SCRIPT_OID  = "1.3.6.1.4.1.25623.1.0.103898";
-
-tag_summary = 'The remote Audemat FMB80 RDS Encoder has no or default credentials set.';
-
-tag_impact = 'This issue may be exploited by a remote attacker to gain
-access to sensitive information or modify system configuration.';
-
-tag_insight = 'It was possible to login without credentials or default credentials of root:root.';
-tag_vuldetect = 'Connect to the telnet service and, if needed, try to login with default credentials.';
-tag_solution = 'Change/Set the password.';
-
 if (description)
 {
- script_oid(SCRIPT_OID); 
- script_version("$Revision: 7287 $");
- script_tag(name:"cvss_base", value:"7.5");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
- script_name("Audemat FMB80 RDS Encoder Default root Credentials");
+  script_oid("1.3.6.1.4.1.25623.1.0.103898");
+  script_version("$Revision: 11867 $");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_name("Audemat FMB80 RDS Encoder Default root Credentials");
 
 
- script_xref(name:"URL" , value:"http://dariusfreamon.wordpress.com/2014/01/28/audemat-fmb80-rds-encoder-default-root-credentials/");
+  script_xref(name:"URL", value:"http://dariusfreamon.wordpress.com/2014/01/28/audemat-fmb80-rds-encoder-default-root-credentials/");
 
- script_tag(name:"last_modification", value:"$Date: 2017-09-27 08:56:51 +0200 (Wed, 27 Sep 2017) $");
- script_tag(name:"creation_date", value:"2014-01-29 15:02:06 +0200 (Wed, 29 Jan 2014)");
- script_category(ACT_ATTACK);
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 12:48:11 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2014-01-29 15:02:06 +0200 (Wed, 29 Jan 2014)");
+  script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
- script_family("Default Accounts");
- script_copyright("This script is Copyright (C) 2014 Greenbone Networks GmbH");
- script_dependencies("telnetserver_detect_type_nd_version.nasl");
- script_require_ports("Services/telnet", 23);
+  script_family("Default Accounts");
+  script_copyright("This script is Copyright (C) 2014 Greenbone Networks GmbH");
+  script_dependencies("telnetserver_detect_type_nd_version.nasl");
+  script_require_ports("Services/telnet", 23);
 
- script_tag(name : "summary" , value : tag_summary);
- script_tag(name : "impact" , value : tag_impact);
- script_tag(name : "vuldetect" , value : tag_vuldetect);
- script_tag(name : "insight" , value : tag_insight);
- script_tag(name : "solution" , value : tag_solution);
+  script_tag(name:"summary", value:"The remote Audemat FMB80 RDS Encoder has no or default credentials set.");
+  script_tag(name:"impact", value:"This issue may be exploited by a remote attacker to gain
+access to sensitive information or modify system configuration.");
+  script_tag(name:"vuldetect", value:"Connect to the telnet service and, if needed, try to login with default credentials.");
+  script_tag(name:"insight", value:"It was possible to login without credentials or default credentials of root:root.");
+  script_tag(name:"solution", value:"Change/Set the password.");
+  script_tag(name:"solution_type", value:"Mitigation");
 
- exit(0);
+  exit(0);
 }
 
 include("telnet_func.inc");
@@ -87,7 +78,7 @@ if ( "User:" >< recv )
   recv = recv( socket:soc, length:128 );
   if( "Type HELP" >!< recv ) exit( 99 );
 
-}  
+}
 
 send( socket:soc, data:'USER?\r\n' );
 recv = recv( socket:soc, length:128 );
@@ -103,6 +94,6 @@ if( "Root" >< recv )
 
   security_message( port:port, data:report );
   exit( 0 );
-}  
+}
 
 exit( 99 );

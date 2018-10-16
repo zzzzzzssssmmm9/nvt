@@ -1,6 +1,6 @@
 ###################################################################
 # OpenVAS Vulnerability Test
-# $Id: os_fingerprint.nasl 10573 2018-07-23 10:44:26Z cfischer $
+# $Id: os_fingerprint.nasl 11833 2018-10-11 08:18:59Z cfischer $
 #
 # ICMP based OS Fingerprinting
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.102002");
-  script_version("$Revision: 10573 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-07-23 12:44:26 +0200 (Mon, 23 Jul 2018) $");
+  script_version("$Revision: 11833 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-11 10:18:59 +0200 (Thu, 11 Oct 2018) $");
   script_tag(name:"creation_date", value:"2009-05-19 12:05:50 +0200 (Tue, 19 May 2009)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -36,7 +36,10 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2009 LSS");
   script_family("Product detection");
-  script_dependencies("gb_greenbone_os_detect.nasl", "gb_ami_megarac_sp_web_detect.nasl",  # Keep in sync with os_detection.nasl...
+  # Keep order the same as in host_details.inc. Also add NVTs registering an OS there if adding here.
+  # nmap_net.nasl was not added as this is in ACT_SCANNER and doesn't use register_and_report_os yet
+  # Keep in sync with os_detection.nasl but without gb_nmap_os_detection.nasl and the own os_fingerprint.nasl
+  script_dependencies("gb_greenbone_os_detect.nasl", "gb_ami_megarac_sp_web_detect.nasl",
                       "gb_ros_detect.nasl", "gb_apple_mobile_detect.nasl",
                       "gb_vmware_esx_web_detect.nasl", "gb_vmware_esx_snmp_detect.nasl",
                       "gb_ssh_cisco_ios_get_version.nasl", "gb_cisco_cucmim_version.nasl",
@@ -48,6 +51,7 @@ if(description)
                       "gb_palo_alto_panOS_version.nasl", "gb_screenos_version.nasl",
                       "gb_extremeos_snmp_detect.nasl",
                       "gb_cisco_asa_version_snmp.nasl", "gb_cisco_asa_version.nasl",
+                      "gb_cisco_asa_detect.nasl",
                       "gb_arista_eos_snmp_detect.nasl", "gb_netgear_prosafe_consolidation.nasl",
                       "gb_hirschmann_consolidation.nasl", "gb_mikrotik_router_routeros_consolidation.nasl",
                       "gb_xenserver_version.nasl", "gb_cisco_ios_xe_version.nasl",
@@ -59,10 +63,11 @@ if(description)
                       "gb_simatic_cp_consolidation.nasl", "gb_simatic_scalance_snmp_detect.nasl",
                       "gb_siemens_ruggedcom_consolidation.nasl", "ilo_detect.nasl",
                       "gb_watchguard_fireware_detect.nasl", "gb_vibnode_consolidation.nasl",
-                      "gb_hyperip_consolidation.nasl", "gb_windows_cpe_detect.nasl",
+                      "gb_hyperip_consolidation.nasl", "gb_avm_fritz_box_detect.nasl",
+                      "gb_windows_cpe_detect.nasl",
                       "gather-package-list.nasl", "gb_cisco_pis_version.nasl",
                       "gb_checkpoint_fw_version.nasl", "gb_smb_windows_detect.nasl",
-                      "gb_nec_communication_platforms_detect.nasl", "gb_ssh_os_detection.nasl", # nmap_net.nasl not added as this is in ACT_SCANNER (and doesn't use register_and_report_os yet)
+                      "gb_nec_communication_platforms_detect.nasl", "gb_ssh_os_detection.nasl",
                       "gb_citrix_netscaler_version.nasl",
                       "gb_junos_snmp_version.nasl", "gb_snmp_os_detection.nasl",
                       "gb_dns_os_detection.nasl", "gb_ftp_os_detection.nasl",
@@ -77,8 +82,8 @@ if(description)
                       "dcetest.nasl", "gb_hnap_os_detection.nasl",
                       "ident_process_owner.nasl", "gb_pihole_detect.nasl",
                       "gb_dropbear_ssh_detect.nasl", "gb_rtsp_os_detection.nasl",
-                      "gb_android_adb_detect.nasl", # but without gb_nmap_os_detection.nasl and the own os_fingerprint.nasl
-                      "global_settings.nasl"); # nb: Extra dependency for the script_exclude_keys below
+                      "gb_nntp_os_detection.nasl", "gb_android_adb_detect.nasl",
+                      "netbios_name_get.nasl", "global_settings.nasl");
   script_exclude_keys("keys/TARGET_IS_IPV6");
 
   script_xref(name:"URL", value:"http://www.phrack.org/issues.html?issue=57&id=7#article");
@@ -992,7 +997,7 @@ if( typeof( best_os ) == "array") {
       }
     }
 
-    # Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
+    # nb: Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
     if( ! runs_key ) runs_key = "unixoide";
 
     register_and_report_os( os:ostitle, cpe:best_os[ostitle], banner_type:"ICMP based OS fingerprint", desc:SCRIPT_DESC, port:i, proto:"icmp", runs_key:runs_key );

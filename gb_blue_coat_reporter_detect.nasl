@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_blue_coat_reporter_detect.nasl 9996 2018-05-29 07:18:44Z cfischer $
+# $Id: gb_blue_coat_reporter_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Blue Coat Reporter Detection
 #
@@ -26,28 +26,28 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.103245");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 9996 $");
- script_tag(name:"last_modification", value:"$Date: 2018-05-29 09:18:44 +0200 (Tue, 29 May 2018) $");
- script_tag(name:"creation_date", value:"2011-09-08 15:23:37 +0200 (Thu, 08 Sep 2011)");
- script_tag(name:"cvss_base", value:"0.0");
- script_name("Blue Coat Reporter Detection");
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Service detection");
- script_copyright("This script is Copyright (C) 2011 Greenbone Networks GmbH");
- script_dependencies("gb_get_http_banner.nasl");
- script_mandatory_keys("BCReport/banner");
- script_require_ports("Services/www", 80);
- script_tag(name : "summary" , value : "This host is running the Blue Coat Reporter.");
- script_xref(name : "URL" , value : "http://www.bluecoat.com/products/proxysg/addons/reporter");
- exit(0);
+  script_oid("1.3.6.1.4.1.25623.1.0.103245");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2011-09-08 15:23:37 +0200 (Thu, 08 Sep 2011)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_name("Blue Coat Reporter Detection");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Service detection");
+  script_copyright("This script is Copyright (C) 2011 Greenbone Networks GmbH");
+  script_dependencies("gb_get_http_banner.nasl");
+  script_mandatory_keys("BCReport/banner");
+  script_require_ports("Services/www", 80);
+  script_tag(name:"summary", value:"This host is running the Blue Coat Reporter.");
+  script_xref(name:"URL", value:"http://www.bluecoat.com/products/proxysg/addons/reporter");
+  exit(0);
 }
 
 include("http_func.inc");
 include("http_keepalive.inc");
-include("global_settings.inc");
+
 
 port = get_http_port(default:80);
 banner = get_http_banner(port:port);

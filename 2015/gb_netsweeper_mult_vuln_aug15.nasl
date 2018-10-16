@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_netsweeper_mult_vuln_aug15.nasl 8601 2018-01-31 12:07:42Z cfischer $
+# $Id: gb_netsweeper_mult_vuln_aug15.nasl 11872 2018-10-12 11:22:41Z cfischer $
 #
 # Netsweeper Multiple Vulnerabilities - Aug15
 #
@@ -28,46 +28,47 @@ CPE = "cpe:/a:netsweeper:netsweeper";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805962");
-  script_version("$Revision: 8601 $");
+  script_version("$Revision: 11872 $");
   script_cve_id("CVE-2014-9612", "CVE-2014-9605", "CVE-2014-9610", "CVE-2014-9619");
   script_tag(name:"cvss_base", value:"7.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-31 13:07:42 +0100 (Wed, 31 Jan 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 13:22:41 +0200 (Fri, 12 Oct 2018) $");
   script_tag(name:"creation_date", value:"2015-08-25 14:52:59 +0530 (Tue, 25 Aug 2015)");
   script_tag(name:"qod_type", value:"exploit");
   script_name("Netsweeper Multiple Vulnerabilities - Aug15");
 
-  script_tag(name: "summary" , value:"The host is running Netsweeper and is prone
+  script_tag(name:"summary", value:"The host is running Netsweeper and is prone
   to multiple vulnerabilities.");
 
   script_tag(name:"vuldetect", value:"Send a crafted request via HTTP GET and
   check whether it is able to execute sql query or not.");
 
   script_tag(name:"insight", value:"Multiple flaws exist as,
+
   - Input passed via 'server' parameter to load_logfiles.php script is not
   validated before returning to users.
+
   - The application does not validate input against crafted requests.
+
   - Unspecified errors.");
 
   script_tag(name:"impact", value:"Successful exploitation will allow remote
   attackers to inject or manipulate SQL queries in the back-end database
   allowing for the manipulation or disclosure of arbitrary data, allowing
-  arbitrary file upload and execution, and authentication bypass.
-
-  Impact Level: Application");
+  arbitrary file upload and execution, and authentication bypass.");
 
   script_tag(name:"affected", value:"Netsweeper before versions 3.1.10, 4.0.9 and
   4.1.2.");
 
-  script_tag(name: "solution" , value:"Upgrade to Netsweeper version 3.1.10,
-  4.0.9 or 4.1.2 or later. For updates refer to http://www.netsweeper.com/");
+  script_tag(name:"solution", value:"Upgrade to Netsweeper version 3.1.10,
+  4.0.9 or 4.1.2 or later.");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
-  script_xref(name : "URL" , value : "https://www.exploit-db.com/exploits/37927");
-  script_xref(name : "URL" , value : "https://www.exploit-db.com/exploits/37928");
-  script_xref(name : "URL" , value : "https://www.exploit-db.com/exploits/37929");
-  script_xref(name : "URL" , value : "https://www.exploit-db.com/exploits/37932");
+  script_xref(name:"URL", value:"https://www.exploit-db.com/exploits/37927");
+  script_xref(name:"URL", value:"https://www.exploit-db.com/exploits/37928");
+  script_xref(name:"URL", value:"https://www.exploit-db.com/exploits/37929");
+  script_xref(name:"URL", value:"https://www.exploit-db.com/exploits/37932");
 
   script_category(ACT_ATTACK);
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
@@ -75,6 +76,7 @@ if(description)
   script_dependencies("gb_netsweeper_remote_detect.nasl");
   script_mandatory_keys("Netsweeper/Installed");
   script_require_ports("Services/www", 80);
+  script_xref(name:"URL", value:"http://www.netsweeper.com/");
   exit(0);
 }
 

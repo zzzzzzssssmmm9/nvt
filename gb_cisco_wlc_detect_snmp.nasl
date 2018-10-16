@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cisco_wlc_detect_snmp.nasl 7239 2017-09-22 16:10:31Z cfischer $
+# $Id: gb_cisco_wlc_detect_snmp.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Cisco Wireless LAN Controller Detection (SNMP)
 #
@@ -27,26 +27,26 @@
 
 if (description)
 {
- script_oid("1.3.6.1.4.1.25623.1.0.105382");
- script_tag(name:"cvss_base", value:"0.0");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 7239 $");
- script_tag(name:"last_modification", value:"$Date: 2017-09-22 18:10:31 +0200 (Fri, 22 Sep 2017) $");
- script_tag(name:"creation_date", value:"2015-09-22 14:49:34 +0200 (Tue, 22 Sep 2015)");
- script_name("Cisco Wireless LAN Controller Detection (SNMP)");
+  script_oid("1.3.6.1.4.1.25623.1.0.105382");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2015-09-22 14:49:34 +0200 (Tue, 22 Sep 2015)");
+  script_name("Cisco Wireless LAN Controller Detection (SNMP)");
 
- script_tag(name: "summary" , value: "This script performs SNMP based detection of Cisco Wireless LAN Controller");
+  script_tag(name:"summary", value:"This script performs SNMP based detection of Cisco Wireless LAN Controller");
 
- script_tag(name:"qod_type", value:"remote_banner");
+  script_tag(name:"qod_type", value:"remote_banner");
 
- script_category(ACT_GATHER_INFO);
- script_family("Product detection");
- script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
- script_dependencies("gb_snmp_sysdesc.nasl");
- script_require_udp_ports("Services/udp/snmp", 161);
- script_mandatory_keys("SNMP/sysdesc/available");
+  script_category(ACT_GATHER_INFO);
+  script_family("Product detection");
+  script_copyright("This script is Copyright (C) 2015 Greenbone Networks GmbH");
+  script_dependencies("gb_snmp_sysdesc.nasl");
+  script_require_udp_ports("Services/udp/snmp", 161);
+  script_mandatory_keys("SNMP/sysdesc/available");
 
- exit(0);
+  exit(0);
 }
 
 include("snmp_func.inc");

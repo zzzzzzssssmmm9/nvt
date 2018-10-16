@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_syncrify_detect.nasl 8528 2018-01-25 07:57:36Z teissa $
+# $Id: gb_syncrify_detect.nasl 11885 2018-10-12 13:47:20Z cfischer $
 #
 # Syncrify Detection
 #
@@ -24,31 +24,29 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "This host is running Syncrify, an incremental, and cloud-ready backup
-that implements the rsync protocol over HTTP.";
-
 if (description)
 {
- 
- script_oid("1.3.6.1.4.1.25623.1.0.100819");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 8528 $");
- script_tag(name:"last_modification", value:"$Date: 2018-01-25 08:57:36 +0100 (Thu, 25 Jan 2018) $");
- script_tag(name:"creation_date", value:"2010-09-22 16:24:51 +0200 (Wed, 22 Sep 2010)");
- script_tag(name:"cvss_base", value:"0.0");
 
- script_name("Syncrify Detection");
- script_category(ACT_GATHER_INFO);
- script_tag(name:"qod_type", value:"remote_banner");
- script_family("Service detection");
- script_copyright("This script is Copyright (C) 2010 Greenbone Networks GmbH");
- script_dependencies("gb_get_http_banner.nasl");
- script_require_ports("Services/www", 5800);
- script_mandatory_keys("Apache-Coyote/banner");
+  script_oid("1.3.6.1.4.1.25623.1.0.100819");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_version("$Revision: 11885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-10-12 15:47:20 +0200 (Fri, 12 Oct 2018) $");
+  script_tag(name:"creation_date", value:"2010-09-22 16:24:51 +0200 (Wed, 22 Sep 2010)");
+  script_tag(name:"cvss_base", value:"0.0");
 
- script_tag(name : "summary" , value : tag_summary);
- script_xref(name : "URL" , value : "http://web.synametrics.com/Syncrify.htm");
- exit(0);
+  script_name("Syncrify Detection");
+  script_category(ACT_GATHER_INFO);
+  script_tag(name:"qod_type", value:"remote_banner");
+  script_family("Service detection");
+  script_copyright("This script is Copyright (C) 2010 Greenbone Networks GmbH");
+  script_dependencies("gb_get_http_banner.nasl");
+  script_require_ports("Services/www", 5800);
+  script_mandatory_keys("Apache-Coyote/banner");
+
+  script_tag(name:"summary", value:"This host is running Syncrify, an incremental, and cloud-ready backup
+that implements the rsync protocol over HTTP.");
+  script_xref(name:"URL", value:"http://web.synametrics.com/Syncrify.htm");
+  exit(0);
 }
 
 
@@ -77,7 +75,7 @@ if("Syncrify" >< buf && "Synametrics Technologies" && "Fast incremental backup" 
        vers=chomp(version[1]);
        if(!isnull(version[2])) {
          vers = vers + "." + version[2]; # ver string: Version: 2.1 build 420 -> version in kb 2.1.420
-       }	 
+       }
     }
 
     set_kb_item(name: string("www/", port, "/syncrify"), value: string(vers," under ",install));
